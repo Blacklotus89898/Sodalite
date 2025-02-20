@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple HTML Page with JS</title>
+</head>
+<body>
+    <h1>Hello, World!</h1>
+    <p id="message">Waiting for message from parent...</p>
+    <button id="sendMessageBackButton">Send Message Back to Parent</button>
+
+    <script>
+        // Function to display an alert message
+        function displayMessage() {
+            alert('Hello from JavaScript!');
+        }
+
+        // Listener to handle messages received from the parent window
+        window.addEventListener('message', (event) => {
+            // Ensure the message is from the expected origin
+            // Update the message paragraph with the received data
+            document.getElementById('message').textContent = event.data;
+            console.log('Received message from parent:', event.data);
+        });
+
+        // Add an event listener to the button to send a message back to the parent window
+        document.getElementById('sendMessageBackButton').addEventListener('click', () => {
+            const message = 'Hello from the iframe!';
+            window.parent.postMessage(message, '*');
+            console.log('Sent message to parent:', message);
+        });
+    </script>
+</body>
+</html>
