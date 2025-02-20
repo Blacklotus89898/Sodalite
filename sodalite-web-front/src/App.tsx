@@ -5,15 +5,25 @@ import { CanvaShare } from './components/canvaShare'
 import { AudioIntensity } from './components/audioIntensity'
 import Sandbox from './sandbox/sandbox'
 import { Container } from './components/container'
+import { Iframe } from './components/iframe'
 
 function App() {
   // const [count, setCount] = useState(0)
-
+  const wikiProps = {
+    link: 'https://en.wikipedia.org/wiki/Main_Page',
+    name: 'Wikipedia'
+  }
+  
   return (
     <>
     <Container>
     <Sandbox></Sandbox>
     </Container>
+  
+    <Container>
+    <Iframe>{wikiProps}</Iframe>
+    </Container>
+  
     <Container>
     <AudioIntensity></AudioIntensity>
     </Container>

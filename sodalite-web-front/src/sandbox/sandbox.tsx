@@ -1,9 +1,11 @@
 import React from 'react';
 import { useEffect, useRef } from 'react';
+import { useData } from '../stores/dataContext';
 
 const Sandbox: React.FC = () => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const [message, setMessage] = React.useState<string>('Waiting for child answer...');
+    // const [message, setMessage] = React.useState<string>('Waiting for child answer...');
+    const { message, setMessage } = useData();
     useEffect(() => {
         const handleChildMessage = (event: MessageEvent) => {
             console.log('Message received from child:', event.data);
@@ -42,3 +44,5 @@ const Sandbox: React.FC = () => {
 };
 
 export default Sandbox;
+
+
