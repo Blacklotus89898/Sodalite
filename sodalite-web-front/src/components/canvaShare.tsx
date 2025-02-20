@@ -1,32 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 import { Container } from './container';
+import { WebSocketService } from '../services/webSocketService';
 
 export const CanvaShare: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDrawing = useRef(false);
-    const wsRef = useRef<WebSocket | null>(null);
+    const wsServiceRef = useRef<WebSocketService | null>(null);
 
-    // make it a togglable feature for websocket or not
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Initialize WebSocket connection
-        wsRef.current = new WebSocket('ws://192.168.0.103:8080');
-
-        // Handle incoming messages
-        wsRef.current.onmessage = async event => {
-            console.log('Received data:', event.data); // Log the received data
-            try {
-                const text = await event.data.text();
-                const data = JSON.parse(text);
-                drawFromServer(data, ctx);
-            } catch (error) {
-                console.error('Error parsing JSON:', error);
-            }
-        };
+        // Initialize WebSocket service
+        wsServiceRef.current = new WebSocketService('ws://192.168.0.103:8080');
+        wsServiceRef.current.connect((data) => drawFromServer(data as { startX: number, startY: number, x: number, y: number }, ctx));
 
         const drawFromServer = (data: { startX: number, startY: number, x: number, y: number }, ctx: CanvasRenderingContext2D) => {
             ctx.beginPath();
@@ -75,13 +64,14 @@ export const CanvaShare: React.FC = () => {
             ctx.stroke();
 
             // Send drawing data to server
-            if (wsRef.current) {
-                wsRef.current.send(JSON.stringify({
+            if (wsServiceRef.current) {
+                wsServiceRef.current.send({
+                    group: 'drawing',
                     startX: pos.x,
                     startY: pos.y,
                     x: pos.x,
                     y: pos.y
-                }));
+                });
             }
         };
 
@@ -112,8 +102,8 @@ export const CanvaShare: React.FC = () => {
             canvas.removeEventListener('touchend', stopDrawing);
             canvas.removeEventListener('touchcancel', stopDrawing);
 
-            if (wsRef.current) {
-                wsRef.current.close();
+            if (wsServiceRef.current) {
+                wsServiceRef.current.close();
             }
         };
     }, []);
@@ -122,7 +112,7 @@ export const CanvaShare: React.FC = () => {
         <div>
             <h1>Canva Share Component</h1>
             <Container>
-            <canvas id="canvas" ref={canvasRef}></canvas>
+                <canvas id="canvas" ref={canvasRef}></canvas>
             </Container>
         </div>
     );

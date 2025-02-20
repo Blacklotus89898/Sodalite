@@ -6,6 +6,8 @@ import { AudioIntensity } from './components/audioIntensity'
 import Sandbox from './sandbox/sandbox'
 import { Container } from './components/container'
 import { Iframe } from './components/iframe'
+import { ChatApp } from './components/chatApp'
+import CollabApp from './components/collabApp'
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -13,9 +15,14 @@ function App() {
     link: 'https://en.wikipedia.org/wiki/Main_Page',
     name: 'Wikipedia'
   }
-  
+
   return (
     <>
+    <Container>
+      <ChatApp></ChatApp>
+      <CollabApp></CollabApp>
+    </Container>
+
     <Container>
     <Sandbox></Sandbox>
     </Container>
