@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 
 interface SidebarProps {
     items: { label: string, href: string }[];
     position: string;
+    children?: ReactNode;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ items, position }) => {
+const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const toggleSidebar = () => {
@@ -27,30 +28,33 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position }) => {
             height: '100vh',
             overflowY: 'auto'
         }}>
-            <button 
-                onClick={toggleSidebar} 
+            <button
+                onClick={toggleSidebar}
                 style={{
                     background: 'none',
                     border: 'none',
                     color: 'white',
                     cursor: 'pointer',
-                    marginBottom: '20px'
-                }}
-            >
-                {isCollapsed ? '>' : '<'}
+                    marginBottom: '20px',
+                    paddingTop: '40vh',
+                }}>
+                {position === "left" ? (isCollapsed ? '>' : '<') : (isCollapsed ? '<' : '>')}
             </button>
             {!isCollapsed && (
-                <nav>
-                    <ul style={{listStyle: 'none', padding: 0}}>
-                        {items.map((item, index) => (
-                            <li key={index}>
-                                <a href={item.href} style={{color: 'white', textDecoration: 'none'}}>
-                                    {item.label}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                <>
+                    <nav>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            {items.map((item, index) => (
+                                <li key={index}>
+                                    <a href={item.href} style={{ color: 'white', textDecoration: 'none' }}>
+                                        {item.label}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                    {children}
+                </>
             )}
         </div>
     );
