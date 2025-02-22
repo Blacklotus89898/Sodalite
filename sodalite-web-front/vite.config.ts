@@ -4,4 +4,8 @@ import react from '@vitejs/plugin-react-swc'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    // port: 3000, // for static port
+    host: '0.0.0.0', // Allows access from external devices
+  },
 })

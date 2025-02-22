@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { WebSocketService } from '../services/webSocketService';
+import { WebSocketService } from '../services/websocketService';
 
 export const ChatApp: React.FC = () => {
   const [messages, setMessages] = useState<{ message: string; group: string }[]>([]);

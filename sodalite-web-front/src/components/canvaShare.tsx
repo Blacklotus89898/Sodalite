@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Container } from './container';
-import { WebSocketService } from '../services/webSocketService';
+import { WebSocketService } from '../services/websocketService';
 
 export const CanvaShare: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);

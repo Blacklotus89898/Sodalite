@@ -1,65 +1,76 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { CanvaShare } from './components/canvaShare'
-import { AudioIntensity } from './components/audioIntensity'
-import Sandbox from './sandbox/sandbox'
-import { Container } from './components/container'
-import { Iframe } from './components/iframe'
-import { ChatApp } from './components/chatApp'
-import CollabApp from './components/collabApp'
+import { CanvaShare } from './components/canvaShare';
+import { AudioIntensity } from './components/audioIntensity';
+import Sandbox from './sandbox/sandbox';
+import { Container } from './components/container';
+import { Iframe } from './components/iframe';
+import { ChatApp } from './components/chatApp';
+import CollabApp from './components/collabApp';
+import Sidebar from './components/sidebar';
+import Header from './components/header';
+import Footer from './components/footer';
+import ServerSettings from './components/serverSettings';
+
+const wikiProps = {
+  link: 'https://en.wikipedia.org/wiki/Main_Page',
+  name: 'Wikipedia',
+};
+
+const sidebarItems = [
+  { label: 'Chat', href: '#ChatApp' },
+  { label: 'Sandbox', href: '#sandbox' },
+  { label: 'Iframe', href: '#Iframe' },
+  { label: 'Audio Intensity', href: '#AudioIntensity' },
+  { label: 'Canva Share', href: '#CanvaShare' },
+];
 
 function App() {
-  // const [count, setCount] = useState(0)
-  const wikiProps = {
-    link: 'https://en.wikipedia.org/wiki/Main_Page',
-    name: 'Wikipedia'
-  }
-
   return (
-    <>
-    <Container>
-      <ChatApp></ChatApp>
-      <CollabApp></CollabApp>
-    </Container>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ display: 'flex', flex: 1 }}>
+        <Sidebar items={sidebarItems} position='left' />
 
-    <Container>
-    <Sandbox></Sandbox>
-    </Container>
-  
-    <Container>
-    <Iframe>{wikiProps}</Iframe>
-    </Container>
-  
-    <Container>
-    <AudioIntensity></AudioIntensity>
-    </Container>
-    <Container>
-    <CanvaShare></CanvaShare>
-    </Container>
+        <div style={{ flex: 1, margin: '3em', marginTop: '0px' }}>
+          <Section id="ChatApp">
+            <Container>
+              <ChatApp />
+              <CollabApp />
+            </Container>
+          </Section>
+          <Section id="sandbox">
+            <Container>
+              <Sandbox />
+            </Container>
+          </Section>
+          <Section id="Iframe">
+            <Container>
+              <Iframe children={wikiProps} />
+            </Container>
+          </Section>
+          <Section id="AudioIntensity">
+            <Container>
+              <AudioIntensity />
+            </Container>
+          </Section>
+          <Section id="CanvaShare">
+            <Container>
+              <CanvaShare />
+            </Container>
+          </Section>
+        </div>
 
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <Sidebar items={sidebarItems} position='right' children={<ServerSettings />} />
       </div>
-      {/* <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
-    </>
-  )
+
+      <Footer></Footer>
+    </div>
+  );
 }
 
-export default App
+const Section = ({ id, children }: { id: string, children: React.ReactNode }) => (
+  <div id={id} style={{ marginBottom: '16px' }}>
+    {children}
+  </div>
+);
+
+export default App;
