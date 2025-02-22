@@ -1,0 +1,20 @@
+{
+  "name": "servers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node drawing_ws_server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^22.13.4",
+    "@types/ws": "^8.5.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "ws": "^8.18.0"
+  }
+}
