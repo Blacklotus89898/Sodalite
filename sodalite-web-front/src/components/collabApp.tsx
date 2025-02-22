@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { WebSocketService } from '../services/websocketService';
+import { useServer } from '../stores/hooks';
 
 const CollabApp: React.FC = () => {
+    const { address } = useServer();
     const [content, setContent] = useState('');
     const wsServiceRef = useRef<WebSocketService | null>(null);
 
     useEffect(() => {
-        wsServiceRef.current = new WebSocketService('ws://localhost:8080');
+        wsServiceRef.current = new WebSocketService(address['websocketServer']);
+
         wsServiceRef.current.connect((data: unknown) => {
             const parsedData = data as { content: string };
             setContent(parsedData.content);
@@ -17,7 +20,7 @@ const CollabApp: React.FC = () => {
                 wsServiceRef.current.close();
             }
         };
-    }, []);
+    }, [address]);
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const newContent = e.target.value;

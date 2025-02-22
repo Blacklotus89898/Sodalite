@@ -7,7 +7,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
 
     const toggleSidebar = () => {
         setIsCollapsed(!isCollapsed);
@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
                     color: 'white',
                     cursor: 'pointer',
                     marginBottom: '20px',
-                    paddingTop: '40vh',
+                    paddingTop: '20vh',
                 }}>
                 {position === "left" ? (isCollapsed ? '>' : '<') : (isCollapsed ? '<' : '>')}
             </button>

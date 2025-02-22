@@ -13,7 +13,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
 export const ServerProvider = ({ children }: { children: ReactNode }) => {
     const [address, setAddressState] = useState<{ [key: string]: string }>({
-        server1: '192.168.1.1', // Example default address
+        websocketServer: 'ws://192.168.0.103:8080', // Example default address
         server2: '192.168.1.2', // Another example default address
     });
     const setAddress = (key: string, address: string) => setAddressState((prev) => ({ ...prev, [key]: address }));

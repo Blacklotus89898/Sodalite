@@ -1,20 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { Container } from './container';
 import { WebSocketService } from '../services/websocketService';
+import { useServer } from '../stores/hooks';
 
 export const CanvaShare: React.FC = () => {
+    const { address } = useServer();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDrawing = useRef(false);
     const wsServiceRef = useRef<WebSocketService | null>(null);
 
     useEffect(() => {
+
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         // Initialize WebSocket service
-        wsServiceRef.current = new WebSocketService('ws://192.168.0.103:8080');
+        wsServiceRef.current = new WebSocketService(address['websocketServer']);
         wsServiceRef.current.connect((data) => drawFromServer(data as { startX: number, startY: number, x: number, y: number }, ctx));
 
         const drawFromServer = (data: { startX: number, startY: number, x: number, y: number }, ctx: CanvasRenderingContext2D) => {
@@ -106,7 +109,7 @@ export const CanvaShare: React.FC = () => {
                 wsServiceRef.current.close();
             }
         };
-    }, []);
+    }, [address]);
 
     return (
         <div>

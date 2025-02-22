@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { WebSocketService } from '../services/websocketService';
+import { useServer } from '../stores/hooks';
 
 export const ChatApp: React.FC = () => {
+  const { address } = useServer();
   const [messages, setMessages] = useState<{ message: string; group: string }[]>([]);
   const [input, setInput] = useState<string>('');
   const [group, setGroup] = useState<string>('default');
@@ -9,7 +11,8 @@ export const ChatApp: React.FC = () => {
 
   useEffect(() => {
     // Initialize WebSocket service
-    wsServiceRef.current = new WebSocketService('ws://192.168.0.103:8080');
+    wsServiceRef.current = new WebSocketService(address['websocketServer']);
+
     wsServiceRef.current.connect((data) => {
       console.log('Received:', data);
       setMessages((prevMessages) => [...prevMessages, data as { message: string; group: string }]);
@@ -20,7 +23,7 @@ export const ChatApp: React.FC = () => {
         wsServiceRef.current.close();
       }
     };
-  }, []);
+  }, [address]);
 
   const sendMessage = () => {
     if (wsServiceRef.current && input.trim()) {
