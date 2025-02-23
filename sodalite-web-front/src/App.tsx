@@ -31,15 +31,15 @@ function App() {
         <Sidebar items={sidebarItems} position='left' />
 
         <div style={{ flex: 1, margin: '3em', marginTop: '0px' }}>
+          <Section id="sandbox">
+            <Container>
+              <Sandbox />
+            </Container>
+          </Section>
           <Section id="ChatApp">
             <Container>
               <ChatApp />
               <CollabApp />
-            </Container>
-          </Section>
-          <Section id="sandbox">
-            <Container>
-              <Sandbox />
             </Container>
           </Section>
           <Section id="Iframe">
