@@ -162,10 +162,10 @@ const textareaStyle = {
 };
 
 // Input hover and focus styles
-const inputHoverStyle = {
-  ...inputStyle,
-  backgroundColor: '#111',
-  border: '1px solid #888',
-};
+// const inputHoverStyle = {
+//   ...inputStyle,
+//   backgroundColor: '#111',
+//   border: '1px solid #888',
+// };
 
 export default ProfileComponent;

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 export const AudioIntensity: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [intensity, setIntensity] = useState<number>(0);
-  const [containerWidth, setContainerWidth] = useState<number>(900); // Default width
+  const [, setContainerWidth] = useState<number>(900); // Default width
 
   useEffect(() => {
     // Step 1: Request Microphone Access

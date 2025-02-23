@@ -48,3 +48,67 @@ export default tseslint.config({
   },
 })
 ```
+
+## Running in Development
+
+To run the project in development mode, use the following commands:
+
+1. Install the dependencies:
+
+```sh
+npm install
+```
+
+2. Start the development server:
+
+```sh
+npm run dev
+```
+
+This will start the Vite development server with hot module replacement (HMR) enabled.
+
+## Deploying to GitHub Pages
+
+To deploy the project to GitHub Pages, follow these steps:
+
+1. Install the `gh-pages` package as a development dependency:
+
+```sh
+npm install gh-pages --save-dev
+```
+
+2. Add the following scripts to your `package.json`:
+
+```json
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+}
+```
+
+3. Update the `vite.config.ts` file to set the `base` option to the repository name:
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/your-repo-name/', // Replace 'your-repo-name' with the name of your GitHub repository
+})
+```
+
+4. Deploy the project to GitHub Pages:
+
+```sh
+npm run deploy
+```
+
+This will build the project and deploy the contents of the `dist` directory to the `gh-pages` branch of your repository.
+
+Make sure to replace `your-repo-name` with the actual name of your GitHub repository.
+
+With these instructions, you should be able to run the project in development mode and deploy it to GitHub Pages.

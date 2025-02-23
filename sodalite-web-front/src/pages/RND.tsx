@@ -12,7 +12,7 @@ interface RNDProps {
 }
 
 
-const RND: React.FC<HomeProps> = ({ title, description, count, onClick }) => {
+const RND: React.FC<RNDProps> = ({ title }) => {
     return (
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "RND"}</h1>

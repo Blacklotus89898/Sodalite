@@ -18,7 +18,7 @@ const Sandbox: React.FC = () => {
         return () => {
             window.removeEventListener('message', handleChildMessage);
         };
-    }, []);
+    }, [setMessage]);
 
     const sendMessageToIframe = () => {
         const message = 'Hello from parent';
