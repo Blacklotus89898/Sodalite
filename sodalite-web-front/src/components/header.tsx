@@ -68,8 +68,9 @@ const Header: React.FC = () => {
 
             {/* Scrollable Dropdown Menu */}
             <div style={dropdownStyle}>
-                <Link to="/" style={linkStyle}>Dashboard</Link>
+                <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
                 <Link to="/home" style={linkStyle}>Home</Link>
+                <Link to="/rnd" style={linkStyle}>RND</Link>
                 <Link to="/sandbox" style={linkStyle}>Sandbox</Link>
                 <Link to="/notfound" style={linkStyle}>NotFound</Link>
                 <a href="#ChatApp" style={linkStyle}>Chat</a>

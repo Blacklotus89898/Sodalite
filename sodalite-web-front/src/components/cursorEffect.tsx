@@ -5,12 +5,12 @@ const CursorEffect = () => {
   const [isMoving, setIsMoving] = useState(false);
 
   interface Trail {
-    id: string; // Unique ID for each trail element
+    id: string;
     x: number;
     y: number;
-    size: number; // Size of the trail dot
-    opacity: number; // Opacity for fading effect
-    color: string; // Trail color (hot to cold gradient)
+    size: number;
+    opacity: number;
+    color: string;
   }
 
   const [trail, setTrail] = useState<Trail[]>([]);
@@ -21,17 +21,15 @@ const CursorEffect = () => {
       setPosition({ x: e.clientX + window.scrollX, y: e.clientY + window.scrollY });
       setIsMoving(true);
 
-      // Create a new trail with a unique id based on timestamp and random number
       const newTrail: Trail = {
         id: `${Date.now()}-${Math.random()}`, // Unique ID
         x: e.clientX + window.scrollX,
         y: e.clientY + window.scrollY,
-        size: 10, // Initial size of the trail dot
-        opacity: 1, // Initial opacity of the trail dot
+        size: 10,
+        opacity: 1,
         color: "red", // Start with red color for the trail
       };
 
-      // Add the new trail point
       setTrail((prev) => [...prev, newTrail]);
     };
 
@@ -54,22 +52,28 @@ const CursorEffect = () => {
       setTrail((prev) =>
         prev
           .map((t) => {
-            // Easing function to create quicker color change at the start
-            // The closer opacity is to 1, the faster the color change
-            const easedOpacity = 1 - Math.pow(1 - t.opacity, 2); // Squared easing function for quicker start and slower end
-            const hue = Math.max(0, 240 * easedOpacity); // From red (0) to blue (240) as opacity decreases
+            const easedOpacity = 1 - Math.pow(1 - t.opacity, 2); // Squared easing for quicker color change
+            const hue = Math.max(0, 240 * easedOpacity); // Color transition from red (0) to blue (240)
             return {
               ...t,
-              size: Math.max(t.size - 0.5, 3), // Shrink the size but maintain a minimum size
-              opacity: Math.max(t.opacity - 0.05, 0), // Fade out the trail points
-              color: `hsl(${hue}, 100%, 50%)`, // Hot to cold gradient (Red to Blue)
+              size: Math.max(t.size - 0.5, 3),
+              opacity: Math.max(t.opacity - 0.05, 0),
+              color: `hsl(${hue}, 100%, 50%)`,
             };
           })
-          .filter((t) => t.opacity > 0) // Remove fully faded trails
+          .filter((t) => t.opacity > 0)
       );
-    }, 30); // Update every 30ms for a smoother effect
+    }, 30);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Make the default cursor invisible by adding 'cursor: none' to the body
+  useEffect(() => {
+    document.body.style.cursor = "none"; // Hide the default cursor
+    return () => {
+      document.body.style.cursor = ""; // Restore the cursor on cleanup
+    };
   }, []);
 
   return (
@@ -86,17 +90,17 @@ const CursorEffect = () => {
       {/* Cursor trail effects */}
       {trail.map((t) => (
         <div
-          key={t.id} // Using the unique id for each trail element
+          key={t.id}
           style={{
             position: "absolute",
-            left: `${t.x - t.size / 2}px`, // Adjust position based on size
-            top: `${t.y - t.size / 2}px`, // Adjust position based on size
-            width: `${t.size}px`, // Shrinking size
-            height: `${t.size}px`, // Shrinking size
+            left: `${t.x - t.size / 2}px`,
+            top: `${t.y - t.size / 2}px`,
+            width: `${t.size}px`,
+            height: `${t.size}px`,
             borderRadius: "50%",
-            backgroundColor: t.color, // Changing color for the trail (hot to cold gradient)
+            backgroundColor: t.color,
             opacity: t.opacity,
-            transition: "all 0.1s ease-out", // Smooth transition for the shrinking/fading effect
+            transition: "all 0.1s ease-out",
           }}
         />
       ))}

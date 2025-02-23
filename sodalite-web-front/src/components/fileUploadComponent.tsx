@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { FileUploadService } from "../services/fileuploadService"; // Make sure the path is correct
 
 const fileUploadService = new FileUploadService("http://localhost:8081");
@@ -72,40 +72,47 @@ const FileUploadComponent = () => {
     }, []);
 
     return (
-        <div>
-            <h1>Text Editor Component</h1>
-            <input type="file" onChange={handleFileChange} />
+        <div style={containerStyle}>
+            <h1 style={headerStyle}>Text Editor Component</h1>
+            <input
+                type="file"
+                onChange={handleFileChange}
+                style={inputStyle}
+            />
+            <button onClick={() => handleFileChange}>New File</button>
             <input
                 type="text"
                 value={filename}
                 onChange={handleFilenameChange}
                 placeholder="Enter filename"
+                style={inputStyle}
             />
             <textarea
                 value={fileContent}
                 onChange={(e) => setFileContent(e.target.value)}
                 rows={10}
                 cols={50}
+                style={textareaStyle}
             />
-            <button onClick={handleFileUpload}>Upload</button>
+            <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
 
             {uploadedFile && (
-                <div>
+                <div style={fileInfoStyle}>
                     <h2>Uploaded File</h2>
                     <p>
-                        <a href={`http://localhost:8081/uploads/${uploadedFile}`} target="_blank" rel="noopener noreferrer">
+                        <a href={`http://localhost:8081/uploads/${uploadedFile}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
                             {uploadedFile}
                         </a>
                     </p>
                 </div>
             )}
 
-            <div>
+            <div style={fileListStyle}>
                 <h2>Uploaded Files</h2>
-                <ul>
+                <ul style={fileListItemStyle}>
                     {files.map((file, index) => (
-                        <li key={index}>
-                            <a href={`http://localhost:8081/uploads/${file}`} target="_blank" rel="noopener noreferrer">
+                        <li key={index} style={listItemStyle}>
+                            <a href={`http://localhost:8081/uploads/${file}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
                                 {file}
                             </a>
                         </li>
@@ -117,3 +124,82 @@ const FileUploadComponent = () => {
 };
 
 export default FileUploadComponent;
+
+// Dark theme styling
+const containerStyle = {
+    padding: '20px',
+    backgroundColor: '#333',
+    color: '#fff',
+    borderRadius: '10px',
+    maxWidth: '800px',
+    margin: 'auto',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+    textAlign: 'center' as const,
+};
+
+const headerStyle = {
+    fontSize: '28px',
+    marginBottom: '20px',
+    color: '#fff',
+    fontWeight: 'bold',
+};
+
+const inputStyle = {
+    padding: '10px',
+    marginBottom: '15px',
+    width: '100%',
+    backgroundColor: '#555',
+    color: '#fff',
+    border: '1px solid #444',
+    borderRadius: '5px',
+    fontSize: '16px',
+    boxSizing: 'border-box' as const,
+};
+
+const textareaStyle = {
+    padding: '10px',
+    marginBottom: '20px',
+    width: '100%',
+    height: '150px',
+    backgroundColor: '#555',
+    color: '#fff',
+    border: '1px solid #444',
+    borderRadius: '5px',
+    fontSize: '16px',
+    resize: 'none' as const,
+    boxSizing: 'border-box' as const,
+};
+
+const buttonStyle = {
+    padding: '10px 20px',
+    backgroundColor: '#3498db',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+};
+
+const fileInfoStyle = {
+    marginTop: '20px',
+    color: '#ddd',
+};
+
+const linkStyle = {
+    color: '#3498db',
+    textDecoration: 'none',
+};
+
+const fileListStyle = {
+    marginTop: '20px',
+    color: '#ddd',
+};
+
+const fileListItemStyle = {
+    listStyleType: 'none',
+    padding: '0',
+};
+
+const listItemStyle = {
+    marginBottom: '10px',
+};

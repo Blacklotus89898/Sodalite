@@ -13,8 +13,8 @@ const ThreeDProjection = () => {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.width = 500;
+        canvas.height = 500;
 
         const center = { x: canvas.width / 2, y: canvas.height / 2 };
 
@@ -25,8 +25,32 @@ const ThreeDProjection = () => {
             { x: 50, y: 50, z: 50 } // New point
         ];
 
+        const drawGrid = () => {
+            const gridSpacing = 50;
+            const gridLines = 20;
+
+            // Draw horizontal grid lines
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 0.5;
+            for (let i = -gridLines; i < gridLines; i++) {
+                ctx.beginPath();
+                ctx.moveTo(center.x + i * gridSpacing, 0);
+                ctx.lineTo(center.x + i * gridSpacing, canvas.height);
+                ctx.stroke();
+            }
+
+            // Draw vertical grid lines
+            for (let i = -gridLines; i < gridLines; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, center.y + i * gridSpacing);
+                ctx.lineTo(canvas.width, center.y + i * gridSpacing);
+                ctx.stroke();
+            }
+        };
+
         const drawAxes = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid(); // Draw the grid
 
             const cosX = Math.cos(angleX);
             const sinX = Math.sin(angleX);

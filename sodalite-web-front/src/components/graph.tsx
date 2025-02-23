@@ -76,7 +76,11 @@ const GraphComponent: React.FC<GraphComponentProps> = ({ xValues, yValues, type 
         }
     }, [xValues, yValues, type]);
 
-    return <canvas ref={canvasRef} width={600} height={400} />;
+    return (
+        <div>
+            <canvas ref={canvasRef} width={600} height={400} />
+        </div>
+    );
 };
 
 export default GraphComponent;

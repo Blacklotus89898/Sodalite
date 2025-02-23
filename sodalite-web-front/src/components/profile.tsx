@@ -59,42 +59,113 @@ const ProfileComponent: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Profile Component</h1>
-      <div>
-        <label>Load Profile from JSON File:</label>
-        <input type="file" accept=".json" onChange={handleFileChange} />
+    <div style={{ padding: '20px', backgroundColor: '#000', borderRadius: '8px', color: 'white', maxWidth: '800px', margin: '0 auto' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Profile Component</h1>
+
+      {/* Load Profile from JSON File */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ fontSize: '16px', marginBottom: '10px' }}>Load Profile from JSON File:</label>
+        <input type="file" accept=".json" onChange={handleFileChange} style={{ padding: '10px', backgroundColor: '#444', border: 'none', borderRadius: '5px', color: 'white' }} />
       </div>
-      <div>
-        <label>Manual Input:</label>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="userName" value={profile.userName} onChange={handleInputChange} />
+
+      {/* Manual Input Section */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ fontSize: '20px', paddingBottom: "10px", marginBottom: '20px' }}>Manual Input:</label>
+        <div style={{ marginBottom: '10px' }}>
+          <label style={{ fontSize: '14px' }}>Username:</label>
+          <input
+            type="text"
+            name="userName"
+            value={profile.userName}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
         </div>
-        <div>
-          <label>Theme:</label>
-          <input type="text" name="theme" value={profile.theme} onChange={handleInputChange} />
+        <div style={{ marginBottom: '10px' }}>
+          <label style={{ fontSize: '14px' }}>Theme:</label>
+          <input
+            type="text"
+            name="theme"
+            value={profile.theme}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
         </div>
-        <div>
-          <label>Chroma:</label>
-          <input type="text" name="chroma" value={profile.chroma} onChange={handleInputChange} />
+        <div style={{ marginBottom: '10px' }}>
+          <label style={{ fontSize: '14px' }}>Chroma:</label>
+          <input
+            type="text"
+            name="chroma"
+            value={profile.chroma}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
         </div>
-        <div>
-          <label>App List (one per line):</label>
-          <textarea name="appList" value={profile.appList.join('\n')} onChange={handleAppListChange} rows={5} cols={30} />
+        <div style={{ marginBottom: '10px' }}>
+          <label style={{ fontSize: '14px' }}>App List (one per line):</label>
+          <textarea
+            name="appList"
+            value={profile.appList.join('\n')}
+            onChange={handleAppListChange}
+            rows={5}
+            style={textareaStyle}
+          />
         </div>
       </div>
-      <div>
-        <label>Load Profile from JSON String:</label>
-        <textarea value={jsonInput} onChange={handleJsonInputChange} rows={5} cols={30} />
-        <button onClick={handleLoadJson}>Load JSON</button>
+
+      {/* Load Profile from JSON String */}
+      <div style={{ marginBottom: '20px' }}>
+        <label style={{ fontSize: '16px', marginBottom: '10px' }}>Load Profile from JSON String:</label>
+        <textarea
+          value={jsonInput}
+          onChange={handleJsonInputChange}
+          rows={5}
+          style={textareaStyle}
+        />
+        <button
+          onClick={handleLoadJson}
+          style={{ padding: '10px 20px', backgroundColor: '#444', border: 'none', borderRadius: '5px', color: 'white', cursor: 'pointer', marginTop: '10px' }}
+        >
+          Load JSON
+        </button>
       </div>
-      <div>
-        <h2>Profile Preview:</h2>
-        <pre>{JSON.stringify(profile, null, 2)}</pre>
+
+      {/* Profile Preview */}
+      <div style={{ backgroundColor: '#222', padding: '20px', borderRadius: '8px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Profile Preview:</h2>
+        <pre style={{ color: '#ddd', backgroundColor: '#333', padding: '10px', borderRadius: '5px' }}>{JSON.stringify(profile, null, 2)}</pre>
       </div>
     </div>
   );
+};
+
+// Reusable styles for input and textarea
+const inputStyle = {
+  width: '100%',
+  padding: '10px',
+  backgroundColor: '#000',
+  border: '1px solid #444',
+  borderRadius: '5px',
+  color: 'white',
+  marginBottom: '10px',
+  transition: 'background-color 0.3s ease, border 0.3s ease',
+};
+
+const textareaStyle = {
+  width: '100%',
+  padding: '10px',
+  backgroundColor: '#000',
+  border: '1px solid #444',
+  borderRadius: '5px',
+  color: 'white',
+  transition: 'background-color 0.3s ease, border 0.3s ease',
+};
+
+// Input hover and focus styles
+const inputHoverStyle = {
+  ...inputStyle,
+  backgroundColor: '#111',
+  border: '1px solid #888',
 };
 
 export default ProfileComponent;

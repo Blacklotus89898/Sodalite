@@ -8,4 +8,5 @@ export default defineConfig({
     // port: 3000, // for static port
     host: '0.0.0.0', // Allows access from external devices
   },
+  base: '/Sodalite/',
 })

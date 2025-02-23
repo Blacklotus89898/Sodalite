@@ -51,6 +51,9 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
             {/* Sidebar Content */}
             {!isCollapsed && (
                 <>
+                     <div style={{ marginTop: 'auto', paddingBottom: '20px', width: '100%' }}>
+                        {children}
+                    </div>
                     <nav style={{ marginTop: '50px', width: '100%' }}>
                         <ul style={{ listStyle: 'none', padding: 0, width: '100%' }}>
                             {items.map((item, index) => (
@@ -74,9 +77,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
                             ))}
                         </ul>
                     </nav>
-                    <div style={{ marginTop: 'auto', paddingBottom: '20px', width: '100%' }}>
-                        {children}
-                    </div>
+               
                 </>
             )}
         </div>
