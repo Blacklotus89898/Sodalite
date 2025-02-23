@@ -1,4 +1,24 @@
 # Sodalite
+
 This project aims to provide an interactive dashboard for students to collaborate and work together.
 
-Trying to make it native.
+## Web Application
+
+You can access the web application at the following link: [Sodalite Web App](https://blacklotus89898.github.io/Sodalite/)
+
+## Features
+
+- Collaborative dashboard
+- Real-time updates
+- Interactive components
+- Drag-and-drop functionality
+
+## Running in Development
+
+To run the project in development mode, use the following commands:
+
+1. Clone the repository:
+
+```sh
+git clone https://github.com/blacklotus89898/Sodalite.git
+cd Sodalite/sodalite-web-front
