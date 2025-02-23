@@ -2,7 +2,7 @@ import { useState, ReactNode } from 'react';
 
 interface SidebarProps {
     items: { label: string, href: string }[];
-    position: string;
+    position: 'left' | 'right';
     children?: ReactNode;
 }
 
@@ -15,45 +15,68 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
 
     return (
         <div style={{
-            position: 'fixed',
+            position: 'sticky', // Makes the sidebar sticky
             [position]: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            top: '6em', // Adjust this to the height of your header to control where it sticks
+            backgroundColor: isCollapsed ? 'transparent' : 'rgba(0, 0, 0, 0.95)',  // Transparent when collapsed
             color: 'white',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
-            transition: 'width 0.3s ease-in-out',
-            width: isCollapsed ? '50px' : '200px',
-            top: "6em",
+            alignItems: isCollapsed ? 'center' : 'flex-start',
+            transition: 'width 0.3s ease-in-out, background-color 0.3s ease-in-out',
+            width: isCollapsed ? '60px' : '220px',
             height: '100vh',
-            overflowY: 'auto'
+            overflowY: 'auto',
+            padding: isCollapsed ? '10px 0' : '20px',
         }}>
+            {/* Toggle Button */}
             <button
                 onClick={toggleSidebar}
                 style={{
                     background: 'none',
                     border: 'none',
-                    color: 'white',
+                    color: isCollapsed ? 'black' : 'white',
                     cursor: 'pointer',
-                    marginBottom: '20px',
-                    paddingTop: '20vh',
-                }}>
-                {position === "left" ? (isCollapsed ? '>' : '<') : (isCollapsed ? '<' : '>')}
+                    fontSize: '20px',
+                    padding: '10px',
+                    transition: 'opacity 0.3s ease',
+                    position: 'absolute',
+                    top: '20px',
+                    [position]: isCollapsed ? '10px' : '180px', // Adjust position dynamically
+                }}
+            >
+                {isCollapsed ? (position === "left" ? '▶' : '◀') : (position === "left" ? '◀' : '▶')}
             </button>
+
+            {/* Sidebar Content */}
             {!isCollapsed && (
                 <>
-                    <nav>
-                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                    <nav style={{ marginTop: '50px', width: '100%' }}>
+                        <ul style={{ listStyle: 'none', padding: 0, width: '100%' }}>
                             {items.map((item, index) => (
-                                <li key={index}>
-                                    <a href={item.href} style={{ color: 'white', textDecoration: 'none' }}>
+                                <li key={index} style={{ margin: '10px 0', textAlign: 'center' }}>
+                                    <a
+                                        href={item.href}
+                                        style={{
+                                            color: 'white',
+                                            textDecoration: 'none',
+                                            padding: '10px',
+                                            display: 'block',
+                                            borderRadius: '5px',
+                                            transition: 'background 0.3s ease-in-out',
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                    >
                                         {item.label}
                                     </a>
                                 </li>
                             ))}
                         </ul>
                     </nav>
-                    {children}
+                    <div style={{ marginTop: 'auto', paddingBottom: '20px', width: '100%' }}>
+                        {children}
+                    </div>
                 </>
             )}
         </div>
