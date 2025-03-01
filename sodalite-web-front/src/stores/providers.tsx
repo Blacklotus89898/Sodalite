@@ -8,7 +8,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const [theme, setTheme] = useState("light");
-    return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
+    const [chroma, setChroma] = useState<string>("#ff0000"); 
+    return <ThemeContext.Provider value={{ theme, setTheme, chroma, setChroma }}>{children}</ThemeContext.Provider>;
 };
 
 export const ServerProvider = ({ children }: { children: ReactNode }) => {
@@ -28,3 +29,69 @@ export const AppProviders = ({ children }: { children: ReactNode }) => (
         </UserProvider>
     </ServerProvider>
 );
+
+
+// Improve with
+// import { createContext, useReducer, ReactNode, useContext, Dispatch } from 'react';
+
+// // Define the initial state and action types
+// type State = {
+//   user: string;
+//   theme: string;
+//   address: { [key: string]: string };
+// };
+
+// const initialState: State = {
+//   user: 'John Doe',
+//   theme: 'light',
+//   address: {
+//     websocketServer: 'ws://192.168.0.103:8080',
+//     fileServer: 'http://192.168.0.103:8081',
+//   },
+// };
+
+// type Action =
+//   | { type: 'SET_USER'; payload: string }
+//   | { type: 'SET_THEME'; payload: string }
+//   | { type: 'SET_ADDRESS'; payload: { key: string; address: string } };
+
+// // Create a reducer function
+// const reducer = (state: State, action: Action): State => {
+//   switch (action.type) {
+//     case 'SET_USER':
+//       return { ...state, user: action.payload };
+//     case 'SET_THEME':
+//       return { ...state, theme: action.payload };
+//     case 'SET_ADDRESS':
+//       return {
+//         ...state,
+//         address: { ...state.address, [action.payload.key]: action.payload.address },
+//       };
+//     default:
+//       return state;
+//   }
+// };
+
+// // Create the context
+// const GlobalContext = createContext<{
+//   state: State;
+//   dispatch: Dispatch<Action>;
+// }>({ state: initialState, dispatch: () => undefined });
+
+// export const GlobalProvider = ({ children }: { children: ReactNode }) => {
+//   const [state, dispatch] = useReducer(reducer, initialState);
+//   return (
+//     <GlobalContext.Provider value={{ state, dispatch }}>
+//       {children}
+//     </GlobalContext.Provider>
+//   );
+// };
+
+// // Custom hooks to use the context
+// export const useGlobalState = () => useContext(GlobalContext).state;
+// export const useGlobalDispatch = () => useContext(GlobalContext).dispatch;
+
+// // Wrapping the app
+// export const AppProviders = ({ children }: { children: ReactNode }) => (
+//   <GlobalProvider>{children}</GlobalProvider>
+// );

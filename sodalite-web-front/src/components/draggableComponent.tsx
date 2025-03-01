@@ -27,7 +27,7 @@ const ResizableDraggableComponent: React.FC<ResizableDraggableComponentProps> = 
   };
 
   const handleDragMove = async (e: MouseEvent) => {
-    await delay(50); // Add a delay of 100ms
+    // await delay(50); // Add a delay of 100ms
 
     if (!dragging) return;
     setPosition({
@@ -50,7 +50,7 @@ const ResizableDraggableComponent: React.FC<ResizableDraggableComponentProps> = 
 
   const handleResizeMove = async (e: MouseEvent) => {
 
-    await delay(200); // Add a delay of 100ms
+    // await delay(200); // Add a delay of 100ms
     if (!resizing) return;
 
     const deltaX = e.clientX - resizeStart.x;

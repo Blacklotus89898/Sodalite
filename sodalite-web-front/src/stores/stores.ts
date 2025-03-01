@@ -1,6 +1,14 @@
 import { createContext } from 'react';
 // Store for Theme
-export const ThemeContext = createContext<{ theme: string; setTheme: (theme: string) => void } | undefined>(undefined);
+type ThemeContextType = {
+    theme: string;
+    setTheme: (theme: string) => void;
+    chroma: string;
+    setChroma: (chroma: string) => void;
+};
+
+// Initialize context with `undefined` as before
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Store for User Data
 export const UserContext = createContext<{ user: string; setUser: (user: string) => void } | undefined>(undefined);

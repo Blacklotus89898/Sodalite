@@ -220,13 +220,19 @@ const intensityStyle = {
 };
 
 const buttonStyle = {
-  padding: '10px 15px',
+  // padding: '10px 15px',
+  // padding: '20px',
+
   backgroundColor: '#333',
   color: '#fff',
   border: 'none',
   borderRadius: '5px',
+  fontSize: '18px',
+
+  padding: '8px 12px',
   cursor: 'pointer',
   transition: 'background-color 0.2s',
+  fontWeight: 'bold',
 };
 
 const buttonActiveStyle = {

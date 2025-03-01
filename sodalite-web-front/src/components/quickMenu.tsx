@@ -31,7 +31,8 @@ const QuickMenu: React.FC<QuickMenuProps> = ({ options, onSelect, position, sele
                 height: "220px",
                 transform: "translate(-50%, -50%)",
                 borderRadius: "50%",
-                backgroundColor: "rgba(0, 0, 0, 1)", // Dark transparent background
+                // backgroundColor: "rgba(0, 0, 0, 1)", // Dark transparent background
+                backgroundColor: "transparent", // Dark transparent background
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
