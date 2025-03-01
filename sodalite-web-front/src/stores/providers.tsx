@@ -1,34 +1,77 @@
-import { useState, ReactNode } from "react";
-import { UserContext, ThemeContext, ServerContext } from "./stores";
+import { useState, ReactNode, useEffect } from "react";
+import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState } from "./stores";
 
+// User Provider Component
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState("John Doe");
+    const [user, setUser] = useState<string>("John Doe");
     return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };
 
+// Theme Provider Component
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const [theme, setTheme] = useState("light");
-    const [chroma, setChroma] = useState<string>("#ff0000"); 
+    const [theme, setTheme] = useState<string>("light");
+    const [chroma, setChroma] = useState<string>("#ff0000");
     return <ThemeContext.Provider value={{ theme, setTheme, chroma, setChroma }}>{children}</ThemeContext.Provider>;
 };
 
+// Server Provider Component
 export const ServerProvider = ({ children }: { children: ReactNode }) => {
     const [address, setAddressState] = useState<{ [key: string]: string }>({
         websocketServer: 'ws://192.168.0.103:8080', // Example default address
         fileServer: 'http://192.168.0.103:8081', // Another example default address
     });
-    const setAddress = (key: string, address: string) => setAddressState((prev) => ({ ...prev, [key]: address }));
+
+    const setAddress = (key: string, address: string) =>
+        setAddressState((prev) => ({ ...prev, [key]: address }));
+
     return <ServerContext.Provider value={{ address, setAddress }}>{children}</ServerContext.Provider>;
 };
 
-// Wrapping the app
+// Profile Provider Component
+export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [profile, setProfile] = useState<ProfileState>({
+        favoriteApp: [],
+        username: '',
+        theme: 'light', // default theme is light
+        chroma: '#4caf50', // default chroma color
+        streak: 0,
+    });
+
+    // Load the profile from localStorage or API on initial render
+    useEffect(() => {
+        const savedProfile = localStorage.getItem('profile');
+        if (savedProfile) {
+            try {
+                setProfile(JSON.parse(savedProfile));
+            } catch (error) {
+                console.error('Error parsing saved profile:', error);
+            }
+        }
+    }, []);
+
+    // Save the profile to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('profile', JSON.stringify(profile));
+    }, [profile]);
+
+    return (
+        <ProfileContext.Provider value={{ profile, setProfile }}>
+            {children}
+        </ProfileContext.Provider>
+    );
+};
+
+// Wrapping all providers together
 export const AppProviders = ({ children }: { children: ReactNode }) => (
-    <ServerProvider>
-        <UserProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-        </UserProvider>
-    </ServerProvider>
+    <ProfileProvider>
+        <ServerProvider>
+            <UserProvider>
+                <ThemeProvider>{children}</ThemeProvider>
+            </UserProvider>
+        </ServerProvider>
+    </ProfileProvider>
 );
+
 
 
 // Improve with

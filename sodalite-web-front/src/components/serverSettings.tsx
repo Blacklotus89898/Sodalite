@@ -115,7 +115,7 @@ const UpdateAddress = () => {
                             key={index}
                             style={key === selectedKey ? activeItemStyle : itemStyle} // Apply active item style conditionally
                             onClick={() => handleItemClick(key, addr)}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = hoverBackground}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = key === selectedKey ? chroma : itemStyle.backgroundColor as string}
                         >
                             <strong>{key}</strong>: {addr}
@@ -131,6 +131,8 @@ const UpdateAddress = () => {
                         onChange={(e) => setKey(e.target.value)}
                         placeholder="Enter server key (e.g., server1)"
                         style={inputStyle}
+                        onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                        onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
                         onFocus={(e) => e.target.style.border = `1px solid ${chroma}`}
                         onBlur={(e) => e.target.style.border = inputStyle.border as string}
                     />
@@ -140,6 +142,8 @@ const UpdateAddress = () => {
                         onChange={(e) => setNewAddress(e.target.value)}
                         placeholder="Enter new address"
                         style={inputStyle}
+                        onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                        onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
                         onFocus={(e) => e.target.style.border = `1px solid ${chroma}`}
                         onBlur={(e) => e.target.style.border = inputStyle.border as string}
                     />

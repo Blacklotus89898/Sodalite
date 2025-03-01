@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ThemeContext, UserContext, ServerContext } from "./stores";
+import { ThemeContext, UserContext, ServerContext, ProfileContext } from "./stores";
 
 // Custom Hooks
 export const useUser = () => {
@@ -18,6 +18,15 @@ export const useServer = () => {
     const context = useContext(ServerContext);
     if (!context) throw new Error("useServer must be used within a ServerProvider");
     return context;
+};
+
+// Custom hook to access profile state
+export const useProfile = () => {
+  const context = useContext(ProfileContext);
+  if (!context) {
+    throw new Error('useProfile must be used within a ProfileProvider');
+  }
+  return context;
 };
 
 

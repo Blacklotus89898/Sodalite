@@ -1,3 +1,5 @@
+// should be called context.ts
+
 import { createContext } from 'react';
 // Store for Theme
 type ThemeContextType = {
@@ -21,3 +23,31 @@ export const ServerContext = createContext<{
     address: {},
     setAddress: () => {},
 });
+
+
+
+// Define the interface for the Profile state
+export interface ProfileState {
+    favoriteApp: string[];
+    username: string;
+    theme: string;
+    chroma: string;
+    streak: number;
+  }
+  
+  // Define the default profile state
+  
+  // Create the Profile Context
+  export const ProfileContext = createContext<{
+    profile: ProfileState;
+    setProfile: React.Dispatch<React.SetStateAction<ProfileState>>;
+  }>({
+    profile: {
+        favoriteApp: [],
+        username: '',
+        theme: '',
+        chroma: '',
+        streak: 0,
+    },
+    setProfile: () => {},
+  });
