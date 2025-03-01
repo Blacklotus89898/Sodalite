@@ -10,7 +10,7 @@ const Timer: React.FC<TimerProps> = ({ initialTime }) => {
   const [inputTime, setInputTime] = useState(initialTime); // Input field value
 
   // Sound alert when the timer reaches zero
-  const sound = new Audio("none"); // Default beep sound
+  // const sound = new Audio("none"); // Default beep sound
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -23,7 +23,10 @@ const Timer: React.FC<TimerProps> = ({ initialTime }) => {
     } 
     // If the timer reaches zero, stop the interval and play the sound
     if (timeLeft === 0) {
-      sound.play();
+      // sound.play();
+    const utterance = new SpeechSynthesisUtterance("Times Up");
+    window.speechSynthesis.speak(utterance);
+
       setIsActive(false);
       window.alert("Time's up!");
     }

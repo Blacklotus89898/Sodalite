@@ -33,11 +33,11 @@ const RND: React.FC<RNDProps> = ({ title,  }) => {
             <ResizableDraggableComponent>
                 <div>Content goes here</div>
             </ResizableDraggableComponent>
-            <ManualRTC/> 
+            {/* <ManualRTC/>  */}
             <Weather/>
             <Iframe initialLink="https://wikipedia.com" name="Example" />
             <ThreeDProjection/>
-            {/* <Timer initialTime={5} /> */}
+            <Timer initialTime={5} />
             <Streak activityDates={["2023-01-01", "2023-01-02", "2023-01-02", "2023-01-03","2025-02-23", "2025-02-24", "2025-02-25", "2025-02-27", "2025-02-28"]} />
         </div>
     );
