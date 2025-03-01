@@ -35,12 +35,12 @@ const About = () => <h2>About</h2>;
 const Contact = () => <h2>Contact</h2>;
 
 function App() {
-
-
   const [showMenu, setShowMenu] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [selectedOption, setSelectedOption] = useState<string | null>(null); // Store selected option
+  const [showSearch, setShowSearch] = useState(false); // State for spotlight search bar
+  const [searchQuery, setSearchQuery] = useState(''); // State for the search query
 
   const options = ["Option 1", "Option 2", "Option 3"];
 
@@ -50,6 +50,8 @@ function App() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      console.log('Key down:', e.key); // Log key events
+
       if (e.key.toLowerCase() === "z" && !showMenu) {
         // Adjust position by the current scroll offset to ensure the menu is in the right place
         setMenuPosition({
@@ -58,9 +60,15 @@ function App() {
         });
         setShowMenu(true);
       }
+
+      // Toggle spotlight search when Shift is pressed
+      if (e.key === "Control") {
+        setShowSearch(prev => !prev);
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      console.log('Key up:', e.key); // Log key events
       if (e.key.toLowerCase() === "z") {
         // Select the option when Z is released
         if (selectedOption) {
@@ -68,6 +76,12 @@ function App() {
         }
         setShowMenu(false);
         setSelectedOption(null);
+      }
+
+      // If Enter is pressed, submit the search and hide the search bar
+      if (e.key === "Enter") {
+        alert(`Search submitted: ${searchQuery}`);
+        setShowSearch(false);
       }
     };
 
@@ -80,7 +94,12 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [showMenu, cursorPosition, selectedOption]); // Ensure updates when cursor moves or option is selected
+  }, [showMenu, cursorPosition, selectedOption, searchQuery]); // Ensure updates when cursor moves or option is selected
+
+  // Handle search query change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <Router basename="/Sodalite">
@@ -93,6 +112,26 @@ function App() {
           position={menuPosition}
           selectedOption={selectedOption}
         />
+      )}
+
+      {/* Spotlight Search Bar */}
+      {showSearch && (
+        <div style={{
+          position: 'fixed', top: '150px', left: '20px', right: '20px',
+          zIndex: 1000, backgroundColor: 'rgba(255, 255, 255, 0.4)', padding: '10px',
+          borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+        }}>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            style={{
+              width: '100%', padding: '10px', fontSize: '16px', borderRadius: '4px',
+              border: '1px solid #ccc'
+            }}
+          />
+        </div>
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column' }}>
