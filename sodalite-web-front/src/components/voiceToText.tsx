@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from "../stores/hooks"; // Assuming useTheme hook is defined in your stores/hooks file
 
 interface CustomWindow extends Window {
     SpeechRecognition: typeof SpeechRecognition;
@@ -14,6 +15,7 @@ interface VoiceToTextProps {
 
 const VoiceToText: React.FC<VoiceToTextProps> = ({ setText, language }) => {
     const [isListening, setIsListening] = useState<boolean>(false);
+    const { theme } = useTheme(); // Get the current theme from the theme context
 
     // Cross-browser SpeechRecognition support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -54,12 +56,42 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ setText, language }) => {
         };
     }, []);
 
+    // Dynamic styling based on the current theme (dark or light)
+    const containerStyle = {
+        padding: '10px',
+        backgroundColor: theme === "dark" ? '#333' : '#fff', // Dynamic background
+        color: theme === "dark" ? '#fff' : '#333', // Dynamic text color
+        borderRadius: '5px',
+        boxShadow: theme === "dark" ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)', // Shadow for dark mode
+        textAlign: 'center' as const,
+    };
+
+    const buttonStyle = {
+        padding: '10px 20px',
+        backgroundColor: '#3498db',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '5px',
+        fontSize: '16px',
+        cursor: 'pointer',
+        marginBottom: '15px',
+        backgroundColor: theme === "dark" ? '#555' : '#f0f0f0', // Dynamic background color for button
+    };
+
+    const resultStyle = {
+        marginTop: '15px',
+        color: theme === "dark" ? '#ddd' : '#333', // Dynamic result text color
+    };
+
     return (
-        <div>
-            <button onClick={startRecognition} disabled={isListening}>
+        <div style={containerStyle}>
+            <button onClick={startRecognition} disabled={isListening} style={buttonStyle}>
                 {isListening ? 'Listening...' : 'Start Voice Recognition'}
             </button>
-            <p>Recognized Text: {setText ? 'You can see the recognized text above.' : ''}</p>
+            <div style={resultStyle}>
+                {/* Display the recognized text */}
+                <p>{setText}</p>
+            </div>
         </div>
     );
 };

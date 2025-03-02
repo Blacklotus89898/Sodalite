@@ -1,19 +1,49 @@
 import React from 'react';
+import { useTheme } from "../stores/hooks"; // Assuming useTheme hook is defined in your stores/hooks file
 
 interface TextToVoiceProps {
   text: string;
-  language: string; // Add language prop
 }
 
-const TextToVoice: React.FC<TextToVoiceProps> = ({ text, language }) => {
+const TextToVoice: React.FC<TextToVoiceProps> = ({ text }) => {
+  const theme = useTheme().theme; // Get the current theme (dark or light)
+
   const speakText = () => {
     if (!window.speechSynthesis) {
       alert("Your browser does not support speech synthesis.");
       return;
     }
     const utterance = new window.SpeechSynthesisUtterance(text);
-    utterance.lang = language; // Set the language
     window.speechSynthesis.speak(utterance);
+  };
+
+  // Dynamic styling based on the current theme (dark or light)
+  const containerStyle = {
+    padding: '20px',
+    backgroundColor: theme === "dark" ? '#333' : '#fff', // Dynamic background
+    color: theme === "dark" ? '#fff' : '#333', // Dynamic text color
+    borderRadius: '10px',
+    maxWidth: '600px',
+    margin: 'auto',
+    boxShadow: theme === "dark" ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)', // Shadow for dark mode
+    textAlign: 'center' as const,
+  };
+
+  const headerStyle = {
+    fontSize: '24px',
+    marginBottom: '10px',
+    color: theme === "dark" ? '#fff' : '#333', // Dynamic header text color
+    fontWeight: 'bold',
+  };
+
+  const buttonStyle = {
+    padding: '10px 20px',
+    backgroundColor: theme === "dark" ? '#555' : '#3498db', // Button background color changes based on theme
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
   };
 
   return (
@@ -25,35 +55,6 @@ const TextToVoice: React.FC<TextToVoiceProps> = ({ text, language }) => {
       </button>
     </div>
   );
-};
-
-// Styles for the TextToVoice component
-const containerStyle = {
-  padding: '20px',
-  backgroundColor: '#333',
-  color: '#fff',
-  borderRadius: '10px',
-  maxWidth: '600px',
-  margin: 'auto',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-  textAlign: 'center' as const,
-};
-
-const headerStyle = {
-  fontSize: '24px',
-  marginBottom: '10px',
-  color: '#fff',
-  fontWeight: 'bold',
-};
-
-const buttonStyle = {
-  padding: '10px 20px',
-  backgroundColor: '#3498db',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '5px',
-  fontSize: '16px',
-  cursor: 'pointer',
 };
 
 export default TextToVoice;
