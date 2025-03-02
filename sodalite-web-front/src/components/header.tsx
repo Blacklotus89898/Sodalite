@@ -79,6 +79,7 @@ const Header: React.FC = () => {
                 <Link to="/rnd" style={linkStyle}>RND</Link>
                 <Link to="/sandbox" style={linkStyle}>Sandbox</Link>
                 <Link to="/music" style={linkStyle}>Music</Link>
+                <Link to="/whitelotus" style={linkStyle}>Whitelotus</Link>
                 <Link to="/notfound" style={linkStyle}>NotFound</Link>
                 <a href="#ChatApp" style={linkStyle}>Chat</a>
                 <a href="#Iframe" style={linkStyle}>Iframe</a>

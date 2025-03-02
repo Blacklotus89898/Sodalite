@@ -2,71 +2,69 @@ import React, { useState, useEffect, ReactNode, CSSProperties } from "react";
 
 interface ResizableDraggableComponentProps {
   children: ReactNode;
+  initialPosition: { left: number; top: number };
+  initialSize: { width: number; height: number };
+  onUpdate: (updates: { left?: number; top?: number; width?: number; height?: number }) => void;
 }
 
-const ResizableDraggableComponent: React.FC<ResizableDraggableComponentProps> = ({ children }) => {
-  const [position, setPosition] = useState({ left: 100, top: 100 });
-  const [size, setSize] = useState({ width: 180, height: 180 });
+const ResizableDraggableComponent: React.FC<ResizableDraggableComponentProps> = ({
+  children,
+  initialPosition,
+  initialSize,
+  onUpdate,
+}) => {
+  const [position, setPosition] = useState(initialPosition);
+  const [size, setSize] = useState(initialSize);
 
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(false);
 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0 });
-  const [initialSize, setInitialSize] = useState({ width: 180, height: 180 });
+  const [resizeInitialSize, setResizeInitialSize] = useState(initialSize);
 
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  useEffect(() => {
+    setPosition(initialPosition);
+    setSize(initialSize);
+  }, [initialPosition, initialSize]);
 
   const handleDragStart = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (resizing) return; // Don't allow dragging if resizing
+    if (resizing) return;
     setDragging(true);
-    setDragOffset({
-      x: e.clientX - position.left,
-      y: e.clientY - position.top,
-    });
+    setDragOffset({ x: e.clientX - position.left, y: e.clientY - position.top });
   };
 
-  const handleDragMove = async (e: MouseEvent) => {
-    // await delay(50); // Add a delay of 100ms
-
+  const handleDragMove = (e: MouseEvent) => {
     if (!dragging) return;
-    setPosition({
-      left: e.clientX - dragOffset.x,
-      top: e.clientY - dragOffset.y,
-    });
+
+    const newLeft = e.clientX - dragOffset.x;
+    const newTop = e.clientY - dragOffset.y;
+
+    setPosition({ left: newLeft, top: newTop });
+    onUpdate({ left: newLeft, top: newTop });
   };
 
-  const handleDragEnd = () => {
-    setDragging(false);
-  };
+  const handleDragEnd = () => setDragging(false);
 
   const handleResizeStart = (e: React.MouseEvent<HTMLDivElement>) => {
     setResizing(true);
     setResizeStart({ x: e.clientX, y: e.clientY });
-    setInitialSize({ width: size.width, height: size.height });
-    e.stopPropagation(); // Prevent dragging from starting
-    e.preventDefault();
+    setResizeInitialSize(size);
+    e.stopPropagation();
   };
 
-  const handleResizeMove = async (e: MouseEvent) => {
-
-    // await delay(200); // Add a delay of 100ms
+  const handleResizeMove = (e: MouseEvent) => {
     if (!resizing) return;
 
-    const deltaX = e.clientX - resizeStart.x;
-    const deltaY = e.clientY - resizeStart.y;
+    const newWidth = Math.max(50, resizeInitialSize.width + (e.clientX - resizeStart.x));
+    const newHeight = Math.max(50, resizeInitialSize.height + (e.clientY - resizeStart.y));
 
-    setSize({
-      width: Math.max(50, initialSize.width + deltaX),
-      height: Math.max(50, initialSize.height + deltaY),
-    });
+    setSize({ width: newWidth, height: newHeight });
+    onUpdate({ width: newWidth, height: newHeight });
   };
 
-  const handleResizeEnd = () => {
-    setResizing(false);
-  };
+  const handleResizeEnd = () => setResizing(false);
 
-  // Global event listeners
   useEffect(() => {
     if (dragging) {
       document.addEventListener("mousemove", handleDragMove);
@@ -98,37 +96,20 @@ const ResizableDraggableComponent: React.FC<ResizableDraggableComponentProps> = 
   }, [resizing]);
 
   return (
-    <div style={parentContainerStyle}>
-      <div
-        style={{
-          ...childStyle,
-          left: `${position.left}px`,
-          top: `${position.top}px`,
-          width: `${size.width}px`,
-          height: `${size.height}px`,
-        }}
-        onMouseDown={handleDragStart}
-      >
-        {children}
-        <div
-          style={resizeHandleStyle}
-          onMouseDown={handleResizeStart}
-          aria-label="Resize"
-        />
-      </div>
+    <div
+      style={{
+        ...childStyle,
+        left: position.left,
+        top: position.top,
+        width: size.width,
+        height: size.height,
+      }}
+      onMouseDown={handleDragStart}
+    >
+      {children}
+      <div style={resizeHandleStyle} onMouseDown={handleResizeStart} />
     </div>
   );
-};
-
-// Styles
-const parentContainerStyle: CSSProperties = {
-  position: "relative",
-  width: "90%",
-  height: "500px",
-  border: "2px solid #ccc",
-  backgroundColor: "#2d2d2d",
-  overflow: "hidden",
-  borderRadius: "8px",
 };
 
 const childStyle: CSSProperties = {
@@ -138,7 +119,6 @@ const childStyle: CSSProperties = {
   justifyContent: "center",
   backgroundColor: "#3498db",
   color: "white",
-  fontSize: "20px",
   fontWeight: "bold",
   borderRadius: "8px",
   cursor: "move",
@@ -148,15 +128,14 @@ const childStyle: CSSProperties = {
 
 const resizeHandleStyle: CSSProperties = {
   position: "absolute",
-  bottom: "0",
-  right: "0",
-  width: "20px",
-  height: "20px",
+  bottom: 0,
+  right: 0,
+  width: "16px",
+  height: "16px",
   backgroundColor: "#e74c3c",
   cursor: "se-resize",
   borderRadius: "50%",
   border: "2px solid white",
-  boxSizing: "border-box",
 };
 
 export default ResizableDraggableComponent;

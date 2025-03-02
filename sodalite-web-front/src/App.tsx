@@ -12,6 +12,7 @@ import CursorEffect from './components/cursorEffect';
 import QuickMenu from './components/quickMenu';
 import RND from './pages/RND';
 import Music from './pages/Music';
+import { Whitelotus } from './pages/Whitelotus';
 
 // Define your sidebar items
 const rightSideBarItems = [
@@ -62,7 +63,7 @@ function App() {
       }
 
       // Toggle spotlight search when Shift is pressed
-      if (e.key === "Control") {
+      if (e.key === "/") {
         setShowSearch(prev => !prev);
       }
     };
@@ -152,6 +153,7 @@ function App() {
               <Route path="/sandbox" element={<Sandbox />} />
               <Route path="/music" element={<Music />} />
               <Route path="/rnd" element={<RND />} />
+              <Route path="/whitelotus" element={<Whitelotus />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
