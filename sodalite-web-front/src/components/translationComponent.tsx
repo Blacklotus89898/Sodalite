@@ -44,66 +44,66 @@ const TranslationComponent = () => {
     return (
         <Container>
             <div style={containerStyle}>
-                <h1 style={headerStyle}>Translation Component</h1>
+            <h1 style={headerStyle}>Translation Component</h1>
 
-                {/* Input text field */}
-                <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Enter text to translate"
-                    style={inputStyle}
-                />
+            {/* Input text field */}
+            <input
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Enter text to translate"
+                style={inputStyle}
+            />
 
-                {/* Language selection */}
-                <div style={selectWrapperStyle}>
-                    <select
-                        value={sourceLanguage}
-                        onChange={(e) => setSourceLanguage(e.target.value)}
-                        style={selectStyle}
-                    >
-                        <option value="auto">Detect Language</option>
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        {/* Add more language options as needed */}
-                    </select>
-                    <select
-                        value={targetLanguage}
-                        onChange={(e) => setTargetLanguage(e.target.value)}
-                        style={selectStyle}
-                    >
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        {/* Add more language options as needed */}
-                    </select>
-                </div>
-
-                {/* Translate Button */}
-                <button
-                    onClick={handleTranslate}
-                    style={buttonStyle}
-                    disabled={isLoading || !text.trim()}
+            {/* Language selection */}
+            <div style={selectWrapperStyle}>
+                <select
+                value={sourceLanguage}
+                onChange={(e) => setSourceLanguage(e.target.value)}
+                style={selectStyle}
                 >
-                    {isLoading ? "Translating..." : "Translate"}
-                </button>
+                <option value="auto">Detect Language</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                {/* Add more language options as needed */}
+                </select>
+                <select
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+                style={selectStyle}
+                >
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                {/* Add more language options as needed */}
+                </select>
+            </div>
 
-                {/* Error Message */}
-                {error && <p style={errorStyle}>{error}</p>}
+            {/* Translate Button */}
+            <button
+                onClick={handleTranslate}
+                style={buttonStyle}
+                disabled={isLoading || !text.trim()}
+            >
+                {isLoading ? "Translating..." : "Translate"}
+            </button>
 
-                {/* Translated Text */}
-                <div style={resultStyle}>
-                    <h2>Translated Text</h2>
-                    <p>{translatedText || "Translation will appear here."}</p>
-                </div>
+            {/* Error Message */}
+            {error && <p style={errorStyle}>{error}</p>}
+
+            {/* Translated Text */}
+            <div style={resultStyle}>
+                <h2>Translated Text</h2>
+                <p>{translatedText || "Translation will appear here."}</p>
+            </div>
             </div>
 
             {/* Pass the translatedText and targetLanguage as props to TextToVoice */}
             <TextToVoice text={translatedText} language={targetLanguage} />
 
-            {/* Pass setText as a prop to VoiceToText */}
-            <VoiceToText setText={setText} />
+            {/* Pass setText and sourceLanguage as props to VoiceToText */}
+            <VoiceToText setText={setText} language={sourceLanguage} />
         </Container>
     );
 };

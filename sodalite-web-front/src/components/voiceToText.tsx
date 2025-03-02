@@ -9,9 +9,10 @@ declare let window: CustomWindow;
 
 interface VoiceToTextProps {
     setText: React.Dispatch<React.SetStateAction<string>>;
+    language: string;
 }
 
-const VoiceToText: React.FC<VoiceToTextProps> = ({ setText }) => {
+const VoiceToText: React.FC<VoiceToTextProps> = ({ setText, language }) => {
     const [isListening, setIsListening] = useState<boolean>(false);
 
     // Cross-browser SpeechRecognition support
@@ -22,7 +23,7 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ setText }) => {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    recognition.lang = language;
     recognition.interimResults = false; // Only final results
     recognition.maxAlternatives = 1; // Max alternative results
 
