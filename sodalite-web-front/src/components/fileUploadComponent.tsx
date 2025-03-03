@@ -1,9 +1,12 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { FileUploadService } from "../services/fileuploadService"; // Make sure the path is correct
+import { useTheme } from '../stores/hooks'; // Assuming the theme hook is available
+import { Container } from "./container";
 
 const fileUploadService = new FileUploadService("http://localhost:8081");
 
 const FileUploadComponent = () => {
+    const { theme, chroma } = useTheme();
     const [file, setFile] = useState<File | null>(null);
     const [fileContent, setFileContent] = useState<string>("");
     const [filename, setFilename] = useState<string>("newfile.txt");
@@ -71,135 +74,146 @@ const FileUploadComponent = () => {
         fetchFiles();
     }, []);
 
+    // Check if the theme is dark mode
+    const isDarkMode = theme === 'dark';
+
+    // Calculate scalable font sizes based on container width
+    const [width, setWidth] = useState(window.innerWidth);
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const baseFontSize = Math.max(12, width * 0.002); // Example: 2% of container width
+
+    const containerStyle: React.CSSProperties = {
+        backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        color: isDarkMode ? 'white' : 'black',
+        borderRadius: '10px',
+        padding: '20px',
+        maxWidth: '800px',
+        margin: 'auto',
+        boxShadow: isDarkMode ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+        fontSize: baseFontSize,
+    };
+
+    const inputStyle: React.CSSProperties = {
+        padding: '10px',
+        marginBottom: '15px',
+        width: '100%',
+        backgroundColor: isDarkMode ? '#555' : '#f0f0f0',
+        color: isDarkMode ? 'white' : 'black',
+        border: `1px solid ${isDarkMode ? '#444' : '#ddd'}`,
+        borderRadius: '5px',
+        fontSize: baseFontSize,
+        outline: 'none',
+        transition: 'border 0.3s ease',
+    };
+
+    const buttonStyle: React.CSSProperties = {
+        padding: '10px 20px',
+        backgroundColor: chroma,
+        color: isDarkMode ? 'black' : 'white',
+        border: 'none',
+        borderRadius: '5px',
+        fontSize: baseFontSize,
+        cursor: 'pointer',
+        transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
+    };
+
+    const textareaStyle: React.CSSProperties = {
+        padding: '10px',
+        marginBottom: '20px',
+        width: '100%',
+        height: '150px',
+        backgroundColor: isDarkMode ? '#555' : '#f0f0f0',
+        color: isDarkMode ? 'white' : 'black',
+        border: `1px solid ${isDarkMode ? '#444' : '#ddd'}`,
+        borderRadius: '5px',
+        fontSize: baseFontSize,
+        resize: 'none',
+        boxSizing: 'border-box',
+    };
+
+    const fileInfoStyle: React.CSSProperties = {
+        marginTop: '20px',
+        color: '#ddd',
+    };
+
+    const linkStyle: React.CSSProperties = {
+        color: chroma,
+        textDecoration: 'none',
+    };
+
+    const fileListStyle: React.CSSProperties = {
+        marginTop: '20px',
+        color: '#ddd',
+    };
+
+    const fileListItemStyle: React.CSSProperties = {
+        listStyleType: 'none',
+        padding: '0',
+    };
+
+    const listItemStyle: React.CSSProperties = {
+        marginBottom: '10px',
+    };
+
     return (
-        <div style={containerStyle}>
-            <h1 style={headerStyle}>Text Editor Component</h1>
-            <input
-                type="file"
-                onChange={handleFileChange}
-                style={inputStyle}
-            />
-            <button onClick={() => handleFileChange}>New File</button>
-            <input
-                type="text"
-                value={filename}
-                onChange={handleFilenameChange}
-                placeholder="Enter filename"
-                style={inputStyle}
-            />
-            <textarea
-                value={fileContent}
-                onChange={(e) => setFileContent(e.target.value)}
-                rows={10}
-                cols={50}
-                style={textareaStyle}
-            />
-            <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
+        <Container>
 
-            {uploadedFile && (
-                <div style={fileInfoStyle}>
-                    <h2>Uploaded File</h2>
-                    <p>
-                        <a href={`http://localhost:8081/uploads/${uploadedFile}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                            {uploadedFile}
-                        </a>
-                    </p>
-                </div>
-            )}
+            <div style={containerStyle}>
+                <h1 style={{ fontSize: baseFontSize * 1.5, marginBottom: '20px' }}>Text Editor Component</h1>
+                <input
+                    type="file"
+                    onChange={handleFileChange}
+                    style={inputStyle}
+                />
+                <button onClick={() => setFile(null)} style={buttonStyle}>New File</button>
+                <input
+                    type="text"
+                    value={filename}
+                    onChange={handleFilenameChange}
+                    placeholder="Enter filename"
+                    style={inputStyle}
+                />
+                <textarea
+                    value={fileContent}
+                    onChange={(e) => setFileContent(e.target.value)}
+                    rows={10}
+                    cols={50}
+                    style={textareaStyle}
+                />
+                <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
 
-            <div style={fileListStyle}>
-                <h2>Uploaded Files</h2>
-                <ul style={fileListItemStyle}>
-                    {files.map((file, index) => (
-                        <li key={index} style={listItemStyle}>
-                            <a href={`http://localhost:8081/uploads/${file}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                                {file}
+                {uploadedFile && (
+                    <div style={fileInfoStyle}>
+                        <h2>Uploaded File</h2>
+                        <p>
+                            <a href={`http://localhost:8081/uploads/${uploadedFile}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                                {uploadedFile}
                             </a>
-                        </li>
-                    ))}
-                </ul>
+                        </p>
+                    </div>
+                )}
+
+                <div style={fileListStyle}>
+                    <h2>Uploaded Files</h2>
+                    <ul style={fileListItemStyle}>
+                        {files.map((file, index) => (
+                            <li key={index} style={listItemStyle}>
+                                <a href={`http://localhost:8081/uploads/${file}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                                    {file}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
-        </div>
+        </Container>
     );
 };
 
 export default FileUploadComponent;
-
-// Dark theme styling
-const containerStyle = {
-    padding: '20px',
-    backgroundColor: '#333',
-    color: '#fff',
-    borderRadius: '10px',
-    maxWidth: '800px',
-    margin: 'auto',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-    textAlign: 'center' as const,
-};
-
-const headerStyle = {
-    fontSize: '28px',
-    marginBottom: '20px',
-    color: '#fff',
-    fontWeight: 'bold',
-};
-
-const inputStyle = {
-    padding: '10px',
-    marginBottom: '15px',
-    width: '100%',
-    backgroundColor: '#555',
-    color: '#fff',
-    border: '1px solid #444',
-    borderRadius: '5px',
-    fontSize: '16px',
-    boxSizing: 'border-box' as const,
-};
-
-const textareaStyle = {
-    padding: '10px',
-    marginBottom: '20px',
-    width: '100%',
-    height: '150px',
-    backgroundColor: '#555',
-    color: '#fff',
-    border: '1px solid #444',
-    borderRadius: '5px',
-    fontSize: '16px',
-    resize: 'none' as const,
-    boxSizing: 'border-box' as const,
-};
-
-const buttonStyle = {
-    padding: '10px 20px',
-    backgroundColor: '#3498db',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-};
-
-const fileInfoStyle = {
-    marginTop: '20px',
-    color: '#ddd',
-};
-
-const linkStyle = {
-    color: '#3498db',
-    textDecoration: 'none',
-};
-
-const fileListStyle = {
-    marginTop: '20px',
-    color: '#ddd',
-};
-
-const fileListItemStyle = {
-    listStyleType: 'none',
-    padding: '0',
-};
-
-const listItemStyle = {
-    marginBottom: '10px',
-};

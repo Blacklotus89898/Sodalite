@@ -118,6 +118,9 @@ const TranslationComponent = () => {
             <div style={containerStyle}>
                 <h1 style={headerStyle}>Translation Component</h1>
 
+                {/* Voice input field */}    
+                <VoiceToText setText={setText} language={sourceLanguage} />
+
                 {/* Input text field */}
                 <input
                     type="text"
@@ -175,7 +178,6 @@ const TranslationComponent = () => {
             <TextToVoice text={translatedText} language={targetLanguage} />
 
             {/* Pass setText and sourceLanguage as props to VoiceToText */}
-            <VoiceToText setText={setText} language={sourceLanguage} />
         </Container>
     );
 };

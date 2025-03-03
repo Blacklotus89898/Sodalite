@@ -1,9 +1,10 @@
 import React, { ChangeEvent } from 'react';
-import { useProfile } from '../stores/hooks'; // Import the custom hook for the global profile context
+import { useProfile, useTheme } from '../stores/hooks'; // Import the custom hook for the global profile context
 import { Container } from './container';
 
 const ProfileComponent: React.FC = () => {
   const { profile, setProfile } = useProfile(); // Access global state from context
+  const { theme, chroma } = useTheme(); // Get theme and chroma dynamically
   const [jsonInput, setJsonInput] = React.useState<string>('');
 
   // Sanitize the input by trimming leading/trailing whitespace
@@ -80,119 +81,171 @@ const ProfileComponent: React.FC = () => {
     document.body.removeChild(link);
   };
 
+  // Determine if dark mode is active
+  const isDarkMode = theme === 'dark';
+
+  // Reusable styles
+  const containerStyle: React.CSSProperties = {
+    padding: '20px',
+    backgroundColor: isDarkMode ? '#111' : '#fff',
+    borderRadius: '8px',
+    color: isDarkMode ? 'white' : 'black',
+    maxWidth: '800px',
+    margin: '0 auto',
+  };
+
+  const headerStyle: React.CSSProperties = {
+    textAlign: 'center',
+    marginBottom: '20px',
+    fontSize: '24px',
+  };
+
+  const sectionStyle: React.CSSProperties = {
+    marginBottom: '20px',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: '16px',
+    marginBottom: '10px',
+  };
+
+  const inputGroupStyle: React.CSSProperties = {
+    marginBottom: '10px',
+  };
+
+  const inputLabelStyle: React.CSSProperties = {
+    fontSize: '14px',
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px',
+    backgroundColor: isDarkMode ? '#000' : '#f8f8f8',
+    border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
+    borderRadius: '5px',
+    color: isDarkMode ? 'white' : 'black',
+    marginBottom: '10px',
+    transition: 'background-color 0.3s ease, border 0.3s ease',
+  };
+
+  const textareaStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px',
+    backgroundColor: isDarkMode ? '#000' : '#f8f8f8',
+    border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
+    borderRadius: '5px',
+    color: isDarkMode ? 'white' : 'black',
+    transition: 'background-color 0.3s ease, border 0.3s ease',
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    backgroundColor: chroma,
+    border: 'none',
+    borderRadius: '5px',
+    color: isDarkMode ? 'black' : 'white',
+    cursor: 'pointer',
+    marginTop: '10px',
+    transition: 'background-color 0.3s ease',
+  };
+
+  const previewStyle: React.CSSProperties = {
+    backgroundColor: isDarkMode ? '#222' : '#f9f9f9',
+    padding: '20px',
+    borderRadius: '8px',
+  };
+
+  const jsonPreviewStyle: React.CSSProperties = {
+    color: isDarkMode ? '#ddd' : '#333',
+    backgroundColor: isDarkMode ? '#333' : '#fff',
+    padding: '10px',
+    borderRadius: '5px',
+    whiteSpace: 'pre-wrap',
+  };
+
   return (
-    <Container>
-      <div style={{ padding: '20px', backgroundColor: '#000', borderRadius: '8px', color: 'white', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Profile Component</h1>
+    <div style={containerStyle}>
+      <h1 style={headerStyle}>Profile Component</h1>
 
-        {/* Load Profile from JSON File */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '16px', marginBottom: '10px' }}>Load Profile from JSON File:</label>
-          <input type="file" accept=".json" onChange={handleFileChange} style={{ padding: '10px', backgroundColor: '#444', border: 'none', borderRadius: '5px', color: 'white' }} />
+      {/* Load Profile from JSON File */}
+      <div style={sectionStyle}>
+        <label style={labelStyle}>Load Profile from JSON File:</label>
+        <input type="file" accept=".json" onChange={handleFileChange} style={inputStyle} />
+      </div>
+
+      {/* Manual Input Section */}
+      <div style={sectionStyle}>
+        <label style={inputLabelStyle}>Manual Input:</label>
+        <div style={inputGroupStyle}>
+          <label style={inputLabelStyle}>Username:</label>
+          <input
+            type="text"
+            name="username"
+            value={profile.username}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
         </div>
-
-        {/* Manual Input Section */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '20px', paddingBottom: "10px", marginBottom: '20px' }}>Manual Input:</label>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ fontSize: '14px' }}>Username:</label>
-            <input
-              type="text"
-              name="username"
-              value={profile.username}
-              onChange={handleInputChange}
-              style={inputStyle}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ fontSize: '14px' }}>Theme:</label>
-            <input
-              type="text"
-              name="theme"
-              value={profile.theme}
-              onChange={handleInputChange}
-              style={inputStyle}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ fontSize: '14px' }}>Chroma:</label>
-            <input
-              type="text"
-              name="chroma"
-              value={profile.chroma}
-              onChange={handleInputChange}
-              style={inputStyle}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ fontSize: '14px' }}>App List (one per line):</label>
-            <textarea
-              name="favoriteApp"
-              value={profile.favoriteApp.join('\n')}
-              onChange={handleAppListChange}
-              rows={5}
-              style={textareaStyle}
-            />
-          </div>
+        <div style={inputGroupStyle}>
+          <label style={inputLabelStyle}>Theme:</label>
+          <input
+            type="text"
+            name="theme"
+            value={profile.theme}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
         </div>
-
-        {/* Load Profile from JSON String */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '16px', marginBottom: '10px' }}>Load Profile from JSON String:</label>
+        <div style={inputGroupStyle}>
+          <label style={inputLabelStyle}>Chroma:</label>
+          <input
+            type="text"
+            name="chroma"
+            value={profile.chroma}
+            onChange={handleInputChange}
+            style={inputStyle}
+          />
+        </div>
+        <div style={inputGroupStyle}>
+          <label style={inputLabelStyle}>App List (one per line):</label>
           <textarea
-            value={jsonInput}
-            onChange={handleJsonInputChange}
+            name="favoriteApp"
+            value={profile.favoriteApp.join('\n')}
+            onChange={handleAppListChange}
             rows={5}
             style={textareaStyle}
           />
-          <button
-            onClick={handleLoadJson}
-            style={{ padding: '10px 20px', backgroundColor: '#444', border: 'none', borderRadius: '5px', color: 'white', cursor: 'pointer', marginTop: '10px' }}
-          >
-            Load JSON
-          </button>
-        </div>
-
-        {/* Download Profile Button */}
-        <div style={{ marginBottom: '20px' }}>
-          <button
-            onClick={downloadProfile}
-            style={{ padding: '10px 20px', backgroundColor: '#444', border: 'none', borderRadius: '5px', color: 'white', cursor: 'pointer' }}
-          >
-            Download Profile as JSON
-          </button>
-        </div>
-
-        {/* Profile Preview */}
-        <div style={{ backgroundColor: '#222', padding: '20px', borderRadius: '8px' }}>
-          <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Profile Preview:</h2>
-          <pre style={{ color: '#ddd', backgroundColor: '#333', padding: '10px', borderRadius: '5px' }}>{JSON.stringify(profile, null, 2)}</pre>
         </div>
       </div>
-    </Container>
+
+      {/* Load Profile from JSON String */}
+      <div style={sectionStyle}>
+        <label style={labelStyle}>Load Profile from JSON String:</label>
+        <textarea
+          value={jsonInput}
+          onChange={handleJsonInputChange}
+          rows={5}
+          style={textareaStyle}
+        />
+        <button onClick={handleLoadJson} style={buttonStyle}>
+          Load JSON
+        </button>
+      </div>
+
+      {/* Download Profile Button */}
+      <div style={sectionStyle}>
+        <button onClick={downloadProfile} style={buttonStyle}>
+          Download Profile as JSON
+        </button>
+      </div>
+
+      {/* Profile Preview */}
+      <div style={previewStyle}>
+        <h2 style={headerStyle}>Profile Preview:</h2>
+        <pre style={jsonPreviewStyle}>{JSON.stringify(profile, null, 2)}</pre>
+      </div>
+    </div>
   );
-};
-
-// Reusable styles for input and textarea
-const inputStyle = {
-  width: '100%',
-  padding: '10px',
-  backgroundColor: '#000',
-  border: '1px solid #444',
-  borderRadius: '5px',
-  color: 'white',
-  marginBottom: '10px',
-  transition: 'background-color 0.3s ease, border 0.3s ease',
-};
-
-const textareaStyle = {
-  width: '100%',
-  padding: '10px',
-  backgroundColor: '#000',
-  border: '1px solid #444',
-  borderRadius: '5px',
-  color: 'white',
-  transition: 'background-color 0.3s ease, border 0.3s ease',
 };
 
 export default ProfileComponent;

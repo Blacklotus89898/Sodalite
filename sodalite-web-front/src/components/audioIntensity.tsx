@@ -213,7 +213,7 @@ const intensityStyle = {
   padding: '15px',
   borderRadius: '8px',
   display: 'flex',
-  flexWrap: 'wrap',
+  flexWrap: 'wrap' as const,
   gap: '15px',
   justifyContent: 'center',
   alignItems: 'center',

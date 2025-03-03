@@ -3,6 +3,10 @@ import ResizableDraggableComponent from "./draggableComponent";
 import { ChatApp } from "./chatApp";
 import Iframe from "./iframe";
 import VideoChat from "./videoChat";
+import UpdateAddress from "./serverSettings";
+import { CanvaShare } from "./canvaShare";
+import CollabApp from "./collabApp";
+import FileUploadComponent from "./fileUploadComponent";
 
 interface BoxData {
   id: number;
@@ -24,8 +28,7 @@ const ResizableDraggableContainer: React.FC = () => {
       height: 180,
       type: "text",
       content:
-      <Iframe initialLink="https://wikipedia.com" name="Example" /> 
-      ,
+      <CollabApp />,
     },
     {
       id: 2,
@@ -45,6 +48,28 @@ const ResizableDraggableContainer: React.FC = () => {
       type: "custom",
       content: (
        <ChatApp />
+      ),
+    },
+    {
+      id: 4,
+      left: 100,
+      top: 300,
+      width: 180,
+      height: 180,
+      type: "custom",
+      content: (
+       <UpdateAddress />
+      ),
+    },
+    {
+      id: 5,
+      left: 100,
+      top: 300,
+      width: 180,
+      height: 180,
+      type: "custom",
+      content: (
+       <FileUploadComponent />
       ),
     },
   ]);
@@ -75,14 +100,18 @@ const ResizableDraggableContainer: React.FC = () => {
       },
     ]);
   };
+
+  const deleteBox = (id: number) => {
+    setBoxes((prev) => prev.filter((box) => box.id !== id));
+  }
   
 
   return (
     <div
       style={{
         position: "relative",
-        width: "90%",
-        height: "500px",
+        width: "100%",
+        height: "800px",
         border: "2px solid #ccc",
         backgroundColor: "#f0f0f0",
         overflow: "hidden",
@@ -91,11 +120,12 @@ const ResizableDraggableContainer: React.FC = () => {
       <button onClick={() => addNewBox("text")}>Add Text Box</button>
       {boxes.map((box) => (
         <ResizableDraggableComponent
-          key={box.id}
-          initialPosition={{ left: box.left, top: box.top }}
-          initialSize={{ width: box.width, height: box.height }}
-          onUpdate={(updates) => updateBox(box.id, updates)}
+        key={box.id}
+        initialPosition={{ left: box.left, top: box.top }}
+        initialSize={{ width: box.width, height: box.height }}
+        onUpdate={(updates) => updateBox(box.id, updates)}
         >
+        <button onClick={() => deleteBox(box.id)}>Delete</button>
           {box.type === "text" ? (
             <div style={{ padding: "10px" }}>{box.content}</div>
           ) : box.type === "image" ? (

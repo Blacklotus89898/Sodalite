@@ -9,7 +9,7 @@ interface HomeProps {
 }
 
 
-const Home: React.FC<HomeProps> = ({ title, description, count, onClick }) => {
+const Home: React.FC<HomeProps> = ({ title,  }) => {
     return (
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "Home"}</h1>

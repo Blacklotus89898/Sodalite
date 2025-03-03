@@ -81,9 +81,9 @@ const UpdateAddress = () => {
         color: isDarkMode ? 'black' : 'white', // Adjust text color for readability
     };
 
-    const hoverBackground = isDarkMode
-        ? 'rgba(255, 255, 255, 0.2)'
-        : 'rgba(0, 0, 0, 0.1)';
+    // const hoverBackground = isDarkMode
+    //     ? 'rgba(255, 255, 255, 0.2)'
+    //     : 'rgba(0, 0, 0, 0.1)';
 
     const handleUpdate = () => {
         if (selectedKey && newAddress) {

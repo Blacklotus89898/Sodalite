@@ -11,6 +11,8 @@ import Weather from "../components/weather";
 import VoiceToText from "../components/voiceToText";
 import TextToVoice from "../components/textToVoice";
 import ThemeSwitcher from "../components/themeSwitcher";
+import CollabApp from "../components/collabApp";
+import { CanvaShare } from "../components/canvaShare";
 
 // Define the type for the props
 interface RNDProps {
@@ -25,15 +27,14 @@ const RND: React.FC<RNDProps> = ({ title,  }) => {
     return (
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "RND"}</h1>
-            <ThemeSwitcher/>
-            <VoiceToText/>
-            <TextToVoice/>
                 <VideoChat/>
                 <ScreenShare/>
-            <ResizableDraggableComponent>
+            {/* <ResizableDraggableComponent>
                 <div>Content goes here</div>
-            </ResizableDraggableComponent>
+            </ResizableDraggableComponent> */}
             {/* <ManualRTC/>  */}
+            <CollabApp/>
+            <CanvaShare />
             <Weather/>
             <Iframe initialLink="https://wikipedia.com" name="Example" />
             <ThreeDProjection/>

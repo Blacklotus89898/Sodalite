@@ -2,8 +2,9 @@ import React from "react";
 import GraphComponent from "../components/graph";
 import ProfileComponent from "../components/profile";
 import { AudioIntensity } from "../components/audioIntensity";
-import FileUploadComponent from "../components/fileUploadComponent";
+// import FileUploadComponent from "../components/fileUploadComponent";
 import TranslationComponent from "../components/translationComponent";
+import Timer from "../components/timer";
 
 const Dashboard: React.FC = () => {
   return (
@@ -11,9 +12,10 @@ const Dashboard: React.FC = () => {
       <h1 style={headerStyle}>Dashboard</h1>
       <div style={dashboardContainerStyle}>
         <ProfileComponent />
-        <FileUploadComponent />
+        {/* <FileUploadComponent /> */}
         <TranslationComponent />
         <AudioIntensity />
+        <Timer initialTime={60} />
         <GraphComponent xValues={[1, 2, 3]} yValues={[4, 5, 6]} />
       </div>
     </>

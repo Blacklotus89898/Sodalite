@@ -80,7 +80,7 @@ function App() {
       }
 
       // If Enter is pressed, submit the search and hide the search bar
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && showSearch) {
         alert(`Search submitted: ${searchQuery}`);
         setShowSearch(false);
       }
@@ -99,6 +99,7 @@ function App() {
 
   // Handle search query change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     setSearchQuery(e.target.value);
   };
 
