@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTheme } from '../stores/hooks';
 
 export const AudioIntensity: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -15,6 +16,8 @@ export const AudioIntensity: React.FC = () => {
   const timeArrayRef = useRef<Uint8Array | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const { theme, chroma } = useTheme();
 
   const toggleAudio = async () => {
     if (isRunning) {
@@ -166,12 +169,27 @@ export const AudioIntensity: React.FC = () => {
         <p>Audio Intensity: {Math.round(intensity)}</p>
         <button
           style={isRunning ? buttonActiveStyle : buttonStyle}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = isRunning
+              ? buttonActiveStyle.backgroundColor
+              : buttonStyle.backgroundColor;
+          }}
+          // style={isRunning ? buttonActiveStyle : buttonStyle}
           onClick={toggleAudio}
         >
           {isRunning ? 'Stop' : 'Start'}
         </button>
 
-        <label style={showBars ? labelActiveStyle : labelStyle}>
+        <label
+          style={showBars ? labelActiveStyle : labelStyle}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = showBars
+              ? labelActiveStyle.backgroundColor
+              : labelStyle.backgroundColor;
+          }}
+        >
           <input
             type="checkbox"
             checked={showBars}
@@ -181,7 +199,15 @@ export const AudioIntensity: React.FC = () => {
           Bars
         </label>
 
-        <label style={showRadial ? labelActiveStyle : labelStyle}>
+        <label
+          style={showRadial ? labelActiveStyle : labelStyle}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = showRadial
+              ? labelActiveStyle.backgroundColor
+              : labelStyle.backgroundColor;
+          }}
+        >
           <input
             type="checkbox"
             checked={showRadial}
@@ -191,7 +217,15 @@ export const AudioIntensity: React.FC = () => {
           Radial
         </label>
 
-        <label style={showWaveform ? labelActiveStyle : labelStyle}>
+        <label
+          style={showWaveform ? labelActiveStyle : labelStyle}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = showWaveform
+              ? labelActiveStyle.backgroundColor
+              : labelStyle.backgroundColor;
+          }}
+        >
           <input
             type="checkbox"
             checked={showWaveform}
@@ -250,7 +284,7 @@ const labelStyle = {
   padding: '8px 12px',
   backgroundColor: '#222',
   borderRadius: '5px',
-  transition: 'background-color 0.2s',
+  transition: 'background-color 0.2s, border 0.5s',
 };
 
 const labelActiveStyle = {
