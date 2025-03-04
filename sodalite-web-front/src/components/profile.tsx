@@ -170,7 +170,11 @@ const ProfileComponent: React.FC = () => {
       {/* Load Profile from JSON File */}
       <div style={sectionStyle}>
         <label style={labelStyle}>Load Profile from JSON File:</label>
-        <input type="file" accept=".json" onChange={handleFileChange} style={inputStyle} />
+        <input type="file" accept=".json" onChange={handleFileChange}
+          style={inputStyle}
+          onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+          onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
+        />
       </div>
 
       {/* Manual Input Section */}
@@ -184,6 +188,8 @@ const ProfileComponent: React.FC = () => {
             value={profile.username}
             onChange={handleInputChange}
             style={inputStyle}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
         </div>
         <div style={inputGroupStyle}>
@@ -194,6 +200,8 @@ const ProfileComponent: React.FC = () => {
             value={profile.theme}
             onChange={handleInputChange}
             style={inputStyle}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
         </div>
         <div style={inputGroupStyle}>
@@ -204,6 +212,8 @@ const ProfileComponent: React.FC = () => {
             value={profile.chroma}
             onChange={handleInputChange}
             style={inputStyle}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
         </div>
         <div style={inputGroupStyle}>
@@ -214,6 +224,8 @@ const ProfileComponent: React.FC = () => {
             onChange={handleAppListChange}
             rows={5}
             style={textareaStyle}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
         </div>
       </div>
@@ -222,6 +234,8 @@ const ProfileComponent: React.FC = () => {
       <div style={sectionStyle}>
         <label style={labelStyle}>Load Profile from JSON String:</label>
         <textarea
+          onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+          onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           value={jsonInput}
           onChange={handleJsonInputChange}
           rows={5}
