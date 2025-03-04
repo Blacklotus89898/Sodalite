@@ -12,7 +12,7 @@ const TranslationComponent = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { theme } = useTheme(); // Get the current theme from the context
+    const { theme, chroma } = useTheme(); // Get the current theme from the context
 
     const handleTranslate = async () => {
         if (!text.trim()) return; // Don't proceed if the input text is empty
@@ -128,6 +128,8 @@ const TranslationComponent = () => {
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter text to translate"
                     style={inputStyle}
+                    onMouseOver={(e) => e.currentTarget.style.border = `2px solid ${chroma}`}
+                    onMouseOut={(e) => e.currentTarget.style.border = '2px solid rgba(0, 0, 0, 0.3)'}
                 />
 
                 {/* Language selection */}
@@ -160,6 +162,11 @@ const TranslationComponent = () => {
                     onClick={handleTranslate}
                     style={buttonStyle}
                     disabled={isLoading || !text.trim()}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.backgroundColor = buttonStyle
+                        .backgroundColor as string
+                    }}
                 >
                     {isLoading ? "Translating..." : "Translate"}
                 </button>
@@ -175,7 +182,7 @@ const TranslationComponent = () => {
             </div>
 
             {/* Pass the translatedText and targetLanguage as props to TextToVoice */}
-            <TextToVoice text={translatedText} language={targetLanguage} />
+            <TextToVoice text={translatedText} targetLanguage={targetLanguage} />
 
             {/* Pass setText and sourceLanguage as props to VoiceToText */}
         </Container>
