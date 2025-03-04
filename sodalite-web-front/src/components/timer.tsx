@@ -74,7 +74,7 @@ const Timer: React.FC<TimerProps> = ({ initialTime }) => {
     const radius = 45;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (time / totalSeconds) * circumference;
-    return { strokeDasharray: circumference, strokeDashoffset: offset };
+    return { strokeDasharray: circumference, strokeDashoffset: offset, transition: '2s' };
   };
 
   const containerStyle: React.CSSProperties = {
@@ -172,6 +172,8 @@ const Timer: React.FC<TimerProps> = ({ initialTime }) => {
             min="0"
             max="99"
             onBlur={handleTimeChange}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
           <span>:</span>
           <input
