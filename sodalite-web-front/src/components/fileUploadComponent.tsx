@@ -1,6 +1,6 @@
-import { useState, useEffect, ChangeEvent } from "react";
-import { FileUploadService } from "../services/fileuploadService"; // Make sure the path is correct
-import { useTheme } from '../stores/hooks'; // Assuming the theme hook is available
+import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { FileUploadService } from "../services/fileuploadService";
+import { useTheme } from '../stores/hooks';
 import { Container } from "./container";
 
 const fileUploadService = new FileUploadService("http://localhost:8081");
@@ -12,8 +12,27 @@ const FileUploadComponent = () => {
     const [filename, setFilename] = useState<string>("newfile.txt");
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
     const [files, setFiles] = useState<string[]>([]);
+    const [width, setWidth] = useState(400); // Default width
 
-    // Handle file selection
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Resize observer to track container size changes
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const observer = new ResizeObserver(([entry]) => {
+            setWidth(entry.contentRect.width);
+        });
+
+        observer.observe(containerRef.current);
+
+        return () => observer.disconnect();
+    }, []);
+
+    // Font size scaling
+    const baseFontSize = Math.min(24, Math.max(12, width * 0.025));
+
+    // File selection handler
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const selectedFile = e.target.files[0];
@@ -22,18 +41,17 @@ const FileUploadComponent = () => {
             const reader = new FileReader();
             reader.onload = (event) => {
                 setFileContent(event.target?.result as string);
-                setFilename(selectedFile.name); // Set default filename
+                setFilename(selectedFile.name);
             };
             reader.readAsText(selectedFile);
         }
     };
 
-    // Handle filename change
     const handleFilenameChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFilename(e.target.value);
     };
 
-    // Handle file upload
+    // File upload handler
     const handleFileUpload = async () => {
         if (!file) return;
 
@@ -51,15 +69,15 @@ const FileUploadComponent = () => {
                 throw new Error(`Server responded with ${response.status}: ${await response.text()}`);
             }
 
-            const data = await response.json(); // Now correctly parses JSON
-            setUploadedFile(data.filename); // Store filename for display
-            fetchFiles(); // Refresh file list
+            const data = await response.json();
+            setUploadedFile(data.filename);
+            fetchFiles();
         } catch (error) {
             console.error("File upload error:", error);
         }
     };
 
-    // Fetch list of uploaded files
+    // Fetch uploaded files
     const fetchFiles = async () => {
         try {
             const fileList = await fileUploadService.getFileList();
@@ -69,24 +87,14 @@ const FileUploadComponent = () => {
         }
     };
 
-    // Fetch files on component mount
     useEffect(() => {
         fetchFiles();
     }, []);
 
-    // Check if the theme is dark mode
+    // Dark mode check
     const isDarkMode = theme === 'dark';
 
-    // Calculate scalable font sizes based on container width
-    const [width, setWidth] = useState(window.innerWidth);
-    useEffect(() => {
-        const handleResize = () => setWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const baseFontSize = Math.max(12, width * 0.002); // Example: 2% of container width
-
+    // Styles with dynamic font sizes
     const containerStyle: React.CSSProperties = {
         backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
         color: isDarkMode ? 'white' : 'black',
@@ -137,40 +145,11 @@ const FileUploadComponent = () => {
         boxSizing: 'border-box',
     };
 
-    const fileInfoStyle: React.CSSProperties = {
-        marginTop: '20px',
-        color: '#ddd',
-    };
-
-    const linkStyle: React.CSSProperties = {
-        color: chroma,
-        textDecoration: 'none',
-    };
-
-    const fileListStyle: React.CSSProperties = {
-        marginTop: '20px',
-        color: '#ddd',
-    };
-
-    const fileListItemStyle: React.CSSProperties = {
-        listStyleType: 'none',
-        padding: '0',
-    };
-
-    const listItemStyle: React.CSSProperties = {
-        marginBottom: '10px',
-    };
-
     return (
         <Container>
-
-            <div style={containerStyle}>
+            <div ref={containerRef} style={containerStyle}>
                 <h1 style={{ fontSize: baseFontSize * 1.5, marginBottom: '20px' }}>Text Editor Component</h1>
-                <input
-                    type="file"
-                    onChange={handleFileChange}
-                    style={inputStyle}
-                />
+                <input type="file" onChange={handleFileChange} style={inputStyle} />
                 <button onClick={() => setFile(null)} style={buttonStyle}>New File</button>
                 <input
                     type="text"
@@ -182,29 +161,37 @@ const FileUploadComponent = () => {
                 <textarea
                     value={fileContent}
                     onChange={(e) => setFileContent(e.target.value)}
-                    rows={10}
-                    cols={50}
                     style={textareaStyle}
                 />
                 <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
 
                 {uploadedFile && (
-                    <div style={fileInfoStyle}>
+                    <div style={{ marginTop: '20px', color: '#ddd' }}>
                         <h2>Uploaded File</h2>
                         <p>
-                            <a href={`http://localhost:8081/uploads/${uploadedFile}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                            <a
+                                href={`http://localhost:8081/uploads/${uploadedFile}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: chroma, textDecoration: 'none' }}
+                            >
                                 {uploadedFile}
                             </a>
                         </p>
                     </div>
                 )}
 
-                <div style={fileListStyle}>
+                <div style={{ marginTop: '20px', color: '#ddd' }}>
                     <h2>Uploaded Files</h2>
-                    <ul style={fileListItemStyle}>
+                    <ul style={{ listStyleType: 'none', padding: '0' }}>
                         {files.map((file, index) => (
-                            <li key={index} style={listItemStyle}>
-                                <a href={`http://localhost:8081/uploads/${file}`} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                            <li key={index} style={{ marginBottom: '10px' }}>
+                                <a
+                                    href={`http://localhost:8081/uploads/${file}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: chroma, textDecoration: 'none' }}
+                                >
                                     {file}
                                 </a>
                             </li>
