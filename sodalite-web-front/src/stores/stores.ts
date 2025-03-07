@@ -26,31 +26,43 @@ export const ServerContext = createContext<{
 
 
 
-// Define the interface for the Profile state
+// Define the interface for the actual profile data
 export interface ProfileState {
-    favoriteApp: string[];
-    username: string;
-    theme: string;
-    chroma: string;
-    streak: number;
-  }
-  
-  // Define the default profile state
-  
-  // Create the Profile Context
-  export const ProfileContext = createContext<{
-    profile: ProfileState;
-    setProfile: React.Dispatch<React.SetStateAction<ProfileState>>;
-  }>({
-    profile: {
-        favoriteApp: [],
-        username: '',
-        theme: '',
-        chroma: '',
-        streak: 0,
-    },
-    setProfile: () => {},
-  });
+  username: string;
+  server: {
+    websocketServer: string;
+    fileServer: string;
+  };
+  streak: number;
+  activityDates: string[];
+  theme: string;
+  chroma: string;
+}
+
+// Define the interface for the profile context (which includes the state + updater)
+interface ProfileContextType {
+  currentProfile: ProfileState;
+  setCurrentProfile: (profile: ProfileState) => void;
+}
+
+// Default profile state (optional - if you want to initialize with defaults)
+const defaultProfile: ProfileState = {
+  username: "John Doe",
+  server: {
+    websocketServer: "ws://192.168.0.103:8080",
+    fileServer: "http://192.168.0.103:8081"
+  },
+  streak: 0,
+  activityDates: [],
+  theme: "dark",
+  chroma: "#00ced1"
+};
+
+// Create the Profile Context
+export const ProfileContext = createContext<ProfileContextType>({
+  currentProfile: defaultProfile,
+  setCurrentProfile: () => {},
+});
 
 
 export  interface StreakContextProps {

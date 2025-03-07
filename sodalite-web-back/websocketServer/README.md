@@ -2,7 +2,7 @@
 
 ## Running the Server
 
-To run the backend server, use the following command:
+To run the backend server (peerServer and websocket), use the following command:
 
 ```sh
 npm start

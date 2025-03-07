@@ -1,23 +1,25 @@
-import React, { ChangeEvent, use, useEffect } from 'react';
-import { useProfile, useTheme, useServer, useStreak } from '../stores/hooks'; // Import the custom hook for the global profile context
-import { Container } from './container';
+import React, { ChangeEvent, useEffect } from 'react';
+import { useProfile, useTheme, useServer, useStreak, useUser } from '../stores/hooks'; // Import the custom hook for the global currentProfile context
 
 const ProfileComponent: React.FC = () => {
-  const { profile, setProfile } = useProfile(); // Access global state from context
-  const { theme, chroma } = useTheme(); // Get theme and chroma dynamically
+  const { currentProfile, setCurrentProfile } = useProfile(); // Access global state from context
+  const { theme, chroma, setChroma, setTheme } = useTheme(); // Get theme and chroma dynamically
   const [jsonInput, setJsonInput] = React.useState<string>('');
-  const [current, setCurrent] = React.useState<any>(null);
-  const server = useServer();
-  const streak = useStreak();
-
+  const {address, setAddress} = useServer();
+  const {activityDates, setActivityDates, streak} = useStreak();
+  const {user, setUser} = useUser();
   useEffect(() => {
-    setCurrent({
-      server: server,
+    setCurrentProfile({
+      username: user,
+      server: address,
       streak: streak,
+      activityDates: activityDates,
       theme: theme,
-      chroma: chroma
+      chroma: chroma  
     });
-  }, [profile, useServer, useStreak, theme, chroma]);
+
+
+  }, [address, streak, activityDates, theme, chroma, user]);
 
 
   // Sanitize the input by trimming leading/trailing whitespace
@@ -25,43 +27,57 @@ const ProfileComponent: React.FC = () => {
     return jsonString.trim();
   };
 
-  // Handle the file input and parse JSON
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Ensure that files exist and we have at least one
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+  
+      // Ensure FileReader is supported
       const reader = new FileReader();
+  
+      // Define the load event for the FileReader
       reader.onload = (event) => {
         if (event.target?.result) {
-          const fileContent = event.target.result as string;
+          const fileContent = event.target.result as string; // Type assertion to string
           console.log("File Content:", fileContent); // Log the content of the file
+  
           try {
             const result = JSON.parse(fileContent);
-            setProfile(result); // Update global profile state
+            setCurrentProfile(result); // Update global currentProfile state
+            setJsonInput(fileContent); // Update the raw JSON input field
           } catch (error) {
             console.error("Error parsing JSON from file:", error);
             alert("The file content is not valid JSON.");
           }
         }
       };
+  
+      // Handle potential error from FileReader
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        alert("Error reading the file.");
+      };
+  
+      // Read the file as text
       reader.readAsText(file);
     }
   };
-
+  
   // Handle changes in the manual input fields
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setProfile(prevProfile => ({
+    setCurrentProfile(prevProfile => ({
       ...prevProfile,
       [name]: value
-    })); // Update global profile state
+    })); // Update global currentProfile state
   };
 
   // Handle changes in the app list input
   const handleAppListChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setProfile(prevProfile => ({
+    setCurrentProfile(prevProfile => ({
       ...prevProfile,
       favoriteApp: e.target.value.split('\n')
-    })); // Update global profile state
+    })); // Update global currentProfile state
   };
 
   // Handle changes in the raw JSON input field
@@ -69,26 +85,36 @@ const ProfileComponent: React.FC = () => {
     setJsonInput(e.target.value);
   };
 
-  // Handle loading the profile from the raw JSON input
+  // Handle loading the currentProfile from the raw JSON input
   const handleLoadJson = () => {
     try {
       const sanitizedInput = sanitizeJson(jsonInput); // Sanitize the input
       console.log("Sanitized JSON Input:", sanitizedInput); // Log sanitized input for debugging
       const jsonProfile = JSON.parse(sanitizedInput); // Try parsing the sanitized input
-      setProfile(jsonProfile); // Update global profile state
+      console.log("Parsed JSON Profile:", jsonProfile); // Log the parsed JSON for debugging
+      setCurrentProfile(jsonProfile); // Update global currentProfile state
+      setActivityDates(jsonProfile.activityDates);
+      if (jsonProfile.servers) {
+        Object.entries(jsonProfile.servers).forEach(([serverName, serverAddress]) => {
+          setAddress(serverName, serverAddress as string); // Assuming the second argument is a boolean, adjust as needed
+        });
+      }
+      setChroma(jsonProfile.chroma);
+      setTheme(jsonProfile.theme);
+      setUser(jsonProfile.username);
     } catch (error) {
       console.error("Invalid JSON input:", error);
       alert("The provided JSON is invalid. Please check the format.");
     }
   };
 
-  // Function to trigger the download of the profile as a JSON file
+  // Function to trigger the download of the currentProfile as a JSON file
   const downloadProfile = () => {
-    const profileBlob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+    const profileBlob = new Blob([JSON.stringify(currentProfile, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(profileBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'profile.json'; // The name of the file being downloaded
+    link.download = 'currentProfile.json'; // The name of the file being downloaded
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -178,11 +204,11 @@ const ProfileComponent: React.FC = () => {
 
   return (
     <div style={containerStyle}>
-      <h1 style={headerStyle}>Profile Component</h1>
+      <h1 style={headerStyle}>currentProfile Component</h1>
 
-      {/* Load Profile from JSON File */}
+      {/* Load currentProfile from JSON File */}
       <div style={sectionStyle}>
-        <label style={labelStyle}>Load Profile from JSON File:</label>
+        <label style={labelStyle}>Load currentProfile from JSON File:</label>
         <input type="file" accept=".json" onChange={handleFileChange}
           style={inputStyle}
           onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
@@ -198,7 +224,7 @@ const ProfileComponent: React.FC = () => {
           <input
             type="text"
             name="username"
-            value={profile.username}
+            value={currentProfile.username}
             onChange={handleInputChange}
             style={inputStyle}
             onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
@@ -210,7 +236,7 @@ const ProfileComponent: React.FC = () => {
           <input
             type="text"
             name="theme"
-            value={profile.theme}
+            value={currentProfile.theme}
             onChange={handleInputChange}
             style={inputStyle}
             onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
@@ -222,30 +248,30 @@ const ProfileComponent: React.FC = () => {
           <input
             type="text"
             name="chroma"
-            value={profile.chroma}
+            value={currentProfile.chroma}
             onChange={handleInputChange}
             style={inputStyle}
             onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
             onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
         </div>
-        <div style={inputGroupStyle}>
+        {/* <div style={inputGroupStyle}>
           <label style={inputLabelStyle}>App List (one per line):</label>
           <textarea
             name="favoriteApp"
-            value={profile.favoriteApp.join('\n')}
+            value={currentProfile.favoriteApp.join('\n')}
             onChange={handleAppListChange}
             rows={5}
             style={textareaStyle}
             onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
             onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
           />
-        </div>
+        </div> */}
       </div>
 
-      {/* Load Profile from JSON String */}
+      {/* Load currentProfile from JSON String */}
       <div style={sectionStyle}>
-        <label style={labelStyle}>Load Profile from JSON String:</label>
+        <label style={labelStyle}>Load currentProfile from JSON String:</label>
         <textarea
           onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
           onMouseOut={(e) => e.currentTarget.style.border = '1px solid rgba(0, 0, 0, 0.3)'}
@@ -259,24 +285,22 @@ const ProfileComponent: React.FC = () => {
         </button>
       </div>
 
-      {/* Download Profile Button */}
+      {/* Download currentProfile Button */}
       <div style={sectionStyle}>
         <button onClick={downloadProfile} style={buttonStyle}>
-          Download Profile as JSON
+          Download currentProfile as JSON
         </button>
       </div>
 
-      {/* Profile Preview */}
+
+
+
+      {/* Current currentProfile */}
       <div style={previewStyle}>
-        <h2 style={headerStyle}>Profile Preview:</h2>
-        <pre style={jsonPreviewStyle}>{JSON.stringify(profile, null, 2)}</pre>
+        <h2 style={headerStyle}>CurrentProfile </h2>
+        <pre style={jsonPreviewStyle}>{JSON.stringify(currentProfile, null, 2)}</pre>
       </div>
 
-    {/* Current profile */}
-    <div style={previewStyle}>
-      <h2 style={headerStyle}>Current Profile:</h2>
-      <pre style={jsonPreviewStyle}>{JSON.stringify(current, null, 2)}</pre>
-    </div>
     </div>
   );
 };

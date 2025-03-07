@@ -5,7 +5,7 @@ import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState,
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<string>("John Doe");
     return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
-};
+}
 
 // Theme Provider Component
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
@@ -29,38 +29,44 @@ export const ServerProvider = ({ children }: { children: ReactNode }) => {
 
 // Profile Provider Component
 export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [profile, setProfile] = useState<ProfileState>({
-        favoriteApp: [],
-        username: '',
-        theme: 'light', // default theme is light
-        chroma: '#4caf50', // default chroma color
-        streak: 0,
-    });
-
-    // Load the profile from localStorage or API on initial render
-    useEffect(() => {
-        const savedProfile = localStorage.getItem('profile');
-        if (savedProfile) {
-            try {
-                setProfile(JSON.parse(savedProfile));
-            } catch (error) {
-                console.error('Error parsing saved profile:', error);
-            }
+    const [currentProfile, setCurrentProfile] = useState<ProfileState>(
+        // Default profile state (optional - if you want to initialize with defaults)
+        {
+            username: "John Doe",
+            server: {
+                websocketServer: "ws://192.168.0.103:8080",
+                fileServer: "http://192.168.0.103:8081"
+            },
+            streak: 0,
+            activityDates: [],
+            theme: "dark",
+            chroma: "#00ced1"
         }
-    }, []);
-
-    // Save the profile to localStorage whenever it changes
-    useEffect(() => {
-        localStorage.setItem('profile', JSON.stringify(profile));
-    }, [profile]);
-
-    return (
-        <ProfileContext.Provider value={{ profile, setProfile }}>
-            {children}
-        </ProfileContext.Provider>
     );
-};
 
+// Load the profile from localStorage or API on initial render
+useEffect(() => {
+    const savedProfile = localStorage.getItem('profile');
+    if (savedProfile) {
+        try {
+            setCurrentProfile(JSON.parse(savedProfile));
+        } catch (error) {
+            console.error('Error parsing saved profile:', error);
+        }
+    }
+}, []);
+
+// Save the profile to localStorage whenever it changes
+useEffect(() => {
+    localStorage.setItem('profile', JSON.stringify(currentProfile));
+}, [currentProfile]);
+
+return (
+    <ProfileContext.Provider value={{ currentProfile, setCurrentProfile }}>
+        {children}
+    </ProfileContext.Provider>
+);
+};
 export const StreakProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [activityDates, setActivityDates] = useState<string[]>([]);
     const [streak, setStreak] = useState<number>(0);
