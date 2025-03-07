@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ThemeContext, UserContext, ServerContext, ProfileContext } from "./stores";
+import { ThemeContext, UserContext, ServerContext, ProfileContext, StreakContextProps, StreakContext } from "./stores";
 
 // Custom Hooks
 export const useUser = () => {
@@ -25,6 +25,14 @@ export const useProfile = () => {
   const context = useContext(ProfileContext);
   if (!context) {
     throw new Error('useProfile must be used within a ProfileProvider');
+  }
+  return context;
+};
+
+export const useStreak = (): StreakContextProps => {
+  const context = useContext(StreakContext);
+  if (!context) {
+    throw new Error('useStreak must be used within a StreakProvider');
   }
   return context;
 };

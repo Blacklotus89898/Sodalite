@@ -13,6 +13,7 @@ import QuickMenu from './components/quickMenu';
 import RND from './pages/RND';
 import Music from './pages/Music';
 import { Whitelotus } from './pages/Whitelotus';
+import './App.css';
 
 // Define your sidebar items
 const rightSideBarItems = [

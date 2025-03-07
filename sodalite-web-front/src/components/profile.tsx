@@ -1,11 +1,24 @@
-import React, { ChangeEvent } from 'react';
-import { useProfile, useTheme } from '../stores/hooks'; // Import the custom hook for the global profile context
+import React, { ChangeEvent, use, useEffect } from 'react';
+import { useProfile, useTheme, useServer, useStreak } from '../stores/hooks'; // Import the custom hook for the global profile context
 import { Container } from './container';
 
 const ProfileComponent: React.FC = () => {
   const { profile, setProfile } = useProfile(); // Access global state from context
   const { theme, chroma } = useTheme(); // Get theme and chroma dynamically
   const [jsonInput, setJsonInput] = React.useState<string>('');
+  const [current, setCurrent] = React.useState<any>(null);
+  const server = useServer();
+  const streak = useStreak();
+
+  useEffect(() => {
+    setCurrent({
+      server: server,
+      streak: streak,
+      theme: theme,
+      chroma: chroma
+    });
+  }, [profile, useServer, useStreak, theme, chroma]);
+
 
   // Sanitize the input by trimming leading/trailing whitespace
   const sanitizeJson = (jsonString: string) => {
@@ -258,6 +271,12 @@ const ProfileComponent: React.FC = () => {
         <h2 style={headerStyle}>Profile Preview:</h2>
         <pre style={jsonPreviewStyle}>{JSON.stringify(profile, null, 2)}</pre>
       </div>
+
+    {/* Current profile */}
+    <div style={previewStyle}>
+      <h2 style={headerStyle}>Current Profile:</h2>
+      <pre style={jsonPreviewStyle}>{JSON.stringify(current, null, 2)}</pre>
+    </div>
     </div>
   );
 };

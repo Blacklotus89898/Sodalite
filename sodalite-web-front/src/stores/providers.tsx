@@ -1,7 +1,7 @@
 import { useState, ReactNode, useEffect } from "react";
-import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState } from "./stores";
+import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState, StreakContext } from "./stores";
 
-// User Provider Component
+// User Provider Component -- not used in the example
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<string>("John Doe");
     return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
@@ -61,15 +61,51 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
 };
 
+export const StreakProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [activityDates, setActivityDates] = useState<string[]>([]);
+    const [streak, setStreak] = useState<number>(0);
+    const [heatmap, setHeatmap] = useState<{ [date: string]: number }>({});
+
+    useEffect(() => {
+        const today = new Date().setHours(0, 0, 0, 0);
+        let currentStreak = 0;
+        const streakData: { [date: string]: number } = {};
+
+        for (let i = activityDates.length - 1; i >= 0; i--) {
+            const activityDate = new Date(activityDates[i]).setHours(0, 0, 0, 0);
+            if (activityDate === today - currentStreak * 86400000) {
+                currentStreak++;
+            } else {
+                break;
+            }
+        }
+
+        activityDates.forEach(date => {
+            streakData[date] = (streakData[date] || 0) + 1;
+        });
+
+        setStreak(currentStreak);
+        setHeatmap(streakData);
+    }, [activityDates]);
+
+    return (
+        <StreakContext.Provider value={{ streak, heatmap, activityDates, setActivityDates }}>
+            {children}
+        </StreakContext.Provider>
+    );
+};
+
 // Wrapping all providers together
 export const AppProviders = ({ children }: { children: ReactNode }) => (
-    <ProfileProvider>
-        <ServerProvider>
-            <UserProvider>
-                <ThemeProvider>{children}</ThemeProvider>
-            </UserProvider>
-        </ServerProvider>
-    </ProfileProvider>
+    <StreakProvider>
+        <ProfileProvider>
+            <ServerProvider>
+                <UserProvider>
+                    <ThemeProvider>{children}</ThemeProvider>
+                </UserProvider>
+            </ServerProvider>
+        </ProfileProvider>
+    </StreakProvider>
 );
 
 

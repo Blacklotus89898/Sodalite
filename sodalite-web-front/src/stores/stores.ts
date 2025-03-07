@@ -51,3 +51,14 @@ export interface ProfileState {
     },
     setProfile: () => {},
   });
+
+
+export  interface StreakContextProps {
+    streak: number;
+    heatmap: { [date: string]: number };
+    activityDates: string[];
+    setActivityDates: React.Dispatch<React.SetStateAction<string[]>>;
+  }
+  
+export  const StreakContext = createContext<StreakContextProps | undefined>(undefined);
+  

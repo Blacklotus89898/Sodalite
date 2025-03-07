@@ -17,6 +17,7 @@ interface VoiceToTextProps {
 const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) => {
     const [isListening, setIsListening] = useState<boolean>(false);
     const [audioLevel, setAudioLevel] = useState<number>(0);
+    const [isSupported, setIsSupported] = useState<boolean>(true);
 
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
@@ -26,10 +27,14 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
     const { theme, chroma } = useTheme();
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
     const recognition = useRef<SpeechRecognition | null>(SpeechRecognition ? new SpeechRecognition() : null).current;
 
     useEffect(() => {
+        if (!SpeechRecognition) {
+            setIsSupported(false);
+            return;
+        }
+
         if (!recognition) {
             return;
         }
@@ -38,7 +43,6 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        // Handle recognition result
         recognition.onresult = (event: SpeechRecognitionEvent) => {
             const result = event.results[0][0].transcript;
             setText(result);
@@ -93,7 +97,7 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
             const tick = () => {
                 analyserRef.current?.getByteFrequencyData(dataArray);
                 const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
-                setAudioLevel(average / 256); // Normalize to 0-1 range
+                setAudioLevel(average / 256);
                 animationFrameRef.current = requestAnimationFrame(tick);
             };
 
@@ -115,7 +119,7 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
 
     useEffect(() => {
         return () => {
-            recognition.stop();
+            recognition?.stop();
             stopVisualizer();
         };
     }, []);
@@ -152,6 +156,14 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
         transition: 'width 50ms linear',
     };
 
+    if (!isSupported) {
+        return (
+            <div style={containerStyle}>
+                <p style={{ color: 'red' }}>Your browser does not support Speech Recognition.</p>
+            </div>
+        );
+    }
+
     return (
         <div style={containerStyle}>
             <button
@@ -171,7 +183,7 @@ const VoiceToText: React.FC<VoiceToTextProps> = ({ text, setText, language }) =>
             )}
 
             <div style={resultStyle}>
-                <p>{text}</p> {/* This now correctly shows recognized text */}
+                <p>{text}</p>
             </div>
         </div>
     );
