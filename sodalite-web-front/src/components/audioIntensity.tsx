@@ -66,7 +66,7 @@ export const AudioIntensity: React.FC = () => {
 
     if (ctx) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#222';
+      ctx.fillStyle = theme === 'dark' ? '#222' : '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       if (showBars) drawBars(ctx, dataArrayRef.current);
@@ -161,6 +161,25 @@ export const AudioIntensity: React.FC = () => {
     return () => window.removeEventListener('resize', resizeCanvas);
   }, []);
 
+  const containerStyle = {
+    padding: '20px 0px',
+    backgroundColor: theme === 'dark' ? '#000' : '#fff',
+    color: theme === 'dark' ? '#fff' : '#000',
+    borderRadius: '8px',
+    maxWidth: '800px',
+    margin: '0 auto',
+    textAlign: 'center' as const,
+    border: theme === 'light' ? `1px solid black` : '1px solid transparent',
+  paddingBottom: '0px',
+
+  };
+  
+  const headerStyle = {
+    fontSize: '24px',
+    marginBottom: '20px',
+    color: theme === 'dark' ? '#fff' : '#000',
+  };
+
   return (
     <div style={containerStyle}>
       <h1 style={headerStyle}>Audio Visualizer</h1>
@@ -240,12 +259,13 @@ export const AudioIntensity: React.FC = () => {
 };
 
 const intensityStyle = {
-  marginTop: '10px',
+  marginTop: '0px',
   fontSize: '18px',
   color: '#ddd',
   backgroundColor: '#111',
   padding: '15px',
-  borderRadius: '8px',
+  // borderRadius: '8px',
+  border: '4px solid #333',
   display: 'flex',
   flexWrap: 'wrap' as const,
   gap: '15px',
@@ -295,21 +315,7 @@ const labelActiveStyle = {
 };
 
 
-const containerStyle = {
-  padding: '20px',
-  backgroundColor: '#000',
-  color: '#fff',
-  borderRadius: '8px',
-  maxWidth: '800px',
-  margin: '0 auto',
-  textAlign: 'center' as const,
-};
 
-const headerStyle = {
-  fontSize: '24px',
-  marginBottom: '20px',
-  color: '#fff',
-};
 
 // const intensityStyle = {
 //   marginTop: '10px',
