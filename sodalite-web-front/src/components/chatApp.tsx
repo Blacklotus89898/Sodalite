@@ -12,7 +12,6 @@ export const ChatApp: React.FC = () => {
   const wsServiceRef = useRef<WebSocketService | null>(null);
 
   useEffect(() => {
-    // Initialize WebSocket service
     wsServiceRef.current = new WebSocketService(address['websocketServer']);
 
     wsServiceRef.current.connect((data) => {
@@ -42,7 +41,7 @@ export const ChatApp: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const baseFontSize = Math.max(0.2, width * 0.01); // 2% of container width
+  const baseFontSize = Math.max(12, width * 0.01); // Adjusting the font size dynamically
 
   const containerStyle: React.CSSProperties = {
     backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
@@ -57,6 +56,8 @@ export const ChatApp: React.FC = () => {
     gap: '15px',
     transition: 'background-color 0.3s ease, color 0.3s ease',
     fontSize: baseFontSize,
+    height: '100%',  // Ensure it grows with parent
+    alignItems: 'center',
   };
 
   const inputStyle: React.CSSProperties = {
@@ -68,6 +69,7 @@ export const ChatApp: React.FC = () => {
     fontSize: baseFontSize * 0.9,
     outline: 'none',
     transition: 'border 0.3s ease',
+    flexShrink: 0, // Prevent shrinking
   };
 
   const buttonStyle: React.CSSProperties = {
@@ -79,6 +81,7 @@ export const ChatApp: React.FC = () => {
     borderRadius: '5px',
     cursor: 'pointer',
     transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
+    flexShrink: 0, // Prevent shrinking
   };
 
   const messageStyle: React.CSSProperties = {
@@ -87,6 +90,7 @@ export const ChatApp: React.FC = () => {
     borderRadius: '5px',
     fontSize: baseFontSize * 0.9,
     marginBottom: '8px',
+    wordWrap: 'break-word',
   };
 
   const groupStyle: React.CSSProperties = {
@@ -95,56 +99,57 @@ export const ChatApp: React.FC = () => {
   };
 
   return (
-    <Container>
-    <div style={containerStyle}>
-      <h1 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '20px' }}>
-        Chat App
-      </h1>
+    <Container maxWidth={800} maxHeight={600}>
+      <div style={containerStyle}>
+        <h1 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '20px' }}>
+          Chat App
+        </h1>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{ fontSize: baseFontSize }}>Group:</label>
-        <input
-          type="text"
-          value={group}
-          onChange={(e) => setGroup(e.target.value)}
-          style={inputStyle}
-          onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
-          onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
-        />
-      </div>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ fontSize: baseFontSize }}>Group:</label>
+          <input
+            type="text"
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+            style={inputStyle}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
+          />
+        </div>
 
-      <div style={{ maxHeight: '300px', overflowY: 'scroll', marginBottom: '15px' }}>
-        {messages.map((msg, index) => (
-          <div key={index} style={messageStyle}>
-            <span style={groupStyle}>{msg.group}:</span> {msg.message}
-          </div>
-        ))}
-      </div>
+        <div style={{ flex: 1, overflowY: 'auto', marginBottom: '15px', width: '100%' }}>
+          {messages.map((msg, index) => (
+            <div key={index} style={messageStyle}>
+              <span style={groupStyle}>{msg.group}:</span> {msg.message}
+            </div>
+          ))}
+        </div>
 
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              sendMessage();
-            }
-          }}
-          style={inputStyle}
-          onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
-          onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
-        />
-        <button
-          onClick={sendMessage}
-          style={buttonStyle}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = chroma}
-        >
-          Send
-        </button>
+        <div style={{ display: 'flex', gap: '5px', paddingBottom: '10px', flexWrap: 'wrap', width: '100%' }}>
+          <input
+            type="text"
+            value={input}
+            placeholder='Enter message'
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                sendMessage();
+              }
+            }}
+            style={{ ...inputStyle, flex: '1 1 auto' }}
+            onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+            onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
+          />
+          <button
+            onClick={sendMessage}
+            style={{ ...buttonStyle, flex: '1 1 100%' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = chroma}
+          >
+            Send
+          </button>
+        </div>
       </div>
-    </div>
     </Container>
   );
 };

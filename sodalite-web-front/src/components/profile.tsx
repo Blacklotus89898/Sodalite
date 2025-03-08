@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useEffect } from 'react';
 import { useProfile, useTheme, useServer, useStreak, useUser } from '../stores/hooks'; // Import the custom hook for the global currentProfile context
+import { Container } from './container';
 
 const ProfileComponent: React.FC = () => {
   const { currentProfile, setCurrentProfile } = useProfile(); // Access global state from context
@@ -11,7 +12,7 @@ const ProfileComponent: React.FC = () => {
   useEffect(() => {
     setCurrentProfile({
       username: user,
-      server: address,
+      servers: address,
       streak: streak,
       activityDates: activityDates,
       theme: theme,
@@ -42,9 +43,20 @@ const ProfileComponent: React.FC = () => {
           console.log("File Content:", fileContent); // Log the content of the file
   
           try {
-            const result = JSON.parse(fileContent);
-            setCurrentProfile(result); // Update global currentProfile state
+            const jsonProfile = JSON.parse(fileContent);
             setJsonInput(fileContent); // Update the raw JSON input field
+            setCurrentProfile(jsonProfile); // Update global currentProfile state
+
+            if (jsonProfile.servers) {
+              Object.entries(jsonProfile.servers).forEach(([serverName, serverAddress]) => {
+                setAddress(serverName, serverAddress as string); // Assuming the second argument is a boolean, adjust as needed
+              });
+            }
+            setChroma(jsonProfile.chroma);
+            setTheme(jsonProfile.theme);
+            setUser(jsonProfile.username);
+
+
           } catch (error) {
             console.error("Error parsing JSON from file:", error);
             alert("The file content is not valid JSON.");
@@ -76,7 +88,7 @@ const ProfileComponent: React.FC = () => {
   const handleAppListChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setCurrentProfile(prevProfile => ({
       ...prevProfile,
-      favoriteApp: e.target.value.split('\n')
+      // favoriteApp: e.target.value.split('\n')
     })); // Update global currentProfile state
   };
 
@@ -92,6 +104,8 @@ const ProfileComponent: React.FC = () => {
       console.log("Sanitized JSON Input:", sanitizedInput); // Log sanitized input for debugging
       const jsonProfile = JSON.parse(sanitizedInput); // Try parsing the sanitized input
       console.log("Parsed JSON Profile:", jsonProfile); // Log the parsed JSON for debugging
+
+      // 
       setCurrentProfile(jsonProfile); // Update global currentProfile state
       setActivityDates(jsonProfile.activityDates);
       if (jsonProfile.servers) {
@@ -102,6 +116,9 @@ const ProfileComponent: React.FC = () => {
       setChroma(jsonProfile.chroma);
       setTheme(jsonProfile.theme);
       setUser(jsonProfile.username);
+      // 
+
+
     } catch (error) {
       console.error("Invalid JSON input:", error);
       alert("The provided JSON is invalid. Please check the format.");
@@ -158,7 +175,7 @@ const ProfileComponent: React.FC = () => {
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '10px',
+    padding: '10px 0px',
     backgroundColor: isDarkMode ? '#000' : '#f8f8f8',
     border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
     borderRadius: '5px',
@@ -169,7 +186,8 @@ const ProfileComponent: React.FC = () => {
 
   const textareaStyle: React.CSSProperties = {
     width: '100%',
-    padding: '10px',
+    resize: 'vertical',
+    padding: '10px 0px',
     backgroundColor: isDarkMode ? '#000' : '#f8f8f8',
     border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
     borderRadius: '5px',
@@ -203,6 +221,8 @@ const ProfileComponent: React.FC = () => {
   };
 
   return (
+<Container maxWidth={800} maxHeight={900}>
+
     <div style={containerStyle}>
       <h1 style={headerStyle}>currentProfile Component</h1>
 
@@ -280,12 +300,12 @@ const ProfileComponent: React.FC = () => {
           rows={5}
           style={textareaStyle}
         />
-        <button onClick={handleLoadJson} style={buttonStyle}>
-          Load JSON
-        </button>
       </div>
 
       {/* Download currentProfile Button */}
+        <button onClick={handleLoadJson} style={buttonStyle}>
+          Load JSON
+        </button>
       <div style={sectionStyle}>
         <button onClick={downloadProfile} style={buttonStyle}>
           Download currentProfile as JSON
@@ -302,6 +322,8 @@ const ProfileComponent: React.FC = () => {
       </div>
 
     </div>
+    </Container>
+
   );
 };
 

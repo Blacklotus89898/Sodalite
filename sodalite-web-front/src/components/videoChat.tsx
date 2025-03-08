@@ -1,118 +1,131 @@
 import { useEffect, useRef, useState } from 'react';
 import Peer, { MediaConnection } from 'peerjs';
-import { useTheme } from "../stores/hooks"; // Assuming useTheme hook is defined in your stores/hooks file
+import { useTheme } from "../stores/hooks";
+import { Container } from './container';
 
 function VideoChat() {
-  const theme = useTheme().theme; // Get the current theme (dark or light)
-
-  // States to manage peer ID, remote peer ID input, and references for video elements
+  const theme = useTheme().theme;
   const [peerId, setPeerId] = useState<string>('');
   const [remotePeerIdValue, setRemotePeerIdValue] = useState<string>('');
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const currentUserVideoRef = useRef<HTMLVideoElement>(null);
   const peerInstance = useRef<Peer | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [fontSize, setFontSize] = useState(16); // Base font size
+  const [isCallActive, setIsCallActive] = useState(false); // Track if the call is active
 
   useEffect(() => {
-    // Initialize PeerJS
     const peer = new Peer();
 
-    // On Peer connection open, set the peer ID
-    peer.on('open', (id: string) => {
-      setPeerId(id);
-    });
+    peer.on('open', (id: string) => setPeerId(id));
 
-    // Handling incoming calls
     peer.on('call', (call: MediaConnection) => {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then((mediaStream) => {
-          // Display the current user's video
-          if (currentUserVideoRef.current) {
-            currentUserVideoRef.current.srcObject = mediaStream;
-            currentUserVideoRef.current.play();
-          }
-          // Answer the call with user's media stream
-          call.answer(mediaStream);
-          // On receiving remote stream, display it
-          call.on('stream', (remoteStream: MediaStream) => {
-            if (remoteVideoRef.current) {
-              remoteVideoRef.current.srcObject = remoteStream;
-              remoteVideoRef.current.play();
-            }
-          });
-        })
-        .catch((err) => {
-          console.error('Failed to get media: ', err);
-        });
-    });
-
-    // Store the peer instance for later use
-    peerInstance.current = peer;
-
-    // Cleanup function to destroy the peer instance when component unmounts
-    return () => {
-      peer.destroy();
-    };
-  }, []);
-
-  // Function to initiate a call to a remote peer
-  const call = (remotePeerId: string) => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then((mediaStream) => {
-        // Display the current user's video
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((mediaStream) => {
         if (currentUserVideoRef.current) {
           currentUserVideoRef.current.srcObject = mediaStream;
           currentUserVideoRef.current.play();
         }
-
-        // Make a call to the remote peer with the media stream
-        const call = peerInstance.current?.call(remotePeerId, mediaStream);
-
-        // On receiving remote stream, display it
-        call?.on('stream', (remoteStream: MediaStream) => {
+        call.answer(mediaStream);
+        call.on('stream', (remoteStream: MediaStream) => {
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream;
             remoteVideoRef.current.play();
           }
         });
-      })
-      .catch((err) => {
-        console.error('Failed to get media: ', err);
       });
+      setIsCallActive(true); // Call started, set the call active flag
+    });
+
+    peerInstance.current = peer;
+    return () => peer.destroy();
+  }, []);
+
+  const call = (remotePeerId: string) => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((mediaStream) => {
+      if (currentUserVideoRef.current) {
+        currentUserVideoRef.current.srcObject = mediaStream;
+        currentUserVideoRef.current.play();
+      }
+
+      const call = peerInstance.current?.call(remotePeerId, mediaStream);
+      call?.on('stream', (remoteStream: MediaStream) => {
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = remoteStream;
+          remoteVideoRef.current.play();
+        }
+      });
+      setIsCallActive(true); // Call started, set the call active flag
+    });
   };
 
-  // Dynamic styles based on the current theme
-  const containerStyle = {
+  const stopVideo = () => {
+    const currentStream = currentUserVideoRef.current?.srcObject as MediaStream;
+    currentStream?.getTracks().forEach((track) => track.stop()); // Stop all tracks
+    setIsCallActive(false); // Call ended, set the call inactive flag
+  };
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        const width = entries[0].contentRect.width;
+        const newFontSize = Math.max(12, width / 40); // Dynamically scale font size
+        setFontSize(newFontSize);
+      }
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const containerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     fontFamily: 'Arial, sans-serif',
-    backgroundColor: theme === "dark" ? '#333' : '#f9f9f9', // Dynamic background
+    backgroundColor: theme === "dark" ? '#333' : '#f9f9f9',
     padding: '20px',
     borderRadius: '10px',
-    boxShadow: theme === "dark" ? '0 0 10px rgba(0, 0, 0, 0.5)' : '0 0 10px rgba(0, 0, 0, 0.1)', // Adjust shadow for dark mode
+    boxShadow: theme === "dark" ? '0 0 10px rgba(0, 0, 0, 0.5)' : '0 0 10px rgba(0, 0, 0, 0.1)',
     width: '80%',
     margin: 'auto',
     marginTop: '20px',
+    fontSize: `${fontSize}px` // Apply dynamic font size
   };
 
   const inputStyle = {
     padding: '10px',
     borderRadius: '5px',
-    border: theme === "dark" ? '1px solid #444' : '1px solid #ccc', // Border color changes based on theme
+    border: theme === "dark" ? '1px solid #444' : '1px solid #ccc',
     width: '60%',
-    backgroundColor: theme === "dark" ? '#555' : '#fff', // Input background
-    color: theme === "dark" ? '#fff' : '#333', // Text color
+    backgroundColor: theme === "dark" ? '#555' : '#fff',
+    color: theme === "dark" ? '#fff' : '#333',
+    fontSize: `${fontSize * 0.8}px`
   };
 
   const buttonStyle = {
     padding: '10px 20px',
     borderRadius: '5px',
     border: 'none',
-    backgroundColor: remotePeerIdValue ? '#007bff' : '#ccc',
+    backgroundColor: remotePeerIdValue ? (theme === "dark" ? '#555' : '#007bff') : '#ccc',
     color: '#fff',
     cursor: remotePeerIdValue ? 'pointer' : 'not-allowed',
     transition: 'background-color 0.3s',
-    backgroundColor: theme === "dark" ? '#555' : '#007bff', // Button color based on theme
+    fontSize: `${fontSize}px`
+  };
+
+  const stopButtonStyle = {
+    padding: '10px 20px',
+    borderRadius: '5px',
+    border: 'none',
+    backgroundColor: theme === "dark" ? '#e74c3c' : '#c0392b',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s',
+    fontSize: `${fontSize}px`
   };
 
   const videoStyle = {
@@ -120,66 +133,61 @@ function VideoChat() {
     border: '1px solid black',
     borderRadius: '5px',
     marginBottom: '20px',
-    backgroundColor: theme === "dark" ? '#444' : '#fff', // Video background to match theme
+    backgroundColor: theme === "dark" ? '#444' : '#fff',
   };
 
   return (
-    <div style={containerStyle}>
-      <h1 style={{ marginBottom: '20px', color: theme === "dark" ? '#fff' : '#333' }}>Video Chat</h1>
+    <Container maxWidth={1200} maxHeight={1200}>
+      <div ref={containerRef} style={containerStyle}>
+        <h1 style={{ marginBottom: '20px', color: theme === "dark" ? '#fff' : '#333', fontSize: `${fontSize * 1.5}px` }}>
+          Video Chat
+        </h1>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-        gap: '10px',
-      }}>
-        <label htmlFor="peerIdInput" style={{ fontSize: '16px', color: theme === "dark" ? '#fff' : '#333' }}>Your Peer ID:</label>
-        <input
-          id="peerIdInput"
-          type="text"
-          value={peerId}
-          readOnly
-          style={inputStyle}
-        />
+        {/* Hide the Peer ID input when the call starts */}
+        {!isCallActive && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '10px' }}>
+              <label htmlFor="peerIdInput" style={{ fontSize: `${fontSize}px`, color: theme === "dark" ? '#fff' : '#333' }}>Your Peer ID:</label>
+              <input id="peerIdInput" type="text" value={peerId} readOnly style={inputStyle} />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '10px' }}>
+              <label htmlFor="remotePeerIdInput" style={{ fontSize: `${fontSize}px`, color: theme === "dark" ? '#fff' : '#333' }}>Remote Peer ID:</label>
+              <input id="remotePeerIdInput" type="text" value={remotePeerIdValue} onChange={(e) => setRemotePeerIdValue(e.target.value)} placeholder="Enter Remote Peer ID" style={inputStyle} />
+            </div>
+          </>
+        )}
+
+        {/* Call/Stop button */}
+        {!isCallActive ? (
+          <button
+            onClick={() => call(remotePeerIdValue)}
+            disabled={!remotePeerIdValue}
+            style={buttonStyle}
+          >
+            Call
+          </button>
+        ) : (
+          <button
+            onClick={stopVideo}
+            style={stopButtonStyle}
+          >
+            Stop Video
+          </button>
+        )}
+
+        {/* Video Display */}
+        <div style={{ marginTop: '20px', width: '100%', textAlign: 'center' }}>
+          <h2 style={{ color: theme === "dark" ? '#fff' : '#333', fontSize: `${fontSize * 1.2}px` }}>Your Video</h2>
+          <video ref={currentUserVideoRef} autoPlay playsInline style={videoStyle} />
+        </div>
+
+        <div style={{ width: '100%', textAlign: 'center' }}>
+          <h2 style={{ color: theme === "dark" ? '#fff' : '#333', fontSize: `${fontSize * 1.2}px` }}>Remote Video</h2>
+          <video ref={remoteVideoRef} autoPlay playsInline style={videoStyle} />
+        </div>
       </div>
-
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-        gap: '10px',
-      }}>
-        <label htmlFor="remotePeerIdInput" style={{ fontSize: '16px', color: theme === "dark" ? '#fff' : '#333' }}>Remote Peer ID:</label>
-        <input
-          id="remotePeerIdInput"
-          type="text"
-          value={remotePeerIdValue}
-          onChange={(e) => setRemotePeerIdValue(e.target.value)}
-          placeholder="Enter Remote Peer ID"
-          style={inputStyle}
-        />
-      </div>
-
-      <button
-        onClick={() => call(remotePeerIdValue)}
-        disabled={!remotePeerIdValue}
-        style={buttonStyle}
-        onMouseOver={(e) => remotePeerIdValue && ((e.target as HTMLButtonElement).style.backgroundColor = '#0056b3')}
-        onMouseOut={(e) => remotePeerIdValue && ((e.target as HTMLButtonElement).style.backgroundColor = '#007bff')}
-      >
-        Call
-      </button>
-
-      <div style={{ marginTop: '20px', width: '100%', textAlign: 'center' }}>
-        <h2 style={{ color: theme === "dark" ? '#fff' : '#333' }}>Your Video</h2>
-        <video ref={currentUserVideoRef} autoPlay playsInline style={videoStyle} />
-      </div>
-
-      <div style={{ width: '100%', textAlign: 'center' }}>
-        <h2 style={{ color: theme === "dark" ? '#fff' : '#333' }}>Remote Video</h2>
-        <video ref={remoteVideoRef} autoPlay playsInline style={videoStyle} />
-      </div>
-    </div>
+    </Container>
   );
 }
 

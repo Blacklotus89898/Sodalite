@@ -108,7 +108,7 @@ const FileUploadComponent = () => {
     };
 
     const inputStyle: React.CSSProperties = {
-        padding: '10px',
+        padding: '10px 0px',
         marginBottom: '15px',
         width: '100%',
         backgroundColor: isDarkMode ? '#555' : '#f0f0f0',
@@ -118,6 +118,7 @@ const FileUploadComponent = () => {
         fontSize: baseFontSize,
         outline: 'none',
         transition: 'border 0.3s ease',
+        alignContent: 'center',
     };
 
     const buttonStyle: React.CSSProperties = {
@@ -129,6 +130,7 @@ const FileUploadComponent = () => {
         fontSize: baseFontSize,
         cursor: 'pointer',
         transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
+        marginBottom: '15px',
     };
 
     const textareaStyle: React.CSSProperties = {
@@ -141,7 +143,7 @@ const FileUploadComponent = () => {
         border: `1px solid ${isDarkMode ? '#444' : '#ddd'}`,
         borderRadius: '5px',
         fontSize: baseFontSize,
-        resize: 'none',
+        resize: 'vertical',
         boxSizing: 'border-box',
     };
 
@@ -149,7 +151,10 @@ const FileUploadComponent = () => {
         <Container>
             <div ref={containerRef} style={containerStyle}>
                 <h1 style={{ fontSize: baseFontSize * 1.5, marginBottom: '20px' }}>Text Editor Component</h1>
-                <input type="file" onChange={handleFileChange} style={inputStyle} />
+                <input type="file" onChange={handleFileChange} style={inputStyle}
+                       onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                       onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
+                        />
                 <button onClick={() => setFile(null)} style={buttonStyle}>New File</button>
                 <input
                     type="text"
@@ -157,11 +162,15 @@ const FileUploadComponent = () => {
                     onChange={handleFilenameChange}
                     placeholder="Enter filename"
                     style={inputStyle}
+                    onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                    onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
                 />
                 <textarea
                     value={fileContent}
                     onChange={(e) => setFileContent(e.target.value)}
                     style={textareaStyle}
+                    onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                    onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
                 />
                 <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
 

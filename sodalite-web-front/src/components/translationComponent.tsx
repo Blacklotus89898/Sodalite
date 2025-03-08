@@ -15,22 +15,21 @@ const TranslationComponent = () => {
     const { theme, chroma } = useTheme(); // Get the current theme from the context
 
     const handleTranslate = async () => {
-        if (!text.trim()) return; // Don't proceed if the input text is empty
+        if (!text.trim()) return;
 
         setIsLoading(true);
-        setError(null); // Reset error state before each new translation
+        setError(null);
 
         try {
             const response = await fetch(
                 `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLanguage}&tl=${targetLanguage}&dt=t&q=${encodeURI(text)}`
             );
-            
+
             if (!response.ok) throw new Error("Failed to fetch translation.");
 
             const result = await response.json();
             console.log("Translation result:", result);
 
-            // Check if the translation result is as expected
             if (result && result[0] && result[0][0] && result[0][0][0]) {
                 setTranslatedText(result[0][0][0]);
             } else {
@@ -45,146 +44,143 @@ const TranslationComponent = () => {
     };
 
     const containerStyle = {
-        padding: '20px',
-        backgroundColor: theme === "dark" ? '#333' : '#fff', // Dynamic background based on theme
-        color: theme === "dark" ? '#fff' : '#333', // Dynamic text color based on theme
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'stretch',
+        padding: 'clamp(10px, 3vw, 20px)',
+        backgroundColor: theme === "dark" ? '#333' : '#fff',
+        color: theme === "dark" ? '#fff' : '#333',
         borderRadius: '10px',
-        maxWidth: '800px',
+        maxWidth: '90vw',
         margin: 'auto',
-        boxShadow: theme === "dark" ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)', // Adjust shadow for dark mode
+        boxShadow: theme === "dark" ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
         textAlign: 'center' as const,
+        height: '100%',
+    };
+
+    const inputContainerStyle = {
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
     };
 
     const headerStyle = {
-        fontSize: '28px',
-        marginBottom: '20px',
-        color: theme === "dark" ? '#fff' : '#333', // Dynamic color based on theme
+        fontSize: 'clamp(20px, 4vw, 32px)', // Scales between 20px and 32px
+        marginBottom: 'clamp(10px, 2vw, 20px)',
         fontWeight: 'bold',
     };
 
     const inputStyle = {
-        padding: '10px',
-        marginBottom: '15px',
+        padding: 'clamp(8px, 2vw, 12px)',
+        marginBottom: 'clamp(10px, 2vw, 15px)',
         width: '100%',
-        backgroundColor: theme === "dark" ? '#555' : '#f0f0f0', // Dynamic background for input field
-        color: theme === "dark" ? '#fff' : '#333', // Dynamic text color for input field
-        border: theme === "dark" ? '1px solid #444' : '1px solid #ddd', // Border for light mode
+        backgroundColor: theme === "dark" ? '#555' : '#f0f0f0',
+        color: theme === "dark" ? '#fff' : '#333',
+        border: theme === "dark" ? '1px solid #444' : '1px solid #ddd',
         borderRadius: '5px',
-        fontSize: '16px',
+        fontSize: 'clamp(14px, 2vw, 18px)', // Responsive text
         boxSizing: 'border-box' as const,
+        resize: "vertical",
+        flexGrow: 1,
     };
 
     const selectWrapperStyle = {
         display: 'flex',
         justifyContent: 'center',
         gap: '10px',
-        marginBottom: '15px',
+        marginBottom: 'clamp(10px, 2vw, 15px)',
     };
 
     const selectStyle = {
-        padding: '10px',
-        backgroundColor: theme === "dark" ? '#555' : '#f0f0f0', // Dynamic background
-        color: theme === "dark" ? '#fff' : '#333', // Dynamic text color
-        border: theme === "dark" ? '1px solid #444' : '1px solid #ddd', // Border for light mode
+        padding: 'clamp(8px, 2vw, 12px)',
+        backgroundColor: theme === "dark" ? '#555' : '#f0f0f0',
+        color: theme === "dark" ? '#fff' : '#333',
+        border: theme === "dark" ? '1px solid #444' : '1px solid #ddd',
         borderRadius: '5px',
-        fontSize: '16px',
+        fontSize: 'clamp(14px, 2vw, 18px)',
         width: '45%',
         boxSizing: 'border-box' as const,
     };
 
     const buttonStyle = {
-        padding: '10px 20px',
+        padding: 'clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px)',
         backgroundColor: '#3498db',
         color: '#fff',
         border: 'none',
         borderRadius: '5px',
-        fontSize: '16px',
+        fontSize: 'clamp(14px, 2vw, 18px)',
         cursor: 'pointer',
     };
 
     const resultStyle = {
-        marginTop: '20px',
-        color: theme === "dark" ? '#ddd' : '#333', // Dynamic text color for results
+        marginTop: 'clamp(10px, 2vw, 20px)',
+        color: theme === "dark" ? '#ddd' : '#333',
     };
 
     const errorStyle = {
         marginTop: '10px',
         color: '#e74c3c',
-        fontSize: '14px',
+        fontSize: 'clamp(12px, 2vw, 16px)',
     };
 
     return (
-        <Container>
+        <Container maxWidth={800} maxHeight={650} style={{ height: "100%" }}>
             <div style={containerStyle}>
                 <h1 style={headerStyle}>Translation Component</h1>
 
-                {/* Voice input field */}    
-                <VoiceToText setText={setText} language={sourceLanguage} />
+                <div style={inputContainerStyle}>
+                    <VoiceToText setText={setText} language={sourceLanguage} />
 
-                {/* Input text field */}
-                <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Enter text to translate"
-                    style={inputStyle}
-                    onMouseOver={(e) => e.currentTarget.style.border = `2px solid ${chroma}`}
-                    onMouseOut={(e) => e.currentTarget.style.border = '2px solid rgba(0, 0, 0, 0.3)'}
-                />
+                    <textarea
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder="Enter text to translate"
+                        rows={4}
+                        style={inputStyle}
+                        onMouseOver={(e) => e.currentTarget.style.border = `2px solid ${chroma}`}
+                        onMouseOut={(e) => e.currentTarget.style.border = '2px solid rgba(0, 0, 0, 0.3)'}
+                    />
+                </div>
 
-                {/* Language selection */}
                 <div style={selectWrapperStyle}>
-                    <select
-                        value={sourceLanguage}
-                        onChange={(e) => setSourceLanguage(e.target.value)}
-                        style={selectStyle}
-                    >
+                    <select value={sourceLanguage} onChange={(e) => setSourceLanguage(e.target.value)} style={selectStyle}>
                         <option value="auto">Detect Language</option>
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
                         <option value="fr">French</option>
-                        {/* Add more language options as needed */}
                     </select>
-                    <select
-                        value={targetLanguage}
-                        onChange={(e) => setTargetLanguage(e.target.value)}
-                        style={selectStyle}
-                    >
+                    <select value={targetLanguage} onChange={(e) => setTargetLanguage(e.target.value)} style={selectStyle}>
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
                         <option value="fr">French</option>
-                        {/* Add more language options as needed */}
                     </select>
                 </div>
 
-                {/* Translate Button */}
                 <button
                     onClick={handleTranslate}
                     style={buttonStyle}
                     disabled={isLoading || !text.trim()}
                     onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.backgroundColor = buttonStyle
-                        .backgroundColor as string
+                        e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor as string;
                     }}
                 >
                     {isLoading ? "Translating..." : "Translate"}
                 </button>
 
-                {/* Error Message */}
                 {error && <p style={errorStyle}>{error}</p>}
 
-                {/* Translated Text */}
                 <div style={resultStyle}>
                     <h2>Translated Text</h2>
-                    <p>{translatedText || "Translation will appear here."}</p>
+                    <p style={{ fontSize: 'clamp(14px, 2vw, 18px)' }}>
+                        {translatedText || "Translation will appear here."}
+                    </p>
                 </div>
+
+                <TextToVoice text={translatedText} targetLanguage={targetLanguage} />
             </div>
-
-            {/* Pass the translatedText and targetLanguage as props to TextToVoice */}
-            <TextToVoice text={translatedText} targetLanguage={targetLanguage} />
-
-            {/* Pass setText and sourceLanguage as props to VoiceToText */}
         </Container>
     );
 };

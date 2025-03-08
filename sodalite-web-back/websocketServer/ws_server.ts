@@ -17,7 +17,7 @@ server.on('connection', (ws: WebSocket) => {
 
         try {
             const parsedMessage = JSON.parse(messageString);
-            group = parsedMessage.group || '';
+            group = parsedMessage.group || ''; //sholud be called channels
             data = parsedMessage.data || null;
         } catch (error) {
             console.error('Failed to parse message:', error);

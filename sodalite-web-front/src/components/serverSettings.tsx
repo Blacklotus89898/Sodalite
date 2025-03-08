@@ -26,8 +26,11 @@ const UpdateAddress = () => {
 
     const isDarkMode = theme === 'dark';
 
-    // Calculate scalable font sizes based on width
-    const baseFontSize = Math.max(12, width * 0.05); // Example: 5% of container width
+    // Calculate scalable font sizes with min and max limits
+    const baseFontSize = Math.min(24, Math.max(12, width * 0.05));
+    const inputFontSize = baseFontSize * 0.85;
+    const buttonFontSize = baseFontSize * 0.95;
+    const titleFontSize = baseFontSize * 1.2;
 
     const containerStyle: React.CSSProperties = {
         backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)',
@@ -50,7 +53,7 @@ const UpdateAddress = () => {
         border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`,
         backgroundColor: 'transparent',
         color: isDarkMode ? 'white' : 'black',
-        fontSize: baseFontSize * 0.9,
+        fontSize: inputFontSize,
         outline: 'none',
         transition: 'border 0.3s ease',
     };
@@ -60,7 +63,7 @@ const UpdateAddress = () => {
         color: isDarkMode ? 'black' : 'white',
         border: 'none',
         padding: '12px',
-        fontSize: baseFontSize,
+        fontSize: buttonFontSize,
         borderRadius: '5px',
         cursor: 'pointer',
         transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
@@ -71,19 +74,15 @@ const UpdateAddress = () => {
         backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
         borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: baseFontSize * 0.85,
+        fontSize: inputFontSize,
         transition: 'background 0.3s ease',
     };
 
     const activeItemStyle: React.CSSProperties = {
         ...itemStyle,
-        backgroundColor: chroma, // Set chroma as background color for the active item
-        color: isDarkMode ? 'black' : 'white', // Adjust text color for readability
+        backgroundColor: chroma,
+        color: isDarkMode ? 'black' : 'white',
     };
-
-    // const hoverBackground = isDarkMode
-    //     ? 'rgba(255, 255, 255, 0.2)'
-    //     : 'rgba(0, 0, 0, 0.1)';
 
     const handleUpdate = () => {
         if (selectedKey && newAddress) {
@@ -97,9 +96,9 @@ const UpdateAddress = () => {
     };
 
     return (
-        <Container>
+        <Container maxWidth={800} maxHeight={600}>
             <div ref={containerRef} style={containerStyle}>
-                <h3 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '10px' }}>
+                <h3 style={{ textAlign: 'center', fontSize: titleFontSize, marginBottom: '10px' }}>
                     Update Address
                 </h3>
 
@@ -113,7 +112,7 @@ const UpdateAddress = () => {
                     {Object.entries(address).map(([key, addr], index) => (
                         <div
                             key={index}
-                            style={key === selectedKey ? activeItemStyle : itemStyle} // Apply active item style conditionally
+                            style={key === selectedKey ? activeItemStyle : itemStyle}
                             onClick={() => handleItemClick(key, addr)}
                             onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = key === selectedKey ? chroma : itemStyle.backgroundColor as string}

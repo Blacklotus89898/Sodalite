@@ -33,7 +33,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
         // Default profile state (optional - if you want to initialize with defaults)
         {
             username: "John Doe",
-            server: {
+            servers: {
                 websocketServer: "ws://192.168.0.103:8080",
                 fileServer: "http://192.168.0.103:8081"
             },
