@@ -10,7 +10,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const { theme } = useTheme();
-
     const isDarkMode = theme === 'dark';
 
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -18,32 +17,34 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
     const sidebarStyle: React.CSSProperties = {
         position: 'sticky',
         [position]: 0,
-        top: '6em', // Adjust this based on header height if needed
+        top: "6em",
         backgroundColor: isCollapsed ? 'transparent' : (isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)'),
         color: isDarkMode ? 'white' : 'black',
         display: 'flex',
         flexDirection: 'column',
         alignItems: isCollapsed ? 'center' : 'flex-start',
         transition: 'width 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out',
-        width: isCollapsed ? '60px' : '220px',
+        width: isCollapsed ? '60px' : '420px',
         height: '100vh',
         overflowY: 'auto',
         padding: isCollapsed ? '10px 0' : '20px',
         scrollbarWidth: 'thin',
         scrollbarColor: isDarkMode ? '#666 #333' : '#bbb #eee',
+        zIndex: 1000,
     };
 
     const toggleButtonStyle: React.CSSProperties = {
         background: 'none',
         border: 'none',
-        color: isDarkMode ? (isCollapsed ? 'black' : 'white') : (isCollapsed ? 'black' : 'black'),
+        color: isDarkMode ? (isCollapsed ? 'black' : 'white') : (isCollapsed ? 'black': "black"),
         cursor: 'pointer',
         fontSize: '20px',
         padding: '10px',
         transition: 'opacity 0.3s ease, color 0.3s ease',
         position: 'absolute',
-        top: '20px',
-        [position]: isCollapsed ? '10px' : '180px',
+        top: '10px',
+        left: position === 'left' ? '10px' : 'auto',
+        right: position === 'right' ? '10px' : 'auto',
     };
 
     const linkStyle: React.CSSProperties = {
@@ -61,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
 
     return (
         <div style={sidebarStyle}>
-            {/* Toggle Button */}
+            {/* Toggle Button - Always at the Top */}
             <button
                 onClick={toggleSidebar}
                 style={toggleButtonStyle}
@@ -74,12 +75,12 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
             {/* Sidebar Content */}
             {!isCollapsed && (
                 <>
-                    <div style={{ marginTop: 'auto', paddingBottom: '20px', width: '100%' }}>
-                        {children}
-                    </div>
+                <div>
+
+                        {items.length > 0 && (
                     <nav style={{ marginTop: '50px', width: '100%' }}>
                         <ul style={{ listStyle: 'none', padding: 0, width: '100%' }}>
-                            {items.map((item, index) => (
+                            {items.map((item: { label: string, href: string }, index: number) => (
                                 <li key={index} style={{ margin: '10px 0', textAlign: 'center' }}>
                                     <a
                                         href={item.href}
@@ -93,6 +94,12 @@ const Sidebar: React.FC<SidebarProps> = ({ items, position, children }) => {
                             ))}
                         </ul>
                     </nav>
+                        )}
+                </div>
+
+                    <div style={{ marginTop: 'auto', paddingBottom: '20px', width: '100%' }}>
+                        {children}
+                    </div>
                 </>
             )}
         </div>

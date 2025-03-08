@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
         width: '100%',
         boxShadow: '0px -4px 6px rgba(0, 0, 0, 0.2)',
         transition: 'background 0.3s ease-in-out',
-        zIndex: -1,
+        zIndex: 1,
     };
 
     const linkStyle: React.CSSProperties = {
@@ -26,18 +26,25 @@ const Footer: React.FC = () => {
             <div>
                 <p>&copy; {new Date().getFullYear()} Blackotus89898 - Sodalite. All rights reserved.</p>
                 <div>
-                    <a href="#privacy" style={linkStyle}
+                    <a href="/privacy" style={linkStyle}
                         onMouseOver={(e) => e.currentTarget.style.color = 'lightgray'}
                         onMouseOut={(e) => e.currentTarget.style.color = 'white'}
                     >
                         Privacy Policy
                     </a>
                     |
-                    <a href="#terms" style={linkStyle}
+                    <a href="/terms" style={linkStyle}
                         onMouseOver={(e) => e.currentTarget.style.color = 'lightgray'}
                         onMouseOut={(e) => e.currentTarget.style.color = 'white'}
                     >
                         Terms of Service
+                    </a>
+                    |
+                    <a href="https://github.com/Blacklotus89898" style={linkStyle} 
+                        onMouseOver={(e) => e.currentTarget.style.color = 'lightgray'}
+                        onMouseOut={(e) => e.currentTarget.style.color = 'white'}
+                    >
+                        About
                     </a>
                 </div>
             </div>

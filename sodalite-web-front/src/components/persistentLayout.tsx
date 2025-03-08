@@ -5,6 +5,7 @@ import PersistentNotebookLayout from './notebook';
 import { CanvaShare } from './canvaShare';
 import Iframe from './iframe';
 import ProfileComponent from './profile';
+import FileUploadComponent from './fileUploadComponent';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
@@ -129,6 +130,12 @@ const PersistentLayout: React.FC = () => {
                     >
                         {collapsed ? '' : 'Iframe'}
                     </button>
+                    <button
+                        style={activeTab === 'cloud' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('cloud')}
+                    >
+                        {collapsed ? '' : 'Cloud'}
+                    </button>
                 </div>
 
                 {/* Main Content Area */}
@@ -149,9 +156,14 @@ const PersistentLayout: React.FC = () => {
                         {/* <div>   </div> */}
                         {/* <CanvaShare /> */}
                     </div>
-                    <div style={{ display: activeTab === 'iframe' ? 'block' : 'none' }}>
+                    <div style={{ display: activeTab === 'iframe' ? 'flex' : 'none', flex: 1 }}>
                         {/* <Iframe initialLink="https://wikipedia.com" name="iframe" /> */}
                         <Iframe initialLink="https://wikipedia.com" name="Example" />
+
+                    </div>
+                    <div style={{ display: activeTab === 'cloud' ? 'flex' : 'none', flex: 1 }}>
+                        {/* <Iframe initialLink="https://wikipedia.com" name="iframe" /> */}
+                        <FileUploadComponent />
 
                     </div>
                 </div>

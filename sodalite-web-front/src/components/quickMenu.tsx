@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme } from "../stores/hooks";
 
 interface QuickMenuProps {
     options: string[];
@@ -10,6 +11,7 @@ interface QuickMenuProps {
 const QuickMenu: React.FC<QuickMenuProps> = ({ options, onSelect, position, selectedOption }) => {
     const radius = 100; // Distance from center to options
     const [hoveredOption, setHoveredOption] = useState<string | null>(null);
+    const {theme, chroma} = useTheme();
 
     const handleMouseEnter = (option: string) => {
         setHoveredOption(option);
@@ -32,12 +34,12 @@ const QuickMenu: React.FC<QuickMenuProps> = ({ options, onSelect, position, sele
                 transform: "translate(-50%, -50%)",
                 borderRadius: "50%",
                 // backgroundColor: "rgba(0, 0, 0, 1)", // Dark transparent background
-                backgroundColor: "transparent", // Dark transparent background
+                backgroundColor: theme === "dark"? "black": "transparent", // Dark transparent background
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 zIndex: 1000,
-                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.5)", // Light shadow for emphasis
+                boxShadow: `0px 4px 10px ${chroma}`, // Light shadow for emphasis
             }}
         >
             {options.map((option, index) => {
@@ -59,14 +61,15 @@ const QuickMenu: React.FC<QuickMenuProps> = ({ options, onSelect, position, sele
                             top: `calc(50% + ${y}px)`,
                             transform: `translate(-50%, -50%) scale(${isHovered || isSelected ? 1.1 : 1})`, // Combine transforms
                             padding: "12px 20px",
-                            backgroundColor: isHovered || isSelected ? "#444" : "#333", // Highlight on hover or selection
+                            backgroundColor: isHovered || isSelected ? (theme === "dark" ? "#444" : "#fff") : (theme === "dark" ? "#333" : "#fff"), // Highlight on hover or selection
                             borderRadius: "8px",
+                            border: theme === "dark" ? "2px solid #444" : "2px solid #ddd",
                             cursor: "pointer",
-                            color: "#fff",
+                            color: theme === "dark" ? "#fff": "#000",
                             textAlign: "center",
-                            fontSize: "16px",
+                            fontSize: "12px",
                             transition: "background 0.3s ease-in-out, transform 0.2s ease-in-out",
-                            boxShadow: isHovered || isSelected ? "0px 4px 12px rgba(0, 0, 0, 0.6)" : "none",
+                            boxShadow: isHovered || isSelected ? `0px 4px 12px ${chroma}` : "none",
                         }}
                     >
                         {option}
