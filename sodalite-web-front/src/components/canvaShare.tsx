@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container } from './container';
 import { WebSocketService } from '../services/websocketService';
 import { useServer, useTheme } from '../stores/hooks';
@@ -8,7 +8,8 @@ export const CanvaShare: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDrawing = useRef(false);
     const wsServiceRef = useRef<WebSocketService | null>(null);
-    const { theme } = useTheme();
+    const { theme, chroma } = useTheme();
+    const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -16,16 +17,23 @@ export const CanvaShare: React.FC = () => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        const updateConnectionStatus = (status: boolean) => {
+            setIsConnected(status);
+        };
+
         // Initialize WebSocket service
         wsServiceRef.current = new WebSocketService(address['websocketServer']);
-        wsServiceRef.current.connect((data) => drawFromServer(data as { startX: number, startY: number, x: number, y: number }, ctx));
+        wsServiceRef.current.connect((data) => {
+            drawFromServer(data as { startX: number, startY: number, x: number, y: number }, ctx);
+            updateConnectionStatus(true);
+        });
 
         const drawFromServer = (data: { startX: number, startY: number, x: number, y: number }, ctx: CanvasRenderingContext2D) => {
             ctx.beginPath();
             ctx.moveTo(data.startX, data.startY);
             ctx.lineTo(data.x, data.y);
             ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
-            ctx.lineWidth = 5; // Change brush size as needed
+            ctx.lineWidth = 1; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
             ctx.closePath();
@@ -59,7 +67,7 @@ export const CanvaShare: React.FC = () => {
 
             ctx.lineTo(pos.x, pos.y);
             ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
-            ctx.lineWidth = 5; // Change brush size as needed
+            ctx.lineWidth = 1; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
 
@@ -84,8 +92,8 @@ export const CanvaShare: React.FC = () => {
         // Set canvas size dynamically to fill the parent container
         const resizeCanvas = () => {
             if (canvas) {
-                canvas.width = canvas.parentElement?.clientWidth || 800; // Set width based on parent container
-                canvas.height = canvas.parentElement?.clientHeight || 600; // Set height based on parent container
+                canvas.width = canvas.parentElement?.clientWidth || 1000; // Set width based on parent container
+                canvas.height = canvas.parentElement?.clientHeight || 800; // Set height based on parent container
             }
         };
 
@@ -123,9 +131,40 @@ export const CanvaShare: React.FC = () => {
         };
     }, [address, theme]); // Add theme as a dependency
 
+    const reconnect = () => {
+        if (wsServiceRef.current) {
+            wsServiceRef.current.close();
+            wsServiceRef.current.connect(() => setIsConnected(true));
+        }
+    };
+      const buttonStyle: React.CSSProperties = {
+        backgroundColor: chroma,
+        color: theme === 'dark' ? 'black' : 'white',
+        border: 'none',
+        padding: '12px',
+        fontSize: "12px",
+        borderRadius: '5px',
+        cursor: 'pointer',
+        transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
+        flexShrink: 0, // Prevent shrinking
+      };
+
     return (
         <Container maxWidth={1000} maxHeight={800}>
             <h1>Canva Share Component</h1>
+            <div>
+                {isConnected ? (
+                    <h2 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Connected</h2>
+                ) : (
+                    <>
+                        <h2 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Disconnected  
+                            <span>        </span>
+
+                        <button style={buttonStyle} onClick={reconnect}>Reconnect</button>
+                        </h2>
+                    </>
+                )}
+            </div>
             <canvas id="canvas" ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }}></canvas>
         </Container>
     );

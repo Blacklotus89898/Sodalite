@@ -1,13 +1,19 @@
 export class WebSocketService {
   private socket: WebSocket | null = null;
+  private isConnected: boolean = false;
+  private url: string;
 
-  constructor(private url: string) {}
-
-//   make the group parameter optional 
-// take as arg the group name
+  constructor(url: string) {
+    this.url = url;
+  }
 
   connect(onMessage: (data: unknown) => void) {
     this.socket = new WebSocket(this.url);
+
+    this.socket.onopen = () => {
+      this.isConnected = true;
+      console.log('WebSocket connected');
+    };
 
     this.socket.onmessage = async (event) => {
       try {
@@ -24,6 +30,7 @@ export class WebSocketService {
     };
 
     this.socket.onclose = () => {
+      this.isConnected = false;
       console.log('WebSocket connection closed');
     };
   }
@@ -37,6 +44,16 @@ export class WebSocketService {
   close() {
     if (this.socket) {
       this.socket.close();
+      this.isConnected = false;
     }
+  }
+
+  reconnect(onMessage: (data: unknown) => void) {
+    this.close();
+    this.connect(onMessage);
+  }
+
+  getConnectionStatus(): boolean {
+    return this.isConnected;
   }
 }
