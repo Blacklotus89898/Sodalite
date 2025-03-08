@@ -1,65 +1,134 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useTheme } from '../stores/hooks';
+import { Container } from './container';
 
-// Define all possible child components
-const Profile = () => {
-    const [count, setCount] = React.useState(0);  // State should persist
-    return (
-        <div>
-            <h2>Profile Page</h2>
-            <p>Counter: {count}</p>
-            <button onClick={() => setCount(count + 1)}>Increment</button>
-        </div>
-    );
-};
+// Child components (you can replace these with your real components)
+const Dashboard = () => <div>Dashboard Content</div>;
+const Profile = () => <div>Profile Content</div>;
+const Settings = () => <div>Settings Content</div>;
 
-const Settings = () => {
-    const [darkMode, setDarkMode] = React.useState(false);  // State should persist
-    return (
-        <div>
-            <h2>Settings Page</h2>
-            <label>
-                <input type="checkbox" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
-                Dark Mode
-            </label>
-        </div>
-    );
-};
-
-const Dashboard = () => {
-    return <div><h2>Dashboard Page</h2></div>;
-};
-
-// Parent layout with sidebar menu
 const PersistentLayout: React.FC = () => {
+    const { theme, chroma } = useTheme();
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const [width, setWidth] = useState(400);
     const [activeTab, setActiveTab] = useState<'dashboard' | 'profile' | 'settings'>('dashboard');
+    const [collapsed, setCollapsed] = useState(false); // State for collapsible sidebar
 
-    // Child components are rendered *once* and hidden/shown using CSS or simple logic.
-    // They are not unmounted/re-mounted.
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const observer = new ResizeObserver(([entry]) => {
+            setWidth(entry.contentRect.width);
+        });
+
+        observer.observe(containerRef.current);
+
+        return () => observer.disconnect();
+    }, []);
+
+    const isDarkMode = theme === 'dark';
+
+    const baseFontSize = Math.min(24, Math.max(12, width * 0.05));
+    const sidebarWidth = collapsed ? 30 : Math.max(150, width * 0.3); // Sidebar width based on collapsed state
+
+    const containerStyle: React.CSSProperties = {
+        display: 'flex',
+        height: '100vh',
+        backgroundColor: isDarkMode ? '#121212' : '#f7f7f7',
+        color: isDarkMode ? 'white' : 'black',
+        fontSize: baseFontSize,
+    };
+
+    const sidebarStyle: React.CSSProperties = {
+        width: sidebarWidth,
+        backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        borderRight: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        padding: '15px',
+        boxShadow: isDarkMode ? '2px 0 10px rgba(0, 0, 0, 0.5)' : '2px 0 10px rgba(200, 200, 200, 0.5)',
+        transition: 'width 0.3s ease', // Smooth transition for collapsing/expanding
+    };
+
+    const buttonStyle: React.CSSProperties = {
+        padding: '10px',
+        borderRadius: '5px',
+        backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+        border: 'none',
+        color: isDarkMode ? 'white' : 'black',
+        cursor: 'pointer',
+        transition: 'background 0.3s ease, color 0.3s ease',
+        fontSize: baseFontSize * 0.9,
+        textAlign: 'left',
+        whiteSpace: 'nowrap', // Prevent text wrapping in buttons
+    };
+
+    const activeButtonStyle: React.CSSProperties = {
+        ...buttonStyle,
+        backgroundColor: chroma,
+        color: isDarkMode ? 'black' : 'white',
+    };
+
+    const contentStyle: React.CSSProperties = {
+        flex: 1,
+        padding: '20px',
+        overflowY: 'auto',
+        transition: 'margin-left 0.3s ease', // Smooth transition for content shifting
+        marginLeft: collapsed ? 0 : sidebarWidth, // Adjust content margin based on sidebar collapse
+    };
+
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            {/* Sidebar Menu */}
-            <div style={{ width: '200px', background: '#eee', padding: '10px' }}>
-                <h3>Menu</h3>
-                <ul style={{ listStyle: 'none', padding: 0 }}>
-                    <li><button onClick={() => setActiveTab('dashboard')}>Dashboard</button></li>
-                    <li><button onClick={() => setActiveTab('profile')}>Profile</button></li>
-                    <li><button onClick={() => setActiveTab('settings')}>Settings</button></li>
-                </ul>
-            </div>
+        <Container maxWidth={1200} maxHeight={800}>
+            <div ref={containerRef} style={containerStyle}>
+                {/* Sidebar */}
+                <div style={sidebarStyle}>
+                    {/* Collapsible Toggle Button */}
+                    <button
+                        onClick={() => setCollapsed(!collapsed)}
+                        style={{ ...buttonStyle, marginBottom: '15px', textAlign: 'center' }}
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor || ''}
+                    >
+                        {collapsed ? '+' : '-'}
+                    </button>
+                    <h3 style={{ fontSize: baseFontSize * 1.2, display: collapsed ? 'none' : 'block' }}>Menu</h3>
+                    <button
+                        style={activeTab === 'dashboard' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('dashboard')}
+                        
+                    >
+                        {collapsed ? '' : 'Dashboard'}
+                    </button>
+                    <button
+                        style={activeTab === 'profile' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('profile')}
+                    >
+                        {collapsed ? '' : 'Profile'}
+                    </button>
+                    <button
+                        style={activeTab === 'settings' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('settings')}
+                    >
+                        {collapsed ? '' : 'Settings'}
+                    </button>
+                </div>
 
-            {/* Main content area - we just switch visibility, not remount */}
-            <div style={{ flex: 1, padding: '20px' }}>
-                <div style={{ display: activeTab === 'dashboard' ? 'block' : 'none' }}>
-                    <Dashboard />
-                </div>
-                <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
-                    <Profile />
-                </div>
-                <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
-                    <Settings />
+                {/* Main Content Area */}
+                <div style={contentStyle}>
+                    <div style={{ display: activeTab === 'dashboard' ? 'block' : 'none' }}>
+                        <Dashboard />
+                    </div>
+                    <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
+                        <Profile />
+                    </div>
+                    <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
+                        <Settings />
+                    </div>
                 </div>
             </div>
-        </div>
+        </Container>
     );
 };
 
