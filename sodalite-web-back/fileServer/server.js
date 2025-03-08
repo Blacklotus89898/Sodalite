@@ -59,6 +59,23 @@ app.get("/files", (req, res) => {
     });
 });
 
+
+// Delete file route
+app.delete("/files/:filename", (req, res) => {
+    const filePath = path.join(__dirname, "uploads", req.params.filename);
+    if (fs.existsSync(filePath)) {
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                return res.status(500).json({ error: "Error deleting file." });
+            }
+            res.json({ message: "File deleted successfully." });
+        });
+    } else {
+        res.status(404).json({ error: "File not found." });
+    }
+});
+
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

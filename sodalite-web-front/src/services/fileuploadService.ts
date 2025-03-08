@@ -38,4 +38,19 @@ export class FileUploadService {
             throw error;
         }
     }
+
+    async deleteFile(filename: string): Promise<void> {
+        try {
+            const response = await fetch(`${this.serverUrl}/files/${filename}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error deleting file: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+            throw error;
+        }
+    }
 }

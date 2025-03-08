@@ -1,11 +1,21 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, useEffect, useRef, ChangeEvent, use } from "react";
 import { FileUploadService } from "../services/fileuploadService";
-import { useTheme } from '../stores/hooks';
+import { useTheme, useServer } from '../stores/hooks';
 import { Container } from "./container";
 
-const fileUploadService = new FileUploadService("http://localhost:8081");
+
 
 const FileUploadComponent = () => {
+
+
+    const { address } = useServer();
+    const [fileUploadService, setFileUploadService] = useState(new FileUploadService(address['fileServer']));
+
+    useEffect(() => {
+        setFileUploadService(new FileUploadService(address['fileServer']));
+        fetchFiles();  // Fetch files on address change
+    }, [address]);
+
     const { theme, chroma } = useTheme();
     const [file, setFile] = useState<File | null>(null);
     const [fileContent, setFileContent] = useState<string>(""); 
@@ -16,7 +26,7 @@ const FileUploadComponent = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Font size scaling
-    const baseFontSize = 16; // Adjusted for more predictable scaling
+    const baseFontSize = 16;
 
     // File selection handler
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +87,21 @@ const FileUploadComponent = () => {
         }
     };
 
+    // Fetch content of a file and update textarea and filename
+    const handleFileLinkClick = async (fileName: string) => {
+        try {
+            const response = await fetch(`http://localhost:8081/uploads/${fileName}`);
+            if (!response.ok) {
+                throw new Error(`Error fetching file content: ${response.status}`);
+            }
+            const content = await response.text();
+            setFileContent(content);
+            setFilename(fileName);
+        } catch (error) {
+            console.error("Error loading file content:", error);
+        }
+    };
+
     useEffect(() => {
         fetchFiles();  // Fetch files on component mount
     }, []);
@@ -91,32 +116,32 @@ const FileUploadComponent = () => {
         borderRadius: '10px',
         padding: '20px',
         maxWidth: '1000px',
-        minHeight: '600px', // Ensure enough space
+        minHeight: '600px', 
         margin: 'auto',
         boxShadow: isDarkMode ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
         display: 'flex',
-        flexDirection: 'row', // Flexbox for horizontal layout
-        flex: 1, // Allow container to grow
+        flexDirection: 'row', 
+        flex: 1, 
     };
 
     const sidebarStyle: React.CSSProperties = {
-        width: '250px', // Fixed sidebar width
+        width: '250px',
         paddingRight: '20px',
         borderRight: `1px solid ${isDarkMode ? '#444' : '#ddd'}`,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        height: '100%', // Ensure sidebar takes full height
-        flexShrink: 0, // Sidebar won't shrink
+        height: '100%',
+        flexShrink: 0,
     };
 
     const contentStyle: React.CSSProperties = {
-        flex: 1, // Take up the remaining space
+        flex: 1,
         paddingLeft: '20px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        flexGrow: 1, // Allow content to grow and take available vertical space
+        flexGrow: 1,
     };
 
     const inputStyle: React.CSSProperties = {
@@ -155,41 +180,42 @@ const FileUploadComponent = () => {
         fontSize: baseFontSize,
         resize: 'vertical',
         boxSizing: 'border-box',
-        flex: 1, // Makes textarea fill the remaining vertical space
-        height: '100%', // Ensure textarea grows with parent
+        flex: 1,
+        height: '100%',
     };
 
     return (
         <Container maxWidth={1200} maxHeight={800}>
             <div ref={containerRef} style={containerStyle}>
-                {/* Sidebar with file controls */}
                 <div style={sidebarStyle}>
                     <h2 style={{ fontSize: baseFontSize * 1.2, marginBottom: '20px' }}>File Controls</h2>
-                    <input type="file" onChange={handleFileChange} style={inputStyle}
-                        onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
+                    <input type="file" onChange={handleFileChange} style={inputStyle} 
+                        onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`} 
                         onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`} />
                     <button onClick={() => setFile(null)} style={buttonStyle}>New File</button>
-                    <h3>Uploaded Files</h3>
-                    <ul style={{ listStyleType: 'none', padding: '0' }}>
+                    <h3>Cloud Drive</h3>
+                    <ul style={{ listStyleType: 'none', padding: '0', overflowY: 'auto', maxHeight: '400px', flex: 0 }}>
                         {files.map((file, index) => (
                             <li key={index} style={{ marginBottom: '10px' }}>
                                 <a
-                                    href={`http://localhost:8081/uploads/${file}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    href="#"
+                                    onClick={() => handleFileLinkClick(file)}
                                     style={{ color: chroma, textDecoration: 'none' }}
                                 >
                                     {file}
                                 </a>
+                                <button onClick={() => {
+                                    fileUploadService.deleteFile(file)
+                                    .then(() => fetchFiles())
+                                    .catch((error) => console.error("Error deleting file:", error));
+                                } } style={{ marginLeft: '10px', padding: '5px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Delete</button>
                             </li>
                         ))}
                     </ul>
                 </div>
 
-                {/* Right side content */}
                 <div style={contentStyle}>
                     <h1 style={{ fontSize: baseFontSize * 1.5, marginBottom: '20px' }}>Text Editor</h1>
-                   
                     <input
                         type="text"
                         value={filename}
@@ -197,14 +223,16 @@ const FileUploadComponent = () => {
                         placeholder="Enter filename"
                         style={inputStyle}
                         onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
-                        onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`} />
+                        onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
+                    />
                     <button onClick={handleFileUpload} style={buttonStyle}>Upload</button>
                     <textarea
                         value={fileContent}
                         onChange={(e) => setFileContent(e.target.value)}
                         style={textareaStyle}
                         onMouseOver={(e) => e.currentTarget.style.border = `1px solid ${chroma}`}
-                        onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`} />
+                        onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
+                    />
                 </div>
             </div>
         </Container>
