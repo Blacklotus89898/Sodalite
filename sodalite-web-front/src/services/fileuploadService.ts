@@ -5,7 +5,7 @@ export class FileUploadService {
         this.serverUrl = serverUrl;
     }
 
-    async uploadFile(file: File, filename: string): Promise<{ filename: string; url: string }> {
+    async uploadFile(file: Blob, filename: string): Promise<{ filename: string; url: string }> {
         const formData = new FormData();
         formData.append("file", file, filename);
 

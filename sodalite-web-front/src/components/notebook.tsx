@@ -1,10 +1,28 @@
-import React, { useState, useRef } from "react";
-import { useTheme } from "../stores/hooks";
+import React, { useState, useRef, useEffect } from "react";
+import { useTheme, useServer } from "../stores/hooks";
 import { Container } from "./container";
+import { FileUploadService } from "../services/fileuploadService";
 
 const PersistentNotebookLayout: React.FC = () => {
+
+  interface Page {
+    id: number;
+    title: string;
+    content: string;
+  }
+
+
+  const { address } = useServer();
+  const [fileUploadService, setFileUploadService] = useState(new FileUploadService(address['fileServer']));
+
+  useEffect(() => {
+    setFileUploadService(new FileUploadService(address['fileServer']));
+  }, [address]);
+
+
+
   const { theme, chroma } = useTheme();
-  const [pages, setPages] = useState<{ id: number; title: string; content: string }[]>([
+  const [pages, setPages] = useState<Page[]>([
     { id: 1, title: "Page 1", content: "" },
   ]);
   const [selectedPage, setSelectedPage] = useState<number>(1);
@@ -104,6 +122,30 @@ const PersistentNotebookLayout: React.FC = () => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+
+
+  const handleFileUpload = async (id: number) => {
+    const page = pages.find((page: Page) => page.id === id);
+    if (!page) return;
+    const filename = page.title;
+    const fileContent = page.content;
+    if (!fileContent) {
+      alert("Please enter some content for the file.");
+      return;
+    }
+
+    const blob = new Blob([fileContent], { type: "text/plain" });
+
+    fileUploadService.uploadFile(blob, filename)
+      .then(() => {
+          alert("File uploaded successfully" + filename);
+      })
+      .catch((error) => {
+        console.error("File upload error:", error);
+        alert("Failed to upload the file.");
+      });
+  };
+
   return (
     <Container maxWidth={1200} maxHeight={1200}>
       <div style={containerStyle}>
@@ -177,19 +219,22 @@ const PersistentNotebookLayout: React.FC = () => {
                     {collapsed ? `#${page.id}` : page.title}
                   </span>
                 )}
+                <button onClick={() => handleFileUpload(page.id)} style={buttonStyle}>Upload to Cloud</button>
                 <button
-                  style={{
-                    marginLeft: "8px",
-                    color: "red",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                  }}
+                  // style={{
+                  //   marginLeft: "8px",
+                  //   color: "red",
+                  //   background: "none",
+                  //   border: "none",
+                  //   cursor: "pointer",
+                  //   fontSize: "16px",
+                  // }}
+                  style={buttonStyle}
                   onClick={() => deletePage(page.id)}
                 >
-                  x
+                  Delete
                 </button>
+
               </li>
             ))}
           </ul>
@@ -239,5 +284,6 @@ const PersistentNotebookLayout: React.FC = () => {
     </Container>
   );
 };
+
 
 export default PersistentNotebookLayout;

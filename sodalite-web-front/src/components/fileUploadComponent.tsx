@@ -55,26 +55,30 @@ const FileUploadComponent = () => {
         }
 
         const blob = new Blob([fileContent], { type: "text/plain" });
-        const formData = new FormData();
-        formData.append("file", blob, filename);
-
-        try {
-            const response = await fetch("http://localhost:8081/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error(`Server responded with ${response.status}: ${await response.text()}`);
-            }
-
-            const data = await response.json();
-            setUploadedFile(data.filename);
+        fileUploadService.uploadFile(blob, filename)
+        .then(() => {
+            alert("File uploaded successfully" + filename);
             fetchFiles();  // Refresh the list of uploaded files
-        } catch (error) {
-            console.error("File upload error:", error);
-            alert("Failed to upload the file.");
-        }
+        })
+        // formData.append("file", blob, filename);
+
+        // try {
+        //     const response = await fetch("http://localhost:8081/upload", {
+        //         method: "POST",
+        //         body: formData,
+        //     });
+
+        //     if (!response.ok) {
+        //         throw new Error(`Server responded with ${response.status}: ${await response.text()}`);
+        //     }
+
+        //     const data = await response.json();
+        //     setUploadedFile(data.filename);
+        //     fetchFiles();  // Refresh the list of uploaded files
+        // } catch (error) {
+        //     console.error("File upload error:", error);
+        //     alert("Failed to upload the file.");
+        // }
     };
 
     // Fetch uploaded files
@@ -194,6 +198,9 @@ const FileUploadComponent = () => {
                         onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`} />
                     <button onClick={() => setFile(null)} style={buttonStyle}>New File</button>
                     <h3>Cloud Drive</h3>
+                    <button onClick={fetchFiles} style={buttonStyle}>
+                        Refresh
+                    </button>
                     <ul style={{ listStyleType: 'none', padding: '0', overflowY: 'auto', maxHeight: '400px', flex: 0 }}>
                         {files.map((file, index) => (
                             <li key={index} style={{ marginBottom: '10px' }}>
