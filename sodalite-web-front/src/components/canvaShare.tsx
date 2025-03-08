@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Container } from './container';
 import { WebSocketService } from '../services/websocketService';
-import { useServer } from '../stores/hooks';
+import { useServer, useTheme } from '../stores/hooks';
 
 export const CanvaShare: React.FC = () => {
     const { address } = useServer();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDrawing = useRef(false);
     const wsServiceRef = useRef<WebSocketService | null>(null);
+    const { theme } = useTheme();
 
     useEffect(() => {
-
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -24,44 +24,41 @@ export const CanvaShare: React.FC = () => {
             ctx.beginPath();
             ctx.moveTo(data.startX, data.startY);
             ctx.lineTo(data.x, data.y);
-            ctx.strokeStyle = '#000000'; // Change color as needed
+            ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
             ctx.lineWidth = 5; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
             ctx.closePath();
         };
 
-        const getTouchPos = (e: TouchEvent) => {
+        const getTouchPos = (e: TouchEvent | MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            return {
-                x: touch.clientX - rect.left,
-                y: touch.clientY - rect.top
-            };
+            const scaleX = canvas.width / rect.width; // Scale factor for width
+            const scaleY = canvas.height / rect.height; // Scale factor for height
+
+            const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+            const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+            // Adjust for scaling
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
+
+            return { x, y };
         };
 
         const startDrawing = (e: MouseEvent | TouchEvent) => {
             isDrawing.current = true;
+            const pos = getTouchPos(e);
             ctx.beginPath();
-            if (e instanceof MouseEvent) {
-                ctx.moveTo(e.offsetX, e.offsetY);
-            } else {
-                const pos = getTouchPos(e);
-                ctx.moveTo(pos.x, pos.y);
-            }
+            ctx.moveTo(pos.x, pos.y);
         };
 
         const draw = (e: MouseEvent | TouchEvent) => {
             if (!isDrawing.current) return;
-            let pos;
-            if (e instanceof MouseEvent) {
-                pos = { x: e.offsetX, y: e.offsetY };
-            } else {
-                pos = getTouchPos(e);
-            }
+            const pos = getTouchPos(e);
 
             ctx.lineTo(pos.x, pos.y);
-            ctx.strokeStyle = '#000000'; // Change color as needed
+            ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
             ctx.lineWidth = 5; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
@@ -83,6 +80,19 @@ export const CanvaShare: React.FC = () => {
             isDrawing.current = false;
             ctx.closePath();
         };
+
+        // Set canvas size dynamically to fill the parent container
+        const resizeCanvas = () => {
+            if (canvas) {
+                canvas.width = canvas.parentElement?.clientWidth || 800; // Set width based on parent container
+                canvas.height = canvas.parentElement?.clientHeight || 600; // Set height based on parent container
+            }
+        };
+
+        // Resize canvas when window is resized
+        window.addEventListener('resize', resizeCanvas);
+
+        resizeCanvas(); // Set initial size
 
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
@@ -108,15 +118,15 @@ export const CanvaShare: React.FC = () => {
             if (wsServiceRef.current) {
                 wsServiceRef.current.close();
             }
+
+            window.removeEventListener('resize', resizeCanvas);
         };
-    }, [address]);
+    }, [address, theme]); // Add theme as a dependency
 
     return (
-        <div>
+        <Container maxWidth={1000} maxHeight={800}>
             <h1>Canva Share Component</h1>
-            <Container>
-                <canvas id="canvas" ref={canvasRef}></canvas>
-            </Container>
-        </div>
+            <canvas id="canvas" ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }}></canvas>
+        </Container>
     );
 };

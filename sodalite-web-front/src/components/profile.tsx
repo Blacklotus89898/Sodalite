@@ -140,7 +140,6 @@ const ProfileComponent: React.FC = () => {
   // Determine if dark mode is active
   const isDarkMode = theme === 'dark';
 
-  // Reusable styles
   const containerStyle: React.CSSProperties = {
     padding: '20px',
     backgroundColor: isDarkMode ? '#111' : '#fff',
@@ -148,7 +147,9 @@ const ProfileComponent: React.FC = () => {
     color: isDarkMode ? 'white' : 'black',
     maxWidth: '800px',
     margin: '0 auto',
-  };
+    width: '100%', // Ensure it takes full width
+    flexGrow: 1, // Allow expansion
+};
 
   const headerStyle: React.CSSProperties = {
     textAlign: 'center',

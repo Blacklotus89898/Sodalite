@@ -13,6 +13,9 @@ import TextToVoice from "../components/textToVoice";
 import ThemeSwitcher from "../components/themeSwitcher";
 import CollabApp from "../components/collabApp";
 import { CanvaShare } from "../components/canvaShare";
+import Notebook from "../components/notebook";
+import CodeEditor from "../components/codeEditor";
+import PersistentLayout from "../components/persistentLayout";
 
 // Define the type for the props
 interface RNDProps {
@@ -28,18 +31,25 @@ const RND: React.FC<RNDProps> = ({ title,  }) => {
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "RND"}</h1>
                 <VideoChat/>
+                <PersistentLayout/>
+                <Streak />
+                <CodeEditor 
+                    theme="dark" 
+                    chroma="default" 
+                    onProfileLoad={(profile) => console.log(profile)} 
+                />
                 <ScreenShare/>
             {/* <ResizableDraggableComponent>
                 <div>Content goes here</div>
             </ResizableDraggableComponent> */}
-            {/* <ManualRTC/>  */}
+            <ManualRTC/> 
+            <Notebook/>
             <CollabApp/>
             <CanvaShare />
             <Weather/>
-            <Iframe initialLink="https://wikipedia.com" name="Example" />
+            <Iframe initialLink="https://wikipedia.com" name="Example" />   
             <ThreeDProjection/>
             <Timer initialTime={5} />
-            <Streak activityDates={["2023-01-01", "2023-01-02", "2023-01-02", "2023-01-03","2025-02-23", "2025-02-24", "2025-02-25", "2025-02-27", "2025-02-28"]} />
         </div>
     );
 };

@@ -14,6 +14,8 @@ import RND from './pages/RND';
 import Music from './pages/Music';
 import { Whitelotus } from './pages/Whitelotus';
 import './App.css';
+import SpacebarModal from './components/shortcut';
+import Sodalite from './pages/Sodalite';
 
 // Define your sidebar items
 const rightSideBarItems = [
@@ -108,6 +110,7 @@ function App() {
     <Router basename="/Sodalite">
       {/* For global features */}
       {/* <CursorEffect /> */}
+      <SpacebarModal />
       {showMenu && menuPosition && (
         <QuickMenu
           options={options}
@@ -149,13 +152,14 @@ function App() {
           <div style={{ flex: 1, marginLeft: "0px", margin: '3em', marginTop: '0px', marginBottom: '0px' }}>
             <Routes >
               {/* Define your routes */}
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Sodalite />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/home" element={<Home />} />
               <Route path="/sandbox" element={<Sandbox />} />
               <Route path="/music" element={<Music />} />
               <Route path="/rnd" element={<RND />} />
               <Route path="/whitelotus" element={<Whitelotus />} />
+              <Route path="/sodalite" element={<Sodalite />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />

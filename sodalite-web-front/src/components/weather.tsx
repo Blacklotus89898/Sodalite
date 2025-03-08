@@ -88,7 +88,7 @@ function Weather() {
                     <div style={styles.forecastContainer}>
                         {weatherData.map((day, index) => (
                             <div key={index} style={styles.forecastCard}>
-                                <Container>
+                                <Container maxHeight={200}>
                                     <div>
                                         <h4 style={styles.dayTitle}>Day {index + 1}</h4>
                                         <p>Date: {day.date}</p>

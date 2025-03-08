@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../stores/hooks';
 import { Container } from './container';
+import PersistentNotebookLayout from './notebook';
+import { CanvaShare } from './canvaShare';
+import Iframe from './iframe';
+import ProfileComponent from './profile';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
-const Profile = () => <div>Profile Content</div>;
 const Settings = () => <div>Settings Content</div>;
 
 const PersistentLayout: React.FC = () => {
@@ -12,7 +15,7 @@ const PersistentLayout: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [width, setWidth] = useState(400);
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'profile' | 'settings'>('dashboard');
+    const [activeTab, setActiveTab] = useState<string>('dashboard');
     const [collapsed, setCollapsed] = useState(false); // State for collapsible sidebar
 
     useEffect(() => {
@@ -70,14 +73,15 @@ const PersistentLayout: React.FC = () => {
         backgroundColor: chroma,
         color: isDarkMode ? 'black' : 'white',
     };
-
     const contentStyle: React.CSSProperties = {
         flex: 1,
         padding: '20px',
         overflowY: 'auto',
-        transition: 'margin-left 0.3s ease', // Smooth transition for content shifting
-        marginLeft: collapsed ? 0 : sidebarWidth, // Adjust content margin based on sidebar collapse
+        transition: 'margin-left 0.3s ease',
+        display: 'flex', // Add this line
+        flexDirection: 'column', // Add this line
     };
+    
 
     return (
         <Container maxWidth={1200} maxHeight={800}>
@@ -97,7 +101,7 @@ const PersistentLayout: React.FC = () => {
                     <button
                         style={activeTab === 'dashboard' ? activeButtonStyle : buttonStyle}
                         onClick={() => setActiveTab('dashboard')}
-                        
+
                     >
                         {collapsed ? '' : 'Dashboard'}
                     </button>
@@ -113,6 +117,18 @@ const PersistentLayout: React.FC = () => {
                     >
                         {collapsed ? '' : 'Settings'}
                     </button>
+                    <button
+                        style={activeTab === 'notes' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('notes')}
+                    >
+                        {collapsed ? '' : 'Notes'}
+                    </button>
+                    <button
+                        style={activeTab === 'iframe' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('iframe')}
+                    >
+                        {collapsed ? '' : 'Iframe'}
+                    </button>
                 </div>
 
                 {/* Main Content Area */}
@@ -120,11 +136,23 @@ const PersistentLayout: React.FC = () => {
                     <div style={{ display: activeTab === 'dashboard' ? 'block' : 'none' }}>
                         <Dashboard />
                     </div>
-                    <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}>
-                        <Profile />
-                    </div>
+                    {/* <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}> */}
+                    <div style={{ display: activeTab === 'profile' ? 'flex' : 'none', flex: 1 }}>
+    <ProfileComponent />
+</div>
+                    {/* </div> */}
                     <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
                         <Settings />
+                    </div>
+                    <div style={{ display: activeTab === 'notes' ? 'flex' : 'none', flex: 1 }}>
+                        <PersistentNotebookLayout />
+                        {/* <div>   </div> */}
+                        {/* <CanvaShare /> */}
+                    </div>
+                    <div style={{ display: activeTab === 'iframe' ? 'block' : 'none' }}>
+                        {/* <Iframe initialLink="https://wikipedia.com" name="iframe" /> */}
+                        <Iframe initialLink="https://wikipedia.com" name="Example" />
+
                     </div>
                 </div>
             </div>
