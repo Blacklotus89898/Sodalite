@@ -24,13 +24,6 @@ const Iframe: React.FC<IframeProps> = ({ initialLink, name }) => {
 
   return (
     <div style={styles.container}>
-      <iframe
-        src={link}
-        title={name}
-        style={styles.iframe}
-      >
-        {name}
-      </iframe>
       <div style={styles.controls}>
         <input
           type="text"
@@ -41,6 +34,14 @@ const Iframe: React.FC<IframeProps> = ({ initialLink, name }) => {
         />
         <button onClick={handleLinkUpdate} style={styles.button}>Update Link</button>
       </div>
+      <iframe
+        src={link}
+        title={name}
+        style={styles.iframe}
+      >
+        {name}
+      </iframe>
+
     </div>
   );
 };
@@ -61,21 +62,21 @@ const styles = {
   },
   iframe: {
     width: '100%',
-    height: '500px',
+    height: '100%',
     border: '1px solid white',
     borderRadius: '15px',
   },
   controls: {
     display: 'flex',
-    flexDirection: 'column' as const,
     alignItems: 'center',
     marginTop: '10px',
+    padding: '10px',
   },
   input: {
-    padding: '8px',
+    padding: '14px',
     borderRadius: '4px',
     border: '1px solid #ccc',
-    marginBottom: '10px',
+    // marginBottom: '10px',
     width: '80%',
   },
   button: {

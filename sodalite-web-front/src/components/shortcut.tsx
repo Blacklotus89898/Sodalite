@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 
 const modalStyles: React.CSSProperties = {
   position: "fixed",
@@ -22,32 +21,23 @@ const modalContentStyles: React.CSSProperties = {
 };
 
 const SpacebarModal: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.code === "Space") {
-      setIsOpen((prev) => !prev);
-      event.preventDefault(); // Prevent page scrolling
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
 
   return (
     <>
-      {isOpen && (
+    
         <div style={modalStyles}>
           <div style={modalContentStyles}>
             <h2>Modal Opened!</h2>
+            <h3>Quick tips</h3>
+            <p>z for quick menu</p>
+            <p>/ for search menu</p>
+            <p>change the theme and chroma</p>
+            <p>Explore</p>
             <p>Press Spacebar again to close.</p>
           </div>
         </div>
-      )}
+      
     </>
   );
 };

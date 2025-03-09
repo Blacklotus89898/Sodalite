@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import QuickMenu from './quickMenu';
 import SpacebarModal from './shortcut';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../stores/hooks';
+import { useEvent, useTheme } from '../stores/hooks';
 
 interface SearchBarProps {
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
@@ -57,6 +57,7 @@ const EventController: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const { setTheme, theme } = useTheme();
     const [showModal, setshowModal] = useState(false);
+    const { events, setEvent } = useEvent();
 
 
     const options = ["Sodalite", "Dashboard", "Theme", "Header", "Sidebar", "Kali"];
@@ -114,6 +115,13 @@ const EventController: React.FC = () => {
                             case "Theme":
                                 setTheme(theme === 'dark' ? 'light' : 'dark');
                                 break;
+                            case "Header":
+                                setEvent('header', !events['header']);
+                                break;
+                            case "Sidebar":
+                                setEvent('lsidebar', !events['lsidebar']);
+                                // setEvent('rsidebar', !events['rsidebar']);
+                                break;
                             default:
                                 break;
                         }
@@ -157,6 +165,19 @@ const EventController: React.FC = () => {
             {showSearch && (
                 <SearchBar setSearchQuery={setSearchQuery} searchQuery={searchQuery} />
             )}
+                        <button
+            style={{
+                position: 'fixed',
+                bottom: '20px',
+                left: '20px',
+                zIndex: 10000,
+                // backgroundColor: '#333',
+                color: 'white',
+                borderRadius: '30px',
+                padding: '5px',
+            }}
+            onClick={() => setshowModal((prev) => !prev)}
+            >❓</button>
         </>
     );
 };

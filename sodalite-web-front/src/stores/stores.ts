@@ -45,21 +45,28 @@ interface ProfileContextType {
 }
 
 // Default profile state (optional - if you want to initialize with defaults)
-const defaultProfile: ProfileState = {
-  username: "John Doe",
-  servers: {
-    websocketServer: "ws://192.168.0.103:8080",
-    fileServer: "http://192.168.0.103:8081"
-  },
-  streak: 0,
-  activityDates: [],
-  theme: "dark",
-  chroma: "#00ced1"
-};
+// const defaultProfile: ProfileState = {
+//   username: "John Doe",
+//   servers: {
+//     websocketServer: "ws://192.168.0.103:8080",
+//     fileServer: "http://192.168.0.103:8081"
+//   },
+//   streak: 0,
+//   activityDates: [],
+//   theme: "dark",
+//   chroma: "#00ced1"
+// };
 
 // Create the Profile Context
-export const ProfileContext = createContext<ProfileContextType>({
-  currentProfile: defaultProfile,
+export const ProfileContext = createContext<ProfileContextType | undefined>({
+  currentProfile: {
+    username: "",
+    servers: {},
+    streak: 0,
+    activityDates: [],
+    theme: "",
+    chroma: ""
+  },
   setCurrentProfile: () => {},
 });
 
@@ -73,3 +80,4 @@ export  interface StreakContextProps {
   
 export  const StreakContext = createContext<StreakContextProps | undefined>(undefined);
   
+export const EventContext = createContext<{ events: { [key: string]: boolean }; setEvent: (key: string, value: boolean) => void } | undefined>(undefined);

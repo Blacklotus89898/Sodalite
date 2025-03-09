@@ -1,11 +1,12 @@
 import React from 'react';
 import { ThemeSwitcher } from './themeSwitcher';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../stores/hooks'; // Import your theme hook
+import { useTheme, useEvent } from '../stores/hooks'; // Import your theme hook
 
 const Header: React.FC = () => {
-    const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    // const [events['header'], setevents['header']] = React.useState(false);
     const { theme } = useTheme(); // Access the current theme
+    const { events, setEvent } = useEvent();
 
     const isDarkMode = theme === 'dark';
 
@@ -35,12 +36,12 @@ const Header: React.FC = () => {
     const dropdownStyle: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
-        opacity: isDropdownOpen ? 1 : 0,
-        maxHeight: isDropdownOpen ? '250px' : '0px',
+        opacity: events['header'] ? 1 : 0,
+        maxHeight: events['header'] ? '250px' : '0px',
         overflowY: 'auto',
         transition: 'opacity 0.4s ease, max-height 0.4s ease-in-out',
         backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-        padding: isDropdownOpen ? '10px' : '0px',
+        padding: events['header'] ? '10px' : '0px',
         borderRadius: '8px',
         boxShadow: isDarkMode
             ? '0px 4px 6px rgba(0, 0, 0, 0.5)'
@@ -66,9 +67,9 @@ const Header: React.FC = () => {
                 <ThemeSwitcher />
                 <button
                     style={buttonStyle}
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => setEvent('header', !events['header'])}
                 >
-                    {isDropdownOpen ? '▲' : '▼'}
+                    {events['header'] ? '▲' : '▼'}
                 </button>
             </div>
 

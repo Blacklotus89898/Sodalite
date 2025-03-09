@@ -1,11 +1,26 @@
 import { useState, ReactNode, useEffect } from "react";
-import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState, StreakContext } from "./stores";
+import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState, StreakContext, EventContext } from "./stores";
 
 // User Provider Component -- not used in the example
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<string>("John Doe");
     return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 }
+
+// Event Provider Component 
+export const EventProvider = ({ children }: { children: ReactNode }) => {
+    const [events, setEvents] = useState<{ [key: string]: boolean }>({
+        header: false,
+        lsidebar: false,
+        rsidebar: false,
+    });
+
+    const setEvent = (key: string, value: boolean) => {
+        setEvents((prev) => ({ ...prev, [key]: value }));
+    };
+
+    return <EventContext.Provider value={{ events, setEvent }}>{children}</EventContext.Provider>;
+};
 
 // Theme Provider Component
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
@@ -44,28 +59,28 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
         }
     );
 
-// Load the profile from localStorage or API on initial render
-useEffect(() => {
-    const savedProfile = localStorage.getItem('profile');
-    if (savedProfile) {
-        try {
-            setCurrentProfile(JSON.parse(savedProfile));
-        } catch (error) {
-            console.error('Error parsing saved profile:', error);
+    // Load the profile from localStorage or API on initial render
+    useEffect(() => {
+        const savedProfile = localStorage.getItem('profile');
+        if (savedProfile) {
+            try {
+                setCurrentProfile(JSON.parse(savedProfile));
+            } catch (error) {
+                console.error('Error parsing saved profile:', error);
+            }
         }
-    }
-}, []);
+    }, []);
 
-// Save the profile to localStorage whenever it changes
-useEffect(() => {
-    localStorage.setItem('profile', JSON.stringify(currentProfile));
-}, [currentProfile]);
+    // Save the profile to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('profile', JSON.stringify(currentProfile));
+    }, [currentProfile]);
 
-return (
-    <ProfileContext.Provider value={{ currentProfile, setCurrentProfile }}>
-        {children}
-    </ProfileContext.Provider>
-);
+    return (
+        <ProfileContext.Provider value={{ currentProfile, setCurrentProfile }}>
+            {children}
+        </ProfileContext.Provider>
+    );
 };
 export const StreakProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [activityDates, setActivityDates] = useState<string[]>([]);
@@ -103,15 +118,17 @@ export const StreakProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
 // Wrapping all providers together
 export const AppProviders = ({ children }: { children: ReactNode }) => (
-    <StreakProvider>
-        <ProfileProvider>
-            <ServerProvider>
-                <UserProvider>
-                    <ThemeProvider>{children}</ThemeProvider>
-                </UserProvider>
-            </ServerProvider>
-        </ProfileProvider>
-    </StreakProvider>
+    <EventProvider>
+        <StreakProvider>
+            <ProfileProvider>
+                <ServerProvider>
+                    <UserProvider>
+                        <ThemeProvider>{children}</ThemeProvider>
+                    </UserProvider>
+                </ServerProvider>
+            </ProfileProvider>
+        </StreakProvider>
+    </EventProvider>
 );
 
 
