@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { WebSocketService } from '../services/websocketService';
 import { useServer } from '../stores/hooks';
 
-// Serveless implementation, need to fix the ice candidate
 function ManualRTC() {
     const [localDescription, setLocalDescription] = useState('');
     const [remoteDescription, setRemoteDescription] = useState('');
@@ -16,13 +15,12 @@ function ManualRTC() {
 
     const wsServiceRef = useRef<WebSocketService | null>(null);
     const { address } = useServer();
-    const [isConnected, setIsConnected] = useState<boolean>(false);
+    const [, setIsConnected] = useState<boolean>(false);
     const [isCaller, setIsCaller] = useState<boolean>(false);
 
 
 
     useEffect(() => {
-        // Singaling with websocket
 
         wsServiceRef.current = new WebSocketService(address['websocketServer']);
 
@@ -38,59 +36,20 @@ function ManualRTC() {
                         console.log("Caller received sdp:"+ parsedData.message);
                         setRemoteDescription(parsedData.message);
                         await handleRemoteDescription(parsedData.message);
-                        // console.log(remoteDescription);
                     } if (parsedData.type === "answerIce") {
                         console.log("Caller received ice:"+ parsedData.message);
                         setRemoteIceCandidate(parsedData.message);
-                        await addIceCandidate();
-                        // console.log(remoteIceCandidate);
                     }
                 } else {
-                    // console.log("Answer received:"+ parsedData);
-                    
                     if (parsedData.type === "offer") {
-                    // console.log("Answer received offer:"+ parsedData.message);
                     console.log("Before setting remote:", remoteDescription);
                     setRemoteDescription(parsedData.message);
                     await handleRemoteDescription(parsedData.message);
                     console.log("After setting remote:", remoteDescription);
                     await createAnswer();
-                    // console.log("After setting remote (state might not update yet):", remoteDescription);
-                    // await handleRemoteDescription(parsedData.message);
-                    // console.log("Handled remote description.");
-                    // await   createAnswer();
-                    // console.log("Answer created.");
-                    //     // wait until answer is created:
-                    //     console.log("Answer SDP:", localDescription);
-                    //     console.log("Answer ICE candidates:", localIceCandidates);
-                    //     // await handleRemoteDescription();
-                    //     // await createAnswer();
-
-
-                    //     // // wait until answer is created:
-                    //     // const waitForLocalDescription = new Promise<void>((resolve) => {
-                    //     //     const interval = setInterval(() => {
-                    //     //         if (localDescription && localIceCandidates.length > 0) {
-                    //     //             clearInterval(interval);
-                    //     //             resolve();
-                    //     //         }
-                    //     //     }, 100);
-                    //     // });
-                    //     // await waitForLocalDescription;
-                        
-                    //     console.log("answer sdp:"+localDescription);
-                    //     console.log("answer ice:"+localIceCandidates);
-
-
-                    //     // console.log(remoteDescription)
-                        // wsServiceRef.current?.send({ message: localDescription, type: "answer" });
-                        // wsServiceRef.current?.send({ message: localIceCandidates, type: "answerIce" });
                     } if (parsedData.type === "offerIce") {
-                    // console.log("Answer received ice:"+ parsedData.message);
 
                         setRemoteIceCandidate(parsedData.message);
-                        await addIceCandidate();
-                        // console.log(localIceCandidates)
                     }
                 }
             });
@@ -207,20 +166,19 @@ function ManualRTC() {
                 }
             }
 
-            alert('All ICE candidates added successfully!');
+            // alert('All ICE candidates added successfully!');
         } catch (error) {
             console.error('Error adding ICE candidate:', error);
             alert('Invalid ICE candidate format. Ensure it is a valid JSON array.');
         }
     };
 
-    const copyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            // alert('Copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-        });
-    };
+    // const copyToClipboard = (text: string) => {
+    //     navigator.clipboard.writeText(text).then(() => {
+    //     }).catch(err => {
+    //         console.error('Failed to copy: ', err);
+    //     });
+    // };
 
     const initiateCall = async () => {
         setIsCaller(true);
@@ -239,35 +197,37 @@ function ManualRTC() {
         
     }, [localDescription, localIceCandidates, isCaller]);
 
-    const sendOffer = async () => {
+    useEffect(() => {   
+        const handleAnswer = async () => {
+            if (!isCaller && localDescription && localIceCandidates.length > 0) {
+                await sendAnswer();
+            }
+        };
+        handleAnswer();
+    }, [localDescription, localIceCandidates, isCaller]);
 
-        wsServiceRef.current?.send({ message: localDescription, type: "offer" });
-        // wait until ICE candidates are gathered
-        // send ice candidates to remote wss
-        wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce" });
-        // addIceCandidate();
+    useEffect(() => {
+        if (remoteIceCandidate) {
+            addIceCandidate();
+        }
+    }, [remoteIceCandidate]);
 
-    }
+    // const sendOffer = async () => {
+    //     wsServiceRef.current?.send({ message: localDescription, type: "offer" });
+    //     wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce" });
 
-    const answerCall = async () => {
+    // }
+
+    const acceptCall = async () => {
         setIsCaller(false);
-        // start local stream
         startLocalStream();
-        // receive offer from remote wss
-        // set remote description
-        // set remote ice candidates
-        // send answer to remote wss
-        // send ice candidates to remote wss
-        // handdled by websocket
-
-
     }
 
     const sendAnswer = async () => {
-
+        console.log("Sending answer");
         wsServiceRef.current?.send({ message: localDescription, type: "answer" });
         wsServiceRef.current?.send({ message: localIceCandidates.join("\n"), type: "answerIce" });
-        addIceCandidate();
+        // addIceCandidate();
 
     }
 
@@ -276,29 +236,29 @@ function ManualRTC() {
     return (
         <div className="ManualRTC">
 
-            <h1>Signaling Server Status ws {isConnected.toString()}</h1>
-            <h1>CaLLER Status {isCaller.toString()}</h1>
-            <button onClick={() => setIsConnected(wsServiceRef.current?.getConnectionStatus() ?? false)}>Refresh connection status</button>
-            <button onClick={initiateCall}>Initiate Call</button>
-            <button onClick={sendOffer}>Offer Call</button>
-            <button onClick={answerCall}>Answer Call</button>
-            <button onClick={sendAnswer}>Send answer</button>
+            {/* <h1>Signaling Server Status ws {isConnected.toString()}</h1> */}
+            {/* <h1>CaLLER Status {isCaller.toString()}</h1> */}
+            {/* <button onClick={() => setIsConnected(wsServiceRef.current?.getConnectionStatus() ?? false)}>Refresh connection status</button> */}
+            <button onClick={acceptCall}>Create Call</button>
+            <button onClick={initiateCall}>Join Call</button>
+            {/* <button onClick={sendOffer}>Offer Call</button> */}
+            {/* <button onClick={sendAnswer}>Send answer</button> */}
 
             <h1>Manual WebRTC Signaling</h1>
-            <button onClick={startLocalStream}>Start Local Stream</button>
+            {/* <button onClick={startLocalStream}>Start Local Stream</button> */}
 
             <div>
                 <video ref={localVideoRef} autoPlay playsInline muted></video>
                 <video ref={remoteVideoRef} autoPlay playsInline></video>
             </div>
-
+{/* 
             <div>
                 <button onClick={createOffer}>Create Offer</button>
                 <button onClick={createAnswer}>Create Answer</button>
                 <button onClick={() => handleRemoteDescription()}>Set Remote Description</button>
                 <button onClick={addIceCandidate}>Add ICE Candidate</button>
-            </div>
-
+            </div> */}
+{/* 
             <div>
                 <h3>Local Description (Offer/Answer)</h3>
                 <textarea value={localDescription} readOnly rows={5}></textarea>
@@ -329,24 +289,9 @@ function ManualRTC() {
                     rows={5}
                 ></textarea>
                 <button onClick={() => copyToClipboard(localIceCandidates.join('\n'))}>Copy to Clipboard</button>
-            </div>
+            </div> */}
         </div>
     );
 }
 
 export default ManualRTC;
-
-/*
-{"candidate":"candidate:2043108713 1 udp 2122260223 172.17.192.1 61899 typ host generation 0 ufrag a5EQ network-id 1","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:4107455132 1 udp 2122194687 192.168.0.103 61900 typ host generation 0 ufrag a5EQ network-id 2","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:3245823347 1 udp 2122129151 172.18.16.1 61901 typ host generation 0 ufrag a5EQ network-id 3","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:2043108713 1 udp 2122260223 172.17.192.1 61902 typ host generation 0 ufrag a5EQ network-id 1","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:4107455132 1 udp 2122194687 192.168.0.103 61903 typ host generation 0 ufrag a5EQ network-id 2","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:3245823347 1 udp 2122129151 172.18.16.1 61904 typ host generation 0 ufrag a5EQ network-id 3","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:118013937 1 tcp 1518280447 172.17.192.1 9 typ host tcptype active generation 0 ufrag a5EQ network-id 1","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:2317166596 1 tcp 1518214911 192.168.0.103 9 typ host tcptype active generation 0 ufrag a5EQ network-id 2","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:3216553963 1 tcp 1518149375 172.18.16.1 9 typ host tcptype active generation 0 ufrag a5EQ network-id 3","sdpMid":"0","sdpMLineIndex":0,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:118013937 1 tcp 1518280447 172.17.192.1 9 typ host tcptype active generation 0 ufrag a5EQ network-id 1","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:2317166596 1 tcp 1518214911 192.168.0.103 9 typ host tcptype active generation 0 ufrag a5EQ network-id 2","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-{"candidate":"candidate:3216553963 1 tcp 1518149375 172.18.16.1 9 typ host tcptype active generation 0 ufrag a5EQ network-id 3","sdpMid":"1","sdpMLineIndex":1,"usernameFragment":"a5EQ"}
-*/
