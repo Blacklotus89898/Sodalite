@@ -3,6 +3,7 @@ import QuickMenu from './quickMenu';
 import SpacebarModal from './shortcut';
 import { useNavigate } from 'react-router-dom';
 import { useEvent, useTheme } from '../stores/hooks';
+import VanishingModal from './vanishingModal';
 
 interface SearchBarProps {
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
@@ -27,9 +28,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchQuery, searchQuery }) =>
 
     return (
         <div style={{
-            position: 'fixed', top: '20%', left: '50%', transform: 'translate(-50%, -50%)',
-            zIndex: 1000, backgroundColor: theme === 'dark' ? '#333' : 'rgba(255, 255, 255, 0.9)', padding: '10px',
-            borderRadius: '8px', boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)', width: '80%', maxWidth: '600px'
+            position: 'fixed',
+            top: '20%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1000,
+            backgroundColor: theme === 'dark' ? '#333' : 'rgba(255, 255, 255, 0.9)',
+            padding: '10px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            width: '80%',
+            maxWidth: '600px'
         }}>
             <input
                 ref={inputRef}
@@ -38,14 +47,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ setSearchQuery, searchQuery }) =>
                 value={searchQuery}
                 onChange={handleSearchChange}
                 style={{
-                    width: '96%', padding: '10px', fontSize: '16px', borderRadius: '4px', margin: 'auto',
-                    border: '1px solid #ccc', backgroundColor: theme === 'dark' ? '#555' : '#fff',
+                    width: '96%',
+                    padding: '10px',
+                    fontSize: '16px',
+                    borderRadius: '4px',
+                    margin: 'auto',
+                    border: '1px solid #ccc',
+                    backgroundColor: theme === 'dark' ? '#555' : '#fff',
                     color: theme === 'dark' ? '#fff' : '#000'
                 }}
             />
         </div>
     );
-}
+};
 
 const EventController: React.FC = () => {
     const navigate = useNavigate();
@@ -56,9 +70,8 @@ const EventController: React.FC = () => {
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const { setTheme, theme } = useTheme();
-    const [showModal, setshowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const { events, setEvent } = useEvent();
-
 
     const options = ["Sodalite", "Dashboard", "Theme", "Header", "Sidebar", "Kali"];
 
@@ -68,23 +81,20 @@ const EventController: React.FC = () => {
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            console.log('Key down:', e.key);
-            
             const target = e.target as HTMLElement;
-            if (!showSearch && target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+            if (!showSearch && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
                 return;
             }
 
-            
             if (e.key === "/") {
                 setShowSearch(prev => !prev);
             }
-            
+
             if (e.code === "Space" && !showSearch) {
-                setshowModal((prev) => !prev);
+                setShowModal((prev) => !prev);
                 e.preventDefault(); // Prevent page scrolling
-              }
-            
+            }
+
             if (e.key.toLowerCase() === "z" && !showMenu && !showSearch) {
                 setMenuPosition({
                     x: cursorPosition.x + window.scrollX,
@@ -92,44 +102,39 @@ const EventController: React.FC = () => {
                 });
                 setShowMenu(true);
             }
-
         };
 
         const handleKeyUp = (e: KeyboardEvent) => {
-            console.log('Key up:', e.key);
-
             const target = e.target as HTMLElement;
-            if (!showSearch && target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+            if (!showSearch && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
                 return;
             }
 
-                if (e.key.toLowerCase() === "z" && !showSearch) {
-                    if (selectedOption) {
-                        switch (selectedOption) {
-                            case "Sodalite":
-                                navigate('/');
-                                break;
-                            case "Dashboard":
-                                navigate('/dashboard');
-                                break;
-                            case "Theme":
-                                setTheme(theme === 'dark' ? 'light' : 'dark');
-                                break;
-                            case "Header":
-                                setEvent('header', !events['header']);
-                                break;
-                            case "Sidebar":
-                                setEvent('lsidebar', !events['lsidebar']);
-                                // setEvent('rsidebar', !events['rsidebar']);
-                                break;
-                            default:
-                                break;
-                        }
+            if (e.key.toLowerCase() === "z" && !showSearch) {
+                if (selectedOption) {
+                    switch (selectedOption) {
+                        case "Sodalite":
+                            navigate('/');
+                            break;
+                        case "Dashboard":
+                            navigate('/dashboard');
+                            break;
+                        case "Theme":
+                            setTheme(theme === 'dark' ? 'light' : 'dark');
+                            break;
+                        case "Header":
+                            setEvent('header', !events['header']);
+                            break;
+                        case "Sidebar":
+                            setEvent('lsidebar', !events['lsidebar']);
+                            break;
+                        default:
+                            break;
                     }
-                    setShowMenu(false);
-                    setSelectedOption(null);
+                }
+                setShowMenu(false);
+                setSelectedOption(null);
             }
-
 
             if (e.key === "Enter" && showSearch) {
                 alert(`Search submitted: ${searchQuery}`);
@@ -146,13 +151,21 @@ const EventController: React.FC = () => {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("keyup", handleKeyUp);
         };
-    }, [showMenu, cursorPosition, selectedOption, searchQuery]);
+    }, [showMenu, cursorPosition, selectedOption, searchQuery, events, navigate, setEvent, setTheme, showSearch, theme]);
 
     return (
         <>
-        {showModal &&
-             <SpacebarModal />
-        }
+
+            {showModal && (
+                <VanishingModal
+                    text="This is a dynamic vanishing modal!"
+                    type="success"  
+                    duration={900}
+                    onClose={() => console.log("vanished")} //to be fixed
+                />
+            )}
+
+            {showModal && <SpacebarModal />}
             {showMenu && menuPosition && (
                 <QuickMenu
                     options={options}
@@ -165,19 +178,20 @@ const EventController: React.FC = () => {
             {showSearch && (
                 <SearchBar setSearchQuery={setSearchQuery} searchQuery={searchQuery} />
             )}
-                        <button
-            style={{
-                position: 'fixed',
-                bottom: '20px',
-                left: '20px',
-                zIndex: 10000,
-                // backgroundColor: '#333',
-                color: 'white',
-                borderRadius: '30px',
-                padding: '5px',
-            }}
-            onClick={() => setshowModal((prev) => !prev)}
-            >❓</button>
+            <button
+                style={{
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '20px',
+                    zIndex: 10000,
+                    color: 'white',
+                    borderRadius: '30px',
+                    padding: '5px',
+                }}
+                onClick={() => setShowModal((prev) => !prev)}
+            >
+                ❓
+            </button>
         </>
     );
 };
