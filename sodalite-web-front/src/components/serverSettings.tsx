@@ -72,6 +72,7 @@ const UpdateAddress = () => {
     const itemStyle: React.CSSProperties = {
         padding: '10px',
         backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+        color: isDarkMode ? 'white' : 'black',
         borderRadius: '5px',
         cursor: 'pointer',
         fontSize: inputFontSize,
@@ -114,8 +115,16 @@ const UpdateAddress = () => {
                             key={index}
                             style={key === selectedKey ? activeItemStyle : itemStyle}
                             onClick={() => handleItemClick(key, addr)}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = key === selectedKey ? chroma : itemStyle.backgroundColor as string}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.backgroundColor = chroma;
+                                e.currentTarget.style.color = "white"}
+                            }
+                            onMouseOut={(e) =>{
+                                e.currentTarget.style.backgroundColor = key === selectedKey ? chroma : itemStyle.backgroundColor as string
+                                e.currentTarget.style.color = key === selectedKey ? "white" : 
+                                    isDarkMode ? 'white' : 'black'
+                            }
+                            }
                         >
                             <strong>{key}</strong>: {addr}
                         </div>
