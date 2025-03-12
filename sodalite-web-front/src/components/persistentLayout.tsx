@@ -6,6 +6,14 @@ import { CanvaShare } from './canvaShare';
 import Iframe from './iframe';
 import ProfileComponent from './profile';
 import FileUploadComponent from './fileUploadComponent';
+import {ChatApp} from './chatApp'; // Add this line
+import CollabApp from './collabApp';
+import TranslationComponent from './translationComponent';
+import {FileShare} from './wsFileSharing';
+import ManualRTC from './manualRTC';
+import UpdateAddress from './serverSettings';
+import Timer from './timer';
+import { AudioIntensity } from './audioIntensity';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
@@ -54,6 +62,7 @@ const PersistentLayout: React.FC = () => {
         padding: '15px',
         boxShadow: isDarkMode ? '2px 0 10px rgba(0, 0, 0, 0.5)' : '2px 0 10px rgba(200, 200, 200, 0.5)',
         transition: 'width 0.3s ease', // Smooth transition for collapsing/expanding
+        overflowY: 'auto',
     };
 
     const buttonStyle: React.CSSProperties = {
@@ -82,7 +91,7 @@ const PersistentLayout: React.FC = () => {
         display: 'flex', // Add this line
         flexDirection: 'column', // Add this line
     };
-    
+
 
     return (
         <Container maxWidth={1200} maxHeight={800}>
@@ -136,6 +145,48 @@ const PersistentLayout: React.FC = () => {
                     >
                         {collapsed ? '' : 'Cloud'}
                     </button>
+                    <button
+                        style={activeTab === 'canvas' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('canvas')}
+                    >
+                        {collapsed ? '' : 'Canvas'}
+                    </button>
+                    <button
+                        style={activeTab === 'chat' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('chat')}
+                    >
+                        {collapsed ? '' : 'Chat'}
+                    </button>
+                    <button
+                        style={activeTab === 'collab' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('collab')}
+                    >
+                        {collapsed ? '' : 'Collab'}
+                    </button>
+                    <button
+                        style={activeTab === 'translation' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('translation')}
+                    >
+                        {collapsed ? '' : 'Translation'}
+                    </button>
+                    <button
+                        style={activeTab === 'rtc' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('rtc')}
+                    >
+                        {collapsed ? '' : 'Video Call'}
+                    </button>
+                    <button
+                        style={activeTab === 'timer' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('timer')}
+                    >
+                        {collapsed ? '' : 'Timer'}
+                    </button>
+                    <button
+                        style={activeTab === 'audio' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('audio')}
+                    >
+                        {collapsed ? '' : 'Audio'}
+                    </button>
                 </div>
 
                 {/* Main Content Area */}
@@ -143,28 +194,47 @@ const PersistentLayout: React.FC = () => {
                     <div style={{ display: activeTab === 'dashboard' ? 'block' : 'none' }}>
                         <Dashboard />
                     </div>
-                    {/* <div style={{ display: activeTab === 'profile' ? 'block' : 'none' }}> */}
                     <div style={{ display: activeTab === 'profile' ? 'flex' : 'none', flex: 1 }}>
-    <ProfileComponent />
-</div>
+                        <ProfileComponent />
+                    </div>
                     {/* </div> */}
-                    <div style={{ display: activeTab === 'settings' ? 'block' : 'none' }}>
-                        <Settings />
+                    <div style={{ display: activeTab === 'settings' ? 'flex' : 'none', flex: 1 }}>
+                        <UpdateAddress />
                     </div>
                     <div style={{ display: activeTab === 'notes' ? 'flex' : 'none', flex: 1 }}>
                         <PersistentNotebookLayout />
-                        {/* <div>   </div> */}
-                        {/* <CanvaShare /> */}
                     </div>
                     <div style={{ display: activeTab === 'iframe' ? 'flex' : 'none', flex: 1 }}>
-                        {/* <Iframe initialLink="https://wikipedia.com" name="iframe" /> */}
                         <Iframe initialLink="https://wikipedia.com" name="Example" />
-
                     </div>
                     <div style={{ display: activeTab === 'cloud' ? 'flex' : 'none', flex: 1 }}>
-                        {/* <Iframe initialLink="https://wikipedia.com" name="iframe" /> */}
                         <FileUploadComponent />
-
+                    </div>
+                    <div style={{ display: activeTab === 'canvas' ? 'flex' : 'none', flex: 1 }}>
+                        <CanvaShare />
+                    </div>
+                    <div style={{ display: activeTab === 'chat' ? 'flex' : 'none', flex: 1 }}>
+                        <ChatApp />
+                    </div>
+                    <div style={{ display: activeTab === 'collab' ? 'flex' : 'none', flex: 1 }}>
+                        <CollabApp />
+                    </div>
+                    <div style={{ display: activeTab === 'translation' ? 'flex' : 'none', flex: 1 }}>
+                        <TranslationComponent/>
+                    </div>
+                    {/* <div style={{ display: activeTab === 'fileshare' ? 'flex' : 'none', flex: 1 }}>
+                        <FileShare  />
+                    </div> */}
+                    <div style={{ display: activeTab === 'rtc' ? 'flex' : 'none', flex: 1 }}>
+                        <ManualRTC />
+                    </div>
+                    <div style={{ display: activeTab === 'timer' ? 'flex' : 'none', flex: 1 }}>
+                        <Timer 
+                        initialTime={60}
+                        />
+                    </div>
+                    <div style={{ display: activeTab === 'audio' ? 'flex' : 'none', flex: 1 }}>
+                        <AudioIntensity />
                     </div>
                 </div>
             </div>

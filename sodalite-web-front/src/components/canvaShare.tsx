@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { Container } from './container';
 import { WebSocketService } from '../services/websocketService';
 import { useServer, useTheme } from '../stores/hooks';
+import VanishingModal from './vanishingModal';
 
 export const CanvaShare: React.FC = () => {
     const { address } = useServer();
@@ -10,23 +11,28 @@ export const CanvaShare: React.FC = () => {
     const wsServiceRef = useRef<WebSocketService | null>(null);
     const { theme, chroma } = useTheme();
     const [isConnected, setIsConnected] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+        
+        // const updateConnectionStatus = (status: boolean) => {
+        //     setIsConnected(status);
 
-        const updateConnectionStatus = (status: boolean) => {
-            setIsConnected(status);
-        };
+        // };
 
         // Initialize WebSocket service
         wsServiceRef.current = new WebSocketService(address['websocketServer']);
         wsServiceRef.current.connect((data) => {
             drawFromServer(data as { startX: number, startY: number, x: number, y: number }, ctx);
-            updateConnectionStatus(true);
+            // updateConnectionStatus(true);
         });
+
+        wsServiceRef.current.onConnectionStatusChange(setIsConnected);
+
 
         const drawFromServer = (data: { startX: number, startY: number, x: number, y: number }, ctx: CanvasRenderingContext2D) => {
             ctx.beginPath();
@@ -67,7 +73,7 @@ export const CanvaShare: React.FC = () => {
 
             ctx.lineTo(pos.x, pos.y);
             ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
-            ctx.lineWidth = 1; // Change brush size as needed
+            ctx.lineWidth = 5; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
 
@@ -134,10 +140,20 @@ export const CanvaShare: React.FC = () => {
     const reconnect = () => {
         if (wsServiceRef.current) {
             wsServiceRef.current.close();
-            wsServiceRef.current.connect(() => setIsConnected(true));
+            wsServiceRef.current.connect(() => {
+                setIsConnected(true);
+                setShowAlert(true); // Show alert when reconnected
+                console.log("Reconnected to the server.");
+            });
         }
-    };
-      const buttonStyle: React.CSSProperties = {
+    }
+
+    useEffect(() => {
+        setShowAlert(true);
+    }
+    , [isConnected]);
+
+    const buttonStyle: React.CSSProperties = {
         backgroundColor: chroma,
         color: theme === 'dark' ? 'black' : 'white',
         border: 'none',
@@ -147,20 +163,29 @@ export const CanvaShare: React.FC = () => {
         cursor: 'pointer',
         transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
         flexShrink: 0, // Prevent shrinking
-      };
+    };
 
     return (
         <Container maxWidth={1000} maxHeight={800}>
             <h1>Canva Share Component</h1>
             <div>
+
+                {showAlert && (
+                    <VanishingModal
+                        text="You are connected to the server."
+                        type="success"
+                        duration={1000}
+                        onClose={() => setShowAlert(false)}
+                    />
+                )}
                 {isConnected ? (
                     <h2 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Connected</h2>
                 ) : (
                     <>
-                        <h2 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Disconnected  
+                        <h2 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Disconnected
                             <span>        </span>
 
-                        <button style={buttonStyle} onClick={reconnect}>Reconnect</button>
+                            <button style={buttonStyle} onClick={reconnect}>Reconnect</button>
                         </h2>
                     </>
                 )}

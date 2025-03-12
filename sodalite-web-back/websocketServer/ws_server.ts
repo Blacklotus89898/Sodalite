@@ -8,7 +8,20 @@ const groups: { [key: string]: Set<WebSocket> } = {};
 server.on('connection', (ws: WebSocket) => {
     console.log('Client connected');
 
-    ws.on('message', (message: Buffer) => {
+    ws.on('message', (message) => {
+        if (message instanceof Buffer) {
+            // Handle binary files
+            console.log("Received a binary file, forwarding to group...");
+
+            // Broadcast the binary data to all clients in the same group
+            server.clients.forEach(client => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            });
+            return;
+        }
+
         const messageString = message.toString();
         console.log('Received:', messageString);
 
@@ -17,7 +30,7 @@ server.on('connection', (ws: WebSocket) => {
 
         try {
             const parsedMessage = JSON.parse(messageString);
-            group = parsedMessage.group || ''; //sholud be called channels
+            group = parsedMessage.group || ''; // Should be called channels
             data = parsedMessage.data || null;
         } catch (error) {
             console.error('Failed to parse message:', error);
