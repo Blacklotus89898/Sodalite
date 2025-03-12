@@ -3,7 +3,6 @@ import QuickMenu from './quickMenu';
 import SpacebarModal from './shortcut';
 import { useNavigate } from 'react-router-dom';
 import { useEvent, useTheme } from '../stores/hooks';
-import VanishingModal from './vanishingModal';
 
 interface SearchBarProps {
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
@@ -73,7 +72,7 @@ const EventController: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const { events, setEvent } = useEvent();
 
-    const options = ["Sodalite", "Dashboard", "Theme", "Header", "Sidebar", "Kali"];
+    const modalRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -153,22 +152,30 @@ const EventController: React.FC = () => {
         };
     }, [showMenu, cursorPosition, selectedOption, searchQuery, events, navigate, setEvent, setTheme, showSearch, theme]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+                console.log("Clicked outside!");
+                setShowModal(false);
+            }
+        };
+
+        if (showModal) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showModal]);
+
     return (
         <>
+            {showModal && <SpacebarModal onClose={() => setShowModal(false)} />}
 
-            {showModal && (
-                <VanishingModal
-                    text="This is a dynamic vanishing modal!"
-                    type="success"  
-                    duration={900}
-                    onClose={() => console.log("vanished")} //to be fixed
-                />
-            )}
-
-            {showModal && <SpacebarModal />}
             {showMenu && menuPosition && (
                 <QuickMenu
-                    options={options}
+                    options={["Sodalite", "Dashboard", "Theme", "Header", "Sidebar", "Kali"]}
                     onSelect={(option) => setSelectedOption(option)}
                     position={menuPosition}
                     selectedOption={selectedOption}
@@ -178,6 +185,7 @@ const EventController: React.FC = () => {
             {showSearch && (
                 <SearchBar setSearchQuery={setSearchQuery} searchQuery={searchQuery} />
             )}
+
             <button
                 style={{
                     position: 'fixed',
@@ -185,10 +193,16 @@ const EventController: React.FC = () => {
                     left: '20px',
                     zIndex: 10000,
                     color: 'white',
-                    borderRadius: '30px',
+                    borderRadius: '40px',
                     padding: '5px',
+                    background: theme === 'dark' ? 'black' : 'white',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '24px',
+                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+                    paddingBlock: '10px',
                 }}
-                onClick={() => setShowModal((prev) => !prev)}
+                onClick={() => showModal ? setShowModal(false) : setShowModal(true)}
             >
                 ❓
             </button>

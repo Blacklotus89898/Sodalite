@@ -53,6 +53,9 @@ const TextComparator: React.FC = () => {
                         </div>
                     ); // Line added in the second input
                 }
+                result.push(
+                    <div key={`${i}-separator`} style={{ height: '1px', backgroundColor: 'black', margin: '5px 0' }} />
+                );
             }
         }
 
@@ -79,6 +82,7 @@ const TextComparator: React.FC = () => {
     return (
         <div>
             <h2>Text Comparator (Line-by-Line)</h2>
+            <div style={{display: 'flex', gap: '10px'}}>
             <textarea
                 placeholder="Enter first text"
                 value={text1}
@@ -86,7 +90,7 @@ const TextComparator: React.FC = () => {
                     setText1(e.target.value);
                 }
                 }
-                style={{ width: '100%', height: '100px', marginBottom: '10px' }}
+                style={{ width: '100%', height: '400px', marginBottom: '10px' }}
             />
             <textarea
                 placeholder="Enter second text"
@@ -95,11 +99,13 @@ const TextComparator: React.FC = () => {
                     setText2(e.target.value);
                     handleCompare();
                 }}
-                style={{ width: '100%', height: '100px', marginBottom: '10px' }}
+                style={{ width: '100%', height: '400px', marginBottom: '10px' }}
             />
-            <button onClick={handleCompare} style={{ marginBottom: '20px' }}>
+            </div>
+
+            {/* <button onClick={handleCompare} style={{ marginBottom: '20px' }}>
                 Compare
-            </button>
+            </button> */}
             <div
                 style={{
                     padding: '10px',
@@ -115,3 +121,5 @@ const TextComparator: React.FC = () => {
 };
 
 export default TextComparator;
+// Styles for the modal
+
