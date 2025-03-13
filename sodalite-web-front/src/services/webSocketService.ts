@@ -17,11 +17,28 @@ export class WebSocketService {
 
     this.socket.onmessage = async (event) => {
       try {
+        //bad approach to check if it is a binary file
+        console.log('Received JSON data...');
         const text = await event.data.text();
         const data = JSON.parse(text);
-        onMessage(data);
+        
+        if (data.group) {
+
+          onMessage(data);
+        } else {
+
+          
+          
+          // Handle binary data (e.g., PDF, images)
+          console.log('Received binary data...');
+          const fileData = await event.data.arrayBuffer();
+          const contentType = event.data.type;
+          onMessage({ content: fileData, type: contentType });
+          // Handle JSON messages
+        }
+        
       } catch (error) {
-        console.error('Error parsing JSON:', error);
+        console.error('Error processing message:', error);
       }
     };
 
@@ -37,7 +54,15 @@ export class WebSocketService {
 
   send(data: unknown) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(data));
+      if (data instanceof ArrayBuffer) {
+        // If it's binary data (file), send as Blob
+        console.log('Sending binary data...', data);
+        this.socket.send(data);
+      } else {
+        // Otherwise send as JSON
+        console.log('Sending JSON data...', data);
+        this.socket.send(JSON.stringify(data));
+      }
     }
   }
 
@@ -55,5 +80,17 @@ export class WebSocketService {
 
   getConnectionStatus(): boolean {
     return this.isConnected;
+  }
+
+  onConnectionStatusChange(onStatusChange: (status: boolean) => void) {
+    this.socket?.addEventListener('open', () => {
+      this.isConnected = true;
+      onStatusChange(this.isConnected);
+    });
+
+    this.socket?.addEventListener('close', () => {
+      this.isConnected = false;
+      onStatusChange(this.isConnected);
+    });
   }
 }

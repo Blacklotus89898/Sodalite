@@ -9,15 +9,23 @@ export const ChatApp: React.FC = () => {
   const [messages, setMessages] = useState<{ message: string; group: string }[]>([]);
   const [input, setInput] = useState<string>('');
   const [group, setGroup] = useState<string>('default');
+  const [isConnected, setIsConnected] = useState<boolean>(false); // State for connection status
   const wsServiceRef = useRef<WebSocketService | null>(null);
 
   useEffect(() => {
     wsServiceRef.current = new WebSocketService(address['websocketServer']);
 
-    wsServiceRef.current.connect((data) => {
-      console.log('Received:', data);
-      setMessages((prevMessages) => [...prevMessages, data as { message: string; group: string }]);
-    });
+    const connectWebSocket = () => {
+      wsServiceRef.current?.connect((data) => {
+        console.log('Received:', data);
+        setMessages((prevMessages) => [...prevMessages, data as { message: string; group: string }]);
+        setIsConnected(true); // Set connection status to true when successfully connected
+      });
+    };
+
+    wsServiceRef.current.onConnectionStatusChange(setIsConnected); // Update connection status
+
+    connectWebSocket(); // Initial connection attempt
 
     return () => {
       if (wsServiceRef.current) {
@@ -28,10 +36,24 @@ export const ChatApp: React.FC = () => {
 
   const sendMessage = () => {
     if (wsServiceRef.current && input.trim()) {
+      setMessages((prevMessages) => [...prevMessages,  { message: input, group: group }]);
       wsServiceRef.current.send({ message: input, group: group });
       setInput('');
     }
   };
+
+  // const reconnect = () => {
+  //   setIsConnected(false); // Set status to disconnected while reconnecting
+  //   if (wsServiceRef.current) {
+  //     wsServiceRef.current.close(); // Close the previous connection
+  //     setTimeout(() => {
+  //       // Retry connecting after a short delay
+  //       wsServiceRef.current?.connect(() => {
+  //         setIsConnected(true); // Set to connected once reconnection is successful
+  //       });
+  //     }, 1000);
+  //   }
+  // };
 
   // Dynamic font sizes based on screen width
   const [width, setWidth] = useState(window.innerWidth);
@@ -101,9 +123,20 @@ export const ChatApp: React.FC = () => {
   return (
     <Container maxWidth={800} maxHeight={600}>
       <div style={containerStyle}>
-        <h1 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '20px' }}>
+        <h1 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '0px' }}>
           Chat App
         </h1>
+
+                {/* Connection status display */}
+                <div style={{margin:"0px" }}>
+          {isConnected ? (
+            <h5 style={{ color: theme === 'dark' ? 'white' : 'black' }}>Status: Connected</h5>
+          ) : (
+            <div style={{ color: theme === 'dark' ? 'white' : 'black' }}>
+              <h5>Status: Disconnected</h5>
+            </div>
+          )}
+        </div>
 
         <div style={{ marginBottom: '20px' }}>
           <label style={{ fontSize: baseFontSize }}>Group:</label>
@@ -116,6 +149,8 @@ export const ChatApp: React.FC = () => {
             onMouseOut={(e) => e.currentTarget.style.border = `1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}`}
           />
         </div>
+
+
 
         <div style={{ flex: 1, overflowY: 'auto', marginBottom: '15px', width: '100%' }}>
           {messages.map((msg, index) => (

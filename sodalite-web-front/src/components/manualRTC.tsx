@@ -27,6 +27,8 @@ function ManualRTC() {
         const connectWebSocket = () => {
             wsServiceRef.current?.connect(async (data: unknown) => {
                 console.log("Data received"+data);
+                // const blob = new Blob([data]);
+                // console.log(Blob.parse(data));
                 const parsedData = data as { type: string; message: string };
                 setIsConnected(true); // Set connection status to true when successfully connected
 
@@ -52,8 +54,9 @@ function ManualRTC() {
                         setRemoteIceCandidate(parsedData.message);
                     }
                 }
-            });
-        };
+            },
+        
+    );};
 
         connectWebSocket(); // Initial connection attempt
         setIsConnected(wsServiceRef.current.getConnectionStatus());
@@ -191,8 +194,8 @@ function ManualRTC() {
     useEffect(() => {
         if (isCaller && localDescription && localIceCandidates.length > 0) {
             // send local description and ICE candidates
-            wsServiceRef.current?.send({ message: localDescription, type: "offer" });
-            wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce" });
+            wsServiceRef.current?.send({ message: localDescription, type: "offer", group: "manualRTC" });
+            wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce", group: "manualRTC" });
         }
         
     }, [localDescription, localIceCandidates, isCaller]);
@@ -225,8 +228,8 @@ function ManualRTC() {
 
     const sendAnswer = async () => {
         console.log("Sending answer");
-        wsServiceRef.current?.send({ message: localDescription, type: "answer" });
-        wsServiceRef.current?.send({ message: localIceCandidates.join("\n"), type: "answerIce" });
+        wsServiceRef.current?.send({ message: localDescription, type: "answer", group: "manualRTC" });
+        wsServiceRef.current?.send({ message: localIceCandidates.join("\n"), type: "answerIce", group: "manualRTC" });
         // addIceCandidate();
 
     }

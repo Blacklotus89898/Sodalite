@@ -128,8 +128,7 @@ const CollabApp: React.FC = () => {
           ) : (
             <h4 style={{ color: theme === 'dark' ? 'white' : 'black' }}>
               Status: Disconnected
-              <span>        </span>
-              <button style={buttonStyle} onClick={reconnect}>Reconnect</button>
+              {/* <button style={buttonStyle} onClick={reconnect}>Reconnect</button> */}
             </h4>
           )}
         </div>

@@ -9,15 +9,15 @@ import FileUploadComponent from './fileUploadComponent';
 import {ChatApp} from './chatApp'; // Add this line
 import CollabApp from './collabApp';
 import TranslationComponent from './translationComponent';
-import {FileShare} from './wsFileSharing';
+import FileShare from './wsFileSharing';
 import ManualRTC from './manualRTC';
 import UpdateAddress from './serverSettings';
 import Timer from './timer';
 import { AudioIntensity } from './audioIntensity';
+import TextComparator from './textComparator';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
-const Settings = () => <div>Settings Content</div>;
 
 const PersistentLayout: React.FC = () => {
     const { theme, chroma } = useTheme();
@@ -170,6 +170,12 @@ const PersistentLayout: React.FC = () => {
                         {collapsed ? '' : 'Translation'}
                     </button>
                     <button
+                        style={activeTab === 'fileshare' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('fileshare')}
+                    >
+                        {collapsed ? '' : 'Filesharing'}
+                    </button>
+                    <button
                         style={activeTab === 'rtc' ? activeButtonStyle : buttonStyle}
                         onClick={() => setActiveTab('rtc')}
                     >
@@ -186,6 +192,12 @@ const PersistentLayout: React.FC = () => {
                         onClick={() => setActiveTab('audio')}
                     >
                         {collapsed ? '' : 'Audio'}
+                    </button>
+                    <button
+                        style={activeTab === 'comparator' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('comparator')}
+                    >
+                        {collapsed ? '' : 'Text Comparator'}
                     </button>
                 </div>
 
@@ -222,9 +234,9 @@ const PersistentLayout: React.FC = () => {
                     <div style={{ display: activeTab === 'translation' ? 'flex' : 'none', flex: 1 }}>
                         <TranslationComponent/>
                     </div>
-                    {/* <div style={{ display: activeTab === 'fileshare' ? 'flex' : 'none', flex: 1 }}>
-                        <FileShare  />
-                    </div> */}
+                    <div style={{ display: activeTab === 'fileshare' ? 'flex' : 'none', flex: 1 }}>
+                        <FileShare  websocketUrl='ws://192.168.0.103:8080'/>
+                    </div>
                     <div style={{ display: activeTab === 'rtc' ? 'flex' : 'none', flex: 1 }}>
                         <ManualRTC />
                     </div>
@@ -235,6 +247,9 @@ const PersistentLayout: React.FC = () => {
                     </div>
                     <div style={{ display: activeTab === 'audio' ? 'flex' : 'none', flex: 1 }}>
                         <AudioIntensity />
+                    </div>
+                    <div style={{ display: activeTab === 'comparator' ? 'flex' : 'none', flex: 1 }}>
+                        <TextComparator />
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Container } from './container';
 import { WebSocketService } from '../services/websocketService';
 import { useServer, useTheme } from '../stores/hooks';
@@ -39,7 +39,7 @@ export const CanvaShare: React.FC = () => {
             ctx.moveTo(data.startX, data.startY);
             ctx.lineTo(data.x, data.y);
             ctx.strokeStyle = theme === 'dark' ? 'white' : 'black'; // Change color based on theme
-            ctx.lineWidth = 1; // Change brush size as needed
+            ctx.lineWidth = 5; // Change brush size as needed
             ctx.lineCap = 'round'; // Round the ends of the lines
             ctx.stroke();
             ctx.closePath();
@@ -159,7 +159,7 @@ export const CanvaShare: React.FC = () => {
         border: 'none',
         padding: '12px',
         fontSize: "12px",
-        borderRadius: '5px',
+        borderRadius: '2px',
         cursor: 'pointer',
         transition: 'background 0.3s ease-in-out, color 0.3s ease-in-out',
         flexShrink: 0, // Prevent shrinking

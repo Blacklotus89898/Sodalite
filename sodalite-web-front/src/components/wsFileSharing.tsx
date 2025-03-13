@@ -205,11 +205,21 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
           alt="Image Preview"
           className="max-w-full max-h-96 mx-auto block"
           />
+          <p>
+            {content}
+          </p>
            <iframe
           src={content}
           title="Iframe Preview"
           className="max-w-full max-h-96 mx-auto block"
           />
+          <a
+            href={url}
+            download={sharedFile?.name}
+            className="text-blue-500 underline"
+          >
+            Download PDF
+          </a>
           </>
       );
     } else if (fileType.includes("pdf")) {

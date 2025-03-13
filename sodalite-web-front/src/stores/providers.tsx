@@ -11,7 +11,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 export const EventProvider = ({ children }: { children: ReactNode }) => {
     const [events, setEvents] = useState<{ [key: string]: boolean }>({
         header: false,
-        lsidebar: false,
+        lsidebar: true,
         rsidebar: false,
     });
 
