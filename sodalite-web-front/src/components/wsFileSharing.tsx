@@ -1,154 +1,303 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 interface FileShareProps {
-    websocketUrl: string;
+  websocketUrl: string;
+}
+
+interface SharedFile {
+  name: string;
+  type: string;
+  content: string | ArrayBuffer;
 }
 
 const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
-    const [file, setFile] = useState<File | null>(null);
-    const [status, setStatus] = useState<string>("");
-    const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [sharedFile, setSharedFile] = useState<{ name: string; type: string; content: string | ArrayBuffer } | null>(null);
-    const [previewURL, setPreviewURL] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [status, setStatus] = useState<string>("");
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [sharedFile, setSharedFile] = useState<SharedFile | null>(null);
+  const [previewURL, setPreviewURL] = useState<string | null>(null);
+  const [textContent, setTextContent] = useState<string>("");
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
-    useEffect(() => {
-        const ws = new WebSocket(websocketUrl);
-        setSocket(ws);
+  // Initialize WebSocket connection
+  useEffect(() => {
+    const ws = new WebSocket(websocketUrl);
+    setSocket(ws);
 
-        ws.onopen = () => {
-            setStatus("Connected to WebSocket server");
-        };
-
-        ws.onmessage = async (event) => {
-            if (event.data instanceof Blob) {
-                // Handle binary data
-                const blob = event.data;
-                const arrayBuffer = await blob.arrayBuffer();
-                const fileType = blob.type || "application/pdf"; // Default to PDF
-                const fileURL = URL.createObjectURL(new Blob([arrayBuffer], { type: fileType }));
-
-                setSharedFile({
-                    name: "ReceivedFile.pdf",
-                    type: fileType,
-                    content: fileURL,
-                });
-
-                setStatus("Received file");
-                return;
-            }
-
-            try {
-                const receivedData = JSON.parse(event.data);
-                setSharedFile({
-                    name: receivedData.filename,
-                    type: receivedData.filetype,
-                    content: receivedData.content,
-                });
-            } catch (error) {
-                console.error("Error parsing received file:", error);
-                setStatus("Error parsing file");
-            }
-        };
-
-        ws.onclose = () => {
-            setStatus("WebSocket connection closed");
-        };
-
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            setStatus("WebSocket error");
-        };
-
-        return () => {
-            ws.close();
-        };
-    }, [websocketUrl]);
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const selectedFile = e.target.files[0];
-            setFile(selectedFile);
-
-            // Create local preview for the file
-            const reader = new FileReader();
-            reader.onload = () => {
-                const previewFileURL = reader.result as string;
-                setPreviewURL(previewFileURL); // Set the preview URL
-            };
-            reader.readAsDataURL(selectedFile); // Read file as DataURL for image/pdf preview
-        }
+    ws.onopen = () => {
+      setStatus("Connected to WebSocket server");
+      setIsConnected(true);
     };
 
-    const handleFileSend = () => {
-        if (!file || !socket || socket.readyState !== WebSocket.OPEN) {
-            setStatus("No file selected or WebSocket not ready");
-            return;
+    ws.onmessage = async (event) => {
+      try {
+        if (event.data instanceof Blob) {
+          handleBinaryData(event.data);
+        } else {
+          handleJsonData(event.data);
         }
+      } catch (error) {
+        console.error("Error processing received data:", error);
+        setStatus("Error processing received data");
+      }
+    };
 
+    ws.onclose = () => {
+      setStatus("WebSocket connection closed");
+      setIsConnected(false);
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      setStatus("WebSocket error");
+      setIsConnected(false);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [websocketUrl]);
+
+  // Handle binary data received from WebSocket
+  const handleBinaryData = async (blob: Blob) => {
+    try {
+      const arrayBuffer = await blob.arrayBuffer();
+      const fileType = blob.type || "application/pdf";
+      const fileURL = URL.createObjectURL(new Blob([arrayBuffer], { type: fileType }));
+      
+      setSharedFile({
+        name: determineFileName(fileType),
+        type: fileType,
+        content: fileURL,
+      });
+      
+      setStatus("Received file");
+      
+      // If it's a text file, read and set content
+      if (fileType.includes("text")) {
+        const text = await blob.text();
+        setTextContent(text);
+      }
+    } catch (error) {
+      console.error("Error processing binary data:", error);
+      setStatus("Error processing binary data");
+    }
+  };
+
+  // Determine filename based on file type
+  const determineFileName = (fileType: string): string => {
+    if (fileType.includes("pdf")) return "ReceivedFile.pdf";
+    if (fileType.includes("image")) {
+      const extension = fileType.split("/")[1] || "png";
+      return `ReceivedImage.${extension}`;
+    }
+    if (fileType.includes("text")) return "ReceivedText.txt";
+    return "ReceivedFile";
+  };
+
+  // Handle JSON data received from WebSocket
+  const handleJsonData = (data: string) => {
+    try {
+      console.log("Received data:", data);
+      const receivedData = JSON.parse(data);
+      
+      setSharedFile({
+        name: receivedData.filename || "Unknown",
+        type: receivedData.filetype || "application/octet-stream",
+        // type: receivedData.filetype || "application/pdf",
+        content: receivedData.content,
+      });
+      
+      setStatus(`Received ${receivedData.filename}`);
+      
+      // If it's text content
+      if (receivedData.filetype?.includes("text")) {
+        setTextContent(receivedData.content);
+      }
+    } catch (error) {
+      console.error("Error parsing JSON data:", error);
+      setStatus("Error parsing JSON data");
+    }
+  };
+
+  // Handle file selection
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      
+      // Create preview URL
+      const localPreviewURL = URL.createObjectURL(selectedFile);
+      setPreviewURL(localPreviewURL);
+      
+      // Handle text files
+      if (selectedFile.type.includes("text")) {
         const reader = new FileReader();
-
         reader.onload = () => {
-            const fileData = reader.result;
-            if (fileData instanceof ArrayBuffer) {
-                socket.send(fileData);
-                setStatus(`File "${file.name}" sent successfully`);
-            } else {
-                setStatus("Failed to read file");
-            }
+          setTextContent(reader.result as string);
         };
+        reader.readAsText(selectedFile);
+      }
+    }
+  }, []);
 
-        reader.onerror = () => {
-            setStatus("Error reading file");
-        };
+  // Send file via WebSocket
+  const handleFileSend = useCallback(() => {
+    if (!file || !socket || socket.readyState !== WebSocket.OPEN) {
+      setStatus(socket?.readyState !== WebSocket.OPEN ? "WebSocket not connected" : "No file selected");
+      return;
+    }
 
-        reader.readAsArrayBuffer(file);
+    setStatus("Sending file...");
+    
+    const reader = new FileReader();
+    
+    reader.onload = () => {
+      const fileData = reader.result;
+      if (fileData instanceof ArrayBuffer) {
+        socket.send(fileData);
+        setStatus(`File "${file.name}" sent successfully`);
+      } else {
+        setStatus("Failed to read file as binary data");
+      }
     };
+    
+    reader.onerror = () => {
+      setStatus("Error reading file");
+    };
+    
+    reader.readAsArrayBuffer(file);
+  }, [file, socket]);
 
-    return (
-        <div style={{ padding: "20px", border: "1px solid #ccc", borderRadius: "8px", width: "400px" }}>
-            <h3>PDF File Sharing via WebSocket</h3>
-            <input type="file" accept="application/pdf" onChange={handleFileChange} />
-            <button onClick={handleFileSend} style={{ marginLeft: "10px" }}>
-                Send File
-            </button>
-            <p>Status: {status}</p>
+  // Cleanup function for URL objects
+  useEffect(() => {
+    return () => {
+      if (previewURL) URL.revokeObjectURL(previewURL);
+      if (sharedFile?.content && typeof sharedFile.content === 'string' && sharedFile.content.startsWith('blob:')) {
+        URL.revokeObjectURL(sharedFile.content);
+      }
+    };
+  }, [previewURL, sharedFile]);
 
-            {/* Local Preview Before Sending */}
-            {previewURL && (
-                <div style={{ marginTop: "20px" }}>
-                    <h4>Local Preview:</h4>
-                    {file && file.type === "application/pdf" ? (
-                        <iframe
-                            src={previewURL}
-                            title="Local Preview"
-                            style={{ width: "100%", height: "400px", border: "none" }}
-                        ></iframe>
-                    ) : (
-                        <p>Preview not available for this file type.</p>
-                    )}
-                </div>
-            )}
-
-            {/* Preview the received file */}
-            {sharedFile && (
-                <div style={{ marginTop: "20px" }}>
-                    <h4>Received File:</h4>
-                    <p><strong>Name:</strong> {sharedFile.name}</p>
-                    <p><strong>Type:</strong> {sharedFile.type}</p>
-
-                    {sharedFile.type === "application/pdf" ? (
-                        <iframe
-                            src={sharedFile.content as string}
-                            title={sharedFile.name}
-                            style={{ width: "100%", height: "400px", border: "none" }}
-                        ></iframe>
-                    ) : (
-                        <p>Preview not available for this file type.</p>
-                    )}
-                </div>
-            )}
+  // Render file preview based on file type
+  const renderFilePreview = ( isReceived: boolean, url: string, fileType: string, content?: string) => {
+    if (fileType.includes("pdf") && !isReceived) {
+      return (
+        <iframe
+          src={url}
+          title="PDF Preview"
+          className="w-full h-96 border-none"
+        />
+      );
+    } else if (fileType.includes("image")) {
+      return (
+        <img
+          src={url}
+          alt="Image Preview"
+          className="max-w-full max-h-96 mx-auto block"
+        />
+      );
+    } else if (fileType.includes("")) {
+      return (
+        <>
+        <img
+          src={url}
+          alt="Image Preview"
+          className="max-w-full max-h-96 mx-auto block"
+          />
+           <iframe
+          src={content}
+          title="Iframe Preview"
+          className="max-w-full max-h-96 mx-auto block"
+          />
+          </>
+      );
+    } else if (fileType.includes("pdf")) {
+      return (
+        <>
+        <iframe
+          src={content}
+          title="Image Preview"
+          className="max-w-full max-h-96 mx-auto block"
+          />
+          </>
+      );
+    } else if (fileType.includes("text")) {
+      return (
+        <div className="whitespace-pre-wrap text-left p-4 border border-gray-200 rounded bg-gray-50 max-h-96 overflow-auto">
+          {content || "Loading text content..."}
         </div>
-    );
+      );
+    }
+    
+    return <div className="p-4 text-gray-500">Preview not available for this file type</div>;
+  };
+
+  return (
+    <div className="p-6 border border-gray-300 rounded-lg max-w-md mx-auto">
+      <h3 className="text-xl font-semibold mb-4">File Sharing via WebSocket</h3>
+      
+      {/* Connection Status */}
+      <div className="mb-4 flex items-center">
+        <span className={`inline-block w-3 h-3 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
+        <span className="text-sm">{status}</span>
+      </div>
+      
+      {/* File Selection */}
+      <div className="mb-4">
+        <div className="flex mb-2">
+          <input 
+            type="file" 
+            accept="application/pdf,image/*,text/plain"
+            onChange={handleFileChange}
+            className="flex-1 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
+          <button 
+            onClick={handleFileSend} 
+            disabled={!file || !isConnected}
+            className={`ml-2 px-4 py-2 rounded text-white ${!file || !isConnected ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          >
+            Send
+          </button>
+        </div>
+        {file && (
+          <div className="text-sm text-gray-600">
+            Selected: {file.name} ({Math.round(file.size / 1024)} KB)
+          </div>
+        )}
+      </div>
+      
+      {/* File Preview Container */}
+      {file && previewURL && (
+        <div className="mb-6 border border-gray-200 rounded-lg p-4">
+          <h4 className="font-medium mb-2">Local Preview</h4>
+          <div className="text-sm text-gray-600 mb-2">
+            <div>Name: {file.name}</div>
+            <div>Type: {file.type}</div>
+          </div>
+          {renderFilePreview(false, previewURL, file.type, textContent)}
+        </div>
+      )}
+      
+      {/* Received File */}
+      {sharedFile && (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h4 className="font-medium mb-2">Received File</h4>
+          <div className="text-sm text-gray-600 mb-2">
+            <div>Name: {sharedFile.name}</div>
+            <div>Type: {sharedFile.type}</div>
+          </div>
+          {typeof sharedFile.content === 'string' && renderFilePreview(
+            true,
+            sharedFile.content,
+            sharedFile.type,
+            sharedFile.type.includes("text") ? textContent : sharedFile.content as string
+             
+          )}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default FileShare;
