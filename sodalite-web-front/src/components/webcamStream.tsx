@@ -4,7 +4,9 @@ const WebcamStream: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null); // Reference to the video element
     const [stream, setStream] = useState<MediaStream | null>(null); // Webcam stream
     const [isRecording, setIsRecording] = useState(false);
-    const mediaRecorderRef = useRef<MediaRecorder | null>(null); // To store the MediaRecorder
+    const [filename, setFilename] = useState<string | null>(null); // Store the filename after upload
+    const [customFilename, setCustomFilename] = useState<string>(""); // Optional custom filename
+    const [videoToFetch, setVideoToFetch] = useState<string>(""); // State for the video filename to fetch
 
     // Initialize the webcam stream
     useEffect(() => {
@@ -46,7 +48,6 @@ const WebcamStream: React.FC = () => {
         setIsRecording(true);
 
         const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder; // Store mediaRecorder in ref
         const chunks: Blob[] = [];
 
         mediaRecorder.ondataavailable = (event) => {
@@ -73,38 +74,53 @@ const WebcamStream: React.FC = () => {
     // Send the recorded video to the backend server
     const sendToServer = async (videoBlob: Blob) => {
         const formData = new FormData();
-        formData.append("video", videoBlob, "recording.webm");
+        const filenameToSend = customFilename || "recording.webm"; // Use custom filename or fallback to "recording.webm"
+        formData.append("video", videoBlob, filenameToSend);
 
         try {
             const response = await fetch("http://localhost:5000/upload", {
                 method: "POST",
                 body: formData,
             });
-            if (!response.ok) {
-                throw new Error("Failed to upload video");
+            const data = await response.json();
+
+            if (response.ok) {
+                // Save the filename received from the server
+                setFilename(data.filename);
+                console.log("Video uploaded successfully, filename:", data.filename);
+            } else {
+                console.error("Error uploading video:", data.message);
             }
-            console.log("Video uploaded successfully");
         } catch (err) {
             console.error("Error uploading video:", err);
         }
     };
 
-    // Cleanup mediaRecorder when the component unmounts
-    useEffect(() => {
-        return () => {
-            if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-                mediaRecorderRef.current.stop(); // Stop the recording if component unmounts
-            }
-        };
-    }, []);
+    // Handle filename input for the fetched video
+    const handleFetchVideo = () => {
+        if (!videoToFetch) return;
+        setFilename(videoToFetch);
+        setVideoToFetch(""); // Clear the input field
+    };
 
     return (
         <div>
             <h1>Webcam Stream</h1>
-            <video
-                ref={videoRef}
-                style={{ width: "100%", maxHeight: "400px", border: "2px solid black" }}
-            />
+            
+            {/* Webcam Video */}
+            <div style={{ marginTop: "20px", border: "2px solid black", padding: "10px" }}>
+                <h2>Your Webcam Stream</h2>
+                <video
+                    ref={videoRef}
+                    style={{ width: "100%", maxHeight: "400px" }}
+                    autoPlay
+                    playsInline
+                    muted
+                    controls
+                />
+            </div>
+
+            {/* Record Button */}
             <div style={{ marginTop: "20px" }}>
                 <button
                     onClick={handleStartRecording}
@@ -120,6 +136,73 @@ const WebcamStream: React.FC = () => {
                     {isRecording ? "Recording..." : "Start Recording"}
                 </button>
             </div>
+
+            {/* Optional filename input for uploaded video */}
+            <div style={{ marginTop: "20px" }}>
+                <label>
+                    Enter a custom filename for your video (optional):
+                    <input
+                        type="text"
+                        value={customFilename}
+                        onChange={(e) => setCustomFilename(e.target.value)}
+                        placeholder="Enter filename (e.g. myvideo)"
+                        style={{
+                            padding: "5px",
+                            marginLeft: "10px",
+                            border: "1px solid #ccc",
+                        }}
+                    />
+                </label>
+            </div>
+
+            {/* Fetch video section */}
+            <div style={{ marginTop: "20px" }}>
+                <label>
+                    Enter a video filename to fetch:
+                    <input
+                        type="text"
+                        value={videoToFetch}
+                        onChange={(e) => setVideoToFetch(e.target.value)}
+                        placeholder="Enter filename to fetch"
+                        style={{
+                            padding: "5px",
+                            marginLeft: "10px",
+                            border: "1px solid #ccc",
+                        }}
+                    />
+                </label>
+                <button
+                    onClick={handleFetchVideo}
+                    style={{
+                        padding: "5px 10px",
+                        marginLeft: "10px",
+                        backgroundColor: "#007BFF",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer",
+                    }}
+                >
+                    Fetch Video
+                </button>
+            </div>
+
+            {/* Display the uploaded video */}
+            {filename && (
+                <div style={{ marginTop: "20px", border: "2px solid black", padding: "10px" }}>
+                    <h2>Watch your uploaded video</h2>
+                    <video
+                        key={filename} // Force re-render of the video element when filename changes
+                        style={{ width: "100%", maxHeight: "400px" }}
+                        controls
+                    >
+                        <source
+                            src={`http://localhost:5000/stream/${filename}`}
+                            type="video/webm"
+                        />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,6 +1,8 @@
 const express = require("express");
 const multer = require("multer");
-const cors = require("cors"); // Import the CORS middleware
+const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 
@@ -22,7 +24,31 @@ const upload = multer({ storage });
 // Endpoint to handle video uploads
 app.post("/upload", upload.single("video"), (req, res) => {
     console.log("Received file:", req.file);
-    res.status(200).send("Video uploaded successfully!");
+    
+    // Send the filename back to the client
+    res.status(200).json({ message: "Video uploaded successfully!", filename: req.file.filename });
+});
+
+// Endpoint to stream the uploaded video
+app.get("/stream/:filename", (req, res) => {
+    const { filename } = req.params;
+    const videoPath = path.join(__dirname, "uploads", filename);
+
+    // Check if the file exists
+    if (!fs.existsSync(videoPath)) {
+        return res.status(404).send("Video file not found.");
+    }
+
+    const videoStat = fs.statSync(videoPath);
+    const videoStream = fs.createReadStream(videoPath);
+
+    res.writeHead(200, {
+        "Content-Type": "video/webm", // Change to the appropriate mime type if necessary
+        "Content-Length": videoStat.size,
+        "Accept-Ranges": "bytes", // Allow for byte-range requests
+    });
+
+    videoStream.pipe(res);
 });
 
 // Start the server
