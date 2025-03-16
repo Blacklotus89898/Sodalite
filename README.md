@@ -12,6 +12,9 @@ You can access the web application at the following link: [Sodalite Web App](htt
 - Real-time updates
 - Interactive components
 - Drag-and-drop functionality
+- Camera access to take pictures
+- Video saving
+- AI agent
 
 ## Running in Development
 
