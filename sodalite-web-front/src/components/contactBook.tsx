@@ -9,6 +9,7 @@ interface Contact {
   address: string;
   notes: string;
   socialLinks?: { platform: string; url: string }[];
+  extraFields?: { key: string; value: string }[];
 }
 
 const initialContacts: Contact[] = [
@@ -23,6 +24,7 @@ const initialContacts: Contact[] = [
       { platform: 'Facebook', url: 'https://facebook.com/johndoe' },
       { platform: 'Twitter', url: 'https://twitter.com/johndoe' },
     ],
+    extraFields: [],
   },
   {
     id: 2,
@@ -35,36 +37,55 @@ const initialContacts: Contact[] = [
       { platform: 'LinkedIn', url: 'https://linkedin.com/in/janesmith' },
       { platform: 'Instagram', url: 'https://instagram.com/janesmith' },
     ],
-  },
-  {
-    id: 3,
-    name: 'Alice Johnson',
-    phone: '555-123-4567',
-    email: 'alice@example.com',
-    address: '789 Pine Rd',
-    notes: 'Neighbor',
-    socialLinks: [{ platform: 'Facebook', url: 'https://facebook.com/alicejohnson' }],
+    extraFields: [],
   },
 ];
 
 const ContactBook: React.FC = () => {
-  const [contacts] = useState<Contact[]>(initialContacts);
+  const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  
+  const addContact = () => {
+    const newContact: Contact = {
+      id: Date.now(),
+      name: 'New Contact',
+      phone: '',
+      email: '',
+      address: '',
+      notes: '',
+      socialLinks: [],
+      extraFields: [],
+    };
+    setContacts([...contacts, newContact]);
+  };
+
+  const updateContact = (updatedContact: Contact) => {
+    setContacts(contacts.map(contact => contact.id === updatedContact.id ? updatedContact : contact));
+    setSelectedContact(updatedContact);
+  };
+
+  const deleteContact = (id: number) => {
+    setContacts(contacts.filter(contact => contact.id !== id));
+    setSelectedContact(null);
+  };
+
+  const addField = () => {
+    if (selectedContact) {
+      const updatedContact = { ...selectedContact, extraFields: [...(selectedContact.extraFields || []), { key: '', value: '' }] };
+      updateContact(updatedContact);
+    }
+  };
 
   const filteredContacts = contacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSocialClick = (platform: string, url: string) => {
-    console.log(`Clicked on ${platform}: ${url}`);
-    window.open(url, '_blank');
-  };
-
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ width: '30%', borderRight: '1px solid #ccc', overflowY: 'auto', padding: '10px' }}>
         <h2>Contacts</h2>
+        <button onClick={addContact}>Add Contact</button>
         <input
           type="text"
           placeholder="Search contacts..."
@@ -92,29 +113,27 @@ const ContactBook: React.FC = () => {
         {selectedContact ? (
           <div>
             <h2>{selectedContact.name}</h2>
-            <p><strong>Phone:</strong> {selectedContact.phone}</p>
-            <p><strong>Email:</strong> {selectedContact.email}</p>
-            <p><strong>Address:</strong> {selectedContact.address}</p>
-            <p><strong>Notes:</strong> {selectedContact.notes}</p>
-            <h3>Social Links</h3>
-            <ul>
-              {selectedContact.socialLinks?.map((link, index) => (
-                <li key={index}>
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: 'blue', textDecoration: 'underline' }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSocialClick(link.platform, link.url);
-                    }}
-                  >
-                    {link.platform}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p><strong>Phone:</strong> <input type="text" value={selectedContact.phone} onChange={(e) => updateContact({...selectedContact, phone: e.target.value})} /></p>
+            <p><strong>Email:</strong> <input type="text" value={selectedContact.email} onChange={(e) => updateContact({...selectedContact, email: e.target.value})} /></p>
+            <p><strong>Address:</strong> <input type="text" value={selectedContact.address} onChange={(e) => updateContact({...selectedContact, address: e.target.value})} /></p>
+            <p><strong>Notes:</strong> <input type="text" value={selectedContact.notes} onChange={(e) => updateContact({...selectedContact, notes: e.target.value})} /></p>
+            <h3>Extra Fields</h3>
+            {selectedContact.extraFields?.map((field, index) => (
+              <div key={index}>
+                <input type="text" value={field.key} placeholder="Field Name" onChange={(e) => {
+                  const updatedFields = [...selectedContact.extraFields!];
+                  updatedFields[index].key = e.target.value;
+                  updateContact({ ...selectedContact, extraFields: updatedFields });
+                }} />
+                <input type="text" value={field.value} placeholder="Field Value" onChange={(e) => {
+                  const updatedFields = [...selectedContact.extraFields!];
+                  updatedFields[index].value = e.target.value;
+                  updateContact({ ...selectedContact, extraFields: updatedFields });
+                }} />
+              </div>
+            ))}
+            <button onClick={addField}>Add Field</button>
+            <button onClick={() => deleteContact(selectedContact.id)}>Delete Contact</button>
             <SocialGraph socialLinks={selectedContact.socialLinks || []} />
           </div>
         ) : (
@@ -125,97 +144,40 @@ const ContactBook: React.FC = () => {
   );
 };
 
-interface SocialLink {
-    platform: string;
-    url: string;
-  }
-
-const SocialGraph: React.FC<{ socialLinks: SocialLink[] }> = ({ socialLinks }) => {
-    const centerX = 200; // Center X position
-    const centerY = 200; // Center Y position
-    const radius = 100; // Radius of the circular arrangement
-  
-    return (
-      <div style={{ position: 'relative', width: '400px', height: '400px', margin: '20px auto', border: '1px solid #ccc' }}>
-        {/* SVG for Lines */}
-        <svg
-          width="400"
-          height="400"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 0, // Ensure lines render below nodes
-          }}
-        >
-          {socialLinks.map((_, index) => {
-            const angle = (index * 2 * Math.PI) / socialLinks.length;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-  
-            return (
-              <line
-                key={`line-${index}`}
-                x1={centerX}
-                y1={centerY}
-                x2={x}
-                y2={y}
-                stroke="#ccc"
-                strokeWidth="2"
-              />
-            );
-          })}
-        </svg>
-  
-        {/* Nodes */}
-        {socialLinks.map((link, index) => {
-          const angle = (index * 2 * Math.PI) / socialLinks.length;
-          const x = centerX + radius * Math.cos(angle) - 40; // Center each node horizontally
-          const y = centerY + radius * Math.sin(angle) - 15; // Center each node vertically
-  
-          return (
-            <div
-              key={link.platform}
-              style={{
-                position: 'absolute',
-                top: `${y}px`,
-                left: `${x}px`,
-                width: '80px',
-                height: '30px',
-                textAlign: 'center',
-                lineHeight: '30px',
-                background: '#ddd',
-                borderRadius: '15px',
-                cursor: 'pointer',
-                zIndex: 1, // Ensure nodes render above lines
-              }}
-              onClick={() => window.open(link.url, '_blank')}
-            >
-              {link.platform}
-            </div>
-          );
-        })}
-  
-        {/* Center Node */}
-        <div
-          style={{
-            position: 'absolute',
-            top: `${centerY - 25}px`,
-            left: `${centerX - 25}px`,
-            width: '50px',
-            height: '50px',
-            background: '#007bff',
-            borderRadius: '50%',
-            color: '#fff',
-            textAlign: 'center',
-            lineHeight: '50px',
-            fontWeight: 'bold',
-          }}
-        >
-          You
-        </div>
-      </div>
-    );
-  };
-
 export default ContactBook;
+
+
+const SocialGraph: React.FC<{ socialLinks: { platform: string; url: string }[] }> = ({ socialLinks }) => {
+  const centerX = 200;
+  const centerY = 200;
+  const radius = 100;
+
+  return (
+    <div style={{ position: 'relative', width: '400px', height: '400px', margin: '20px auto', border: '1px solid #ccc' }}>
+      <svg width="400" height="400" style={{ position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
+        {socialLinks.map((_, index) => {
+          const angle = (index * 2 * Math.PI) / socialLinks.length;
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+
+          return <line key={`line-${index}`} x1={centerX} y1={centerY} x2={x} y2={y} stroke="#ccc" strokeWidth="2" />;
+        })}
+      </svg>
+      {socialLinks.map((link, index) => {
+        const angle = (index * 2 * Math.PI) / socialLinks.length;
+        const x = centerX + radius * Math.cos(angle) - 40;
+        const y = centerY + radius * Math.sin(angle) - 15;
+
+        return (
+          <div key={link.platform} style={{ position: 'absolute', top: `${y}px`, left: `${x}px`, width: '80px', height: '30px', textAlign: 'center', lineHeight: '30px', background: '#ddd', borderRadius: '15px', cursor: 'pointer', zIndex: 1 }} onClick={() => window.open(link.url, '_blank')}>
+            {link.platform}
+          </div>
+        );
+      })}
+      <div style={{ position: 'absolute', top: `${centerY - 25}px`, left: `${centerX - 25}px`, width: '50px', height: '50px', background: '#007bff', borderRadius: '50%', color: '#fff', textAlign: 'center', lineHeight: '50px', fontWeight: 'bold' }}>
+        You
+      </div>
+    </div>
+  );
+};
+
