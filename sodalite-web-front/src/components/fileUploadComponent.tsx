@@ -86,6 +86,7 @@ const FileUploadComponent = () => {
         try {
             const fileList = await fileUploadService.getFileList();
             setFiles(fileList);
+            console.log(fileList);
         } catch (error) {
             console.error("Error fetching files:", error);
         }
@@ -202,7 +203,7 @@ const FileUploadComponent = () => {
                     <button onClick={fetchFiles} style={buttonStyle}>
                         Refresh
                     </button>
-                    <ul style={{ listStyleType: 'none', padding: '0', overflowY: 'auto', maxHeight: '400px', flex: 0 }}>
+                    <ul style={{ padding: '0', overflowY: 'auto', maxHeight: '400px', flex: 1 }}>
                         {files.map((file, index) => (
                             <li key={index} style={{ marginBottom: '10px' }}>
                                 <a
