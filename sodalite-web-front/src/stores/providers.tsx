@@ -1,5 +1,5 @@
 import { useState, ReactNode, useEffect } from "react";
-import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState, StreakContext, EventContext } from "./stores";
+import { UserContext, ThemeContext, ServerContext, ProfileContext, ProfileState, StreakContext, EventContext, LogContext, LogType } from "./stores";
 
 // User Provider Component -- not used in the example
 export const UserProvider = ({ children }: { children: ReactNode }) => {
@@ -116,19 +116,30 @@ export const StreakProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
 };
 
+
+export const LogProvider = ({ children }: { children: ReactNode }) => {
+    const [logs, setLogs] = useState<LogType[]>([]);
+    const addLogs = (newLogs: LogType[]) => setLogs((prev) => [...prev, ...newLogs]);
+    return <LogContext.Provider value={{ logs, addLogs }}>{children}</LogContext.Provider>;
+}
+
+// May consider a modular state to add to a plugin context
+
 // Wrapping all providers together
 export const AppProviders = ({ children }: { children: ReactNode }) => (
-    <EventProvider>
-        <StreakProvider>
-            <ProfileProvider>
-                <ServerProvider>
-                    <UserProvider>
-                        <ThemeProvider>{children}</ThemeProvider>
-                    </UserProvider>
-                </ServerProvider>
-            </ProfileProvider>
-        </StreakProvider>
-    </EventProvider>
+    <LogProvider>
+        <EventProvider>
+            <StreakProvider>
+                <ProfileProvider>
+                    <ServerProvider>
+                        <UserProvider>
+                            <ThemeProvider>{children}</ThemeProvider>
+                        </UserProvider>
+                    </ServerProvider>
+                </ProfileProvider>
+            </StreakProvider>
+        </EventProvider>
+    </LogProvider>
 );
 
 

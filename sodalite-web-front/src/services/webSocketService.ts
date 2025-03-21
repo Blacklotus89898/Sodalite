@@ -1,3 +1,4 @@
+// log should be added here
 export class WebSocketService {
   private socket: WebSocket | null = null;
   private isConnected: boolean = false;
@@ -13,6 +14,7 @@ export class WebSocketService {
     this.socket.onopen = () => {
       this.isConnected = true;
       console.log('WebSocket connected');
+      
     };
 
     this.socket.onmessage = async (event) => {

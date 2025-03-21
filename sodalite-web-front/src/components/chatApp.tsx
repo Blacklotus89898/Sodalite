@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { WebSocketService } from '../services/websocketService';
 import { useServer, useTheme } from '../stores/hooks';
 import { Container } from './container';
+import { useLog } from '../stores/hooks';
+import { LogType } from '../stores/stores';
 
 export const ChatApp: React.FC = () => {
   const { address } = useServer();
@@ -11,6 +13,7 @@ export const ChatApp: React.FC = () => {
   const [group, setGroup] = useState<string>('default');
   const [isConnected, setIsConnected] = useState<boolean>(false); // State for connection status
   const wsServiceRef = useRef<WebSocketService | null>(null);
+  const { logs, addLogs } = useLog();	
 
   useEffect(() => {
     wsServiceRef.current = new WebSocketService(address['websocketServer']);
@@ -18,6 +21,12 @@ export const ChatApp: React.FC = () => {
     const connectWebSocket = () => {
       wsServiceRef.current?.connect((data) => {
         console.log('Received:', data);
+
+        addLogs([ {
+          Time: new Date().toLocaleTimeString(),
+          Message: data as string,
+          Type: "chatApp",
+        }]);
         setMessages((prevMessages) => [...prevMessages, data as { message: string; group: string }]);
         setIsConnected(true); // Set connection status to true when successfully connected
       });

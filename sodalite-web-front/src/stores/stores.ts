@@ -12,6 +12,9 @@ type ThemeContextType = {
 // Initialize context with `undefined` as before
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+
+
+
 // Store for User Data
 export const UserContext = createContext<{ user: string; setUser: (user: string) => void } | undefined>(undefined);
 
@@ -71,6 +74,9 @@ export const ProfileContext = createContext<ProfileContextType | undefined>({
 });
 
 
+
+
+
 export  interface StreakContextProps {
     streak: number;
     heatmap: { [date: string]: number };
@@ -81,3 +87,13 @@ export  interface StreakContextProps {
 export  const StreakContext = createContext<StreakContextProps | undefined>(undefined);
   
 export const EventContext = createContext<{ events: { [key: string]: boolean }; setEvent: (key: string, value: boolean) => void } | undefined>(undefined);
+
+
+export interface LogType {
+    Time: string;
+    Type: string;
+    Message: string;
+}
+
+// Need to rethink the stucture of logs: type? error, warning, info? time?, source?
+export const LogContext = createContext<{ logs: LogType[]; addLogs: (logs: LogType[]) => void } | undefined>(undefined);

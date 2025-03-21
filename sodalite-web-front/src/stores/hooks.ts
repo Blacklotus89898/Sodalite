@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ThemeContext, UserContext, ServerContext, ProfileContext, StreakContextProps, StreakContext, EventContext } from "./stores";
+import { ThemeContext, UserContext, ServerContext, ProfileContext, StreakContextProps, StreakContext, EventContext, LogContext } from "./stores";
 
 // Custom Hooks
 export const useUser = () => {
@@ -36,6 +36,14 @@ export const useStreak = (): StreakContextProps => {
   }
   return context;
 };
+
+export const useLog = () => {
+  const context = useContext(LogContext);
+  if (!context) {
+    throw new Error('useLog must be used within a LogProvider');
+  }
+  return context;
+}
 
 export const useEvent = () => {
     const context = useContext(EventContext);
