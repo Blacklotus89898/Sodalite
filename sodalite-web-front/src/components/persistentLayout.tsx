@@ -15,6 +15,9 @@ import UpdateAddress from './serverSettings';
 import Timer from './timer';
 import { AudioIntensity } from './audioIntensity';
 import TextComparator from './textComparator';
+import CalendarPicker from './calendarPicker';
+import ContactBook from './contactBook';
+import WebcamStream from './webcamStream';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
@@ -94,7 +97,7 @@ const PersistentLayout: React.FC = () => {
 
 
     return (
-        <Container maxWidth={1600} maxHeight={1100}>
+        <Container maxWidth={1600} maxHeight={1200}>
             <div ref={containerRef} style={containerStyle}>
                 {/* Sidebar */}
                 <div style={sidebarStyle}>
@@ -199,6 +202,24 @@ const PersistentLayout: React.FC = () => {
                     >
                         {collapsed ? '' : 'Text Comparator'}
                     </button>
+                    <button
+                        style={activeTab === 'Calendar' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('Calendar')}
+                    >
+                        {collapsed ? '' : 'Calendar'}
+                    </button>
+                    <button
+                        style={activeTab === 'Contact' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('Contact')}
+                    >
+                        {collapsed ? '' : 'Contact'}
+                    </button>
+                    <button
+                        style={activeTab === 'Video' ? activeButtonStyle : buttonStyle}
+                        onClick={() => setActiveTab('Video')}
+                    >
+                        {collapsed ? '' : 'Video'}
+                    </button>
                 </div>
 
                 {/* Main Content Area */}
@@ -250,6 +271,15 @@ const PersistentLayout: React.FC = () => {
                     </div>
                     <div style={{ display: activeTab === 'comparator' ? 'flex' : 'none', flex: 1 }}>
                         <TextComparator />
+                    </div>
+                    <div style={{ display: activeTab === 'Calendar' ? 'flex' : 'none', flex: 1 }}>
+                        <CalendarPicker />
+                    </div>
+                    <div style={{ display: activeTab === 'Contact' ? 'flex' : 'none', flex: 1 }}>
+                        <ContactBook />
+                    </div>
+                    <div style={{ display: activeTab === 'Video' ? 'flex' : 'none', flex: 1 }}>
+                        <WebcamStream />
                     </div>
                 </div>
             </div>
