@@ -126,7 +126,7 @@ const TranslationComponent = () => {
     };
 
     return (
-        <Container maxWidth={800} maxHeight={650} style={{ height: "100%" }}>
+        <Container maxWidth={1100} maxHeight={1250} style={{ height: "100%" }}>
             <div style={containerStyle}>
                 <h1 style={headerStyle}>Translation Component</h1>
 

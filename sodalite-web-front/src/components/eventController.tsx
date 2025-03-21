@@ -10,7 +10,7 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ setSearchQuery, searchQuery }) => {
-    const { theme } = useTheme();
+    const { theme, chroma } = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -68,7 +68,7 @@ const EventController: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const { setTheme, theme } = useTheme();
+    const { setTheme, theme, chroma } = useTheme();
     const [showModal, setShowModal] = useState(false);
     const { events, setEvent } = useEvent();
 
@@ -196,11 +196,12 @@ const EventController: React.FC = () => {
                     borderRadius: '40px',
                     padding: '5px',
                     background: theme === 'dark' ? 'black' : 'white',
-                    border: 'none',
+                    // border: 'none',
                     cursor: 'pointer',
                     fontSize: '24px',
                     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
                     paddingBlock: '10px',
+                    border: `3px solid ${chroma}`
                 }}
                 onClick={() => showModal ? setShowModal(false) : setShowModal(true)}
             >

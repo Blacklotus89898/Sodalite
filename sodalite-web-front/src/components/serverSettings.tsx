@@ -97,7 +97,7 @@ const UpdateAddress = () => {
     };
 
     return (
-        <Container maxWidth={800} maxHeight={600}>
+        <Container maxWidth={1200} maxHeight={1200}>
             <div ref={containerRef} style={containerStyle}>
                 <h3 style={{ textAlign: 'center', fontSize: titleFontSize, marginBottom: '10px' }}>
                     Update Address

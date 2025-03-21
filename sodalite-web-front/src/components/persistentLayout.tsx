@@ -46,7 +46,7 @@ const PersistentLayout: React.FC = () => {
 
     const containerStyle: React.CSSProperties = {
         display: 'flex',
-        height: '100vh',
+        height: '90vh',
         backgroundColor: isDarkMode ? '#121212' : '#f7f7f7',
         color: isDarkMode ? 'white' : 'black',
         fontSize: baseFontSize,
@@ -94,7 +94,7 @@ const PersistentLayout: React.FC = () => {
 
 
     return (
-        <Container maxWidth={1200} maxHeight={800}>
+        <Container maxWidth={1600} maxHeight={1100}>
             <div ref={containerRef} style={containerStyle}>
                 {/* Sidebar */}
                 <div style={sidebarStyle}>

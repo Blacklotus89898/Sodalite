@@ -166,7 +166,7 @@ export const CanvaShare: React.FC = () => {
     };
 
     return (
-        <Container maxWidth={1000} maxHeight={800}>
+        <Container maxWidth={1600} maxHeight={1200}>
             <h1>Canva Share Component</h1>
             <div>
 

@@ -120,7 +120,8 @@ const FileUploadComponent = () => {
         borderRadius: '10px',
         padding: '20px',
         maxWidth: '1000px',
-        minHeight: '600px', 
+        minHeight: '600px',
+        height: '80vh', 
         margin: 'auto',
         boxShadow: isDarkMode ? '0 4px 12px rgba(0, 0, 0, 0.2)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
         display: 'flex',
@@ -189,7 +190,7 @@ const FileUploadComponent = () => {
     };
 
     return (
-        <Container maxWidth={1200} maxHeight={800}>
+        <Container maxWidth={1200} maxHeight={1200}>
             <div ref={containerRef} style={containerStyle}>
                 <div style={sidebarStyle}>
                     <h2 style={{ fontSize: baseFontSize * 1.2, marginBottom: '20px' }}>File Controls</h2>

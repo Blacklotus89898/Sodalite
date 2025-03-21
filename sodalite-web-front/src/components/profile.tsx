@@ -222,7 +222,7 @@ const ProfileComponent: React.FC = () => {
   };
 
   return (
-<Container maxWidth={800} maxHeight={900}>
+<Container maxWidth={1200} maxHeight={1200}>
 
     <div style={containerStyle}>
       <h1 style={headerStyle}>currentProfile Component</h1>

@@ -121,7 +121,7 @@ export const ChatApp: React.FC = () => {
   };
 
   return (
-    <Container maxWidth={800} maxHeight={600}>
+    <Container maxWidth={1200} maxHeight={1000}>
       <div style={containerStyle}>
         <h1 style={{ textAlign: 'center', fontSize: baseFontSize * 1.2, marginBottom: '0px' }}>
           Chat App
