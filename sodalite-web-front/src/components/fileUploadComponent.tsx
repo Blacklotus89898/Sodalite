@@ -95,7 +95,7 @@ const FileUploadComponent = () => {
     // Fetch content of a file and update textarea and filename
     const handleFileLinkClick = async (fileName: string) => {
         try {
-            const response = await fetch(`http://localhost:8081/uploads/${fileName}`);
+            const response = await fetch(`http://127.0.0.1:8081/uploads/${fileName}`);
             if (!response.ok) {
                 throw new Error(`Error fetching file content: ${response.status}`);
             }
@@ -203,7 +203,7 @@ const FileUploadComponent = () => {
                     <button onClick={fetchFiles} style={buttonStyle}>
                         Refresh
                     </button>
-                    <ul style={{ padding: '0', overflowY: 'auto', maxHeight: '400px', flex: 1 }}>
+                    <ul style={{ padding: '10', overflowY: 'auto', maxHeight: '400px', flex: 1 }}>
                         {files.map((file, index) => (
                             <li key={index} style={{ marginBottom: '10px' }}>
                                 <a

@@ -13,6 +13,7 @@ import ContactBook from "../components/contactBook";
 import CalendarPicker from "../components/calendarPicker";
 import ReminderCreator from "../components/reminder";
 import { LogManager } from "../components/logManager";
+import ServerController from "../components/serverController";
 
 // Define the type for the props
 interface HomeProps {
@@ -28,6 +29,7 @@ const Home: React.FC<HomeProps> = ({ title,  }) => {
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "Home"}</h1>
             <div style={{display: 'flex'}}>
+                <ServerController/>
                 <LogManager/>
             {/* <ReminderCreator/> */}
             {/* <CalendarPicker/> */}

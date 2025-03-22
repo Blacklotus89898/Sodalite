@@ -33,7 +33,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 export const ServerProvider = ({ children }: { children: ReactNode }) => {
     const [address, setAddressState] = useState<{ [key: string]: string }>({
         websocketServer: 'ws://192.168.0.103:8080', // Example default address
-        fileServer: 'http://192.168.0.103:8081', // Another example default address
+        fileServer: 'http://127.0.0.1:8081', // Another example default address
     });
 
     const setAddress = (key: string, address: string) =>

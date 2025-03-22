@@ -22,6 +22,33 @@ To run the project in development mode, use the following commands:
 
 1. Clone the repository:
 
-```sh
+```bash
 git clone https://github.com/blacklotus89898/Sodalite.git
+```
+
+2. Starting the frontend
+``` bash
 cd Sodalite/sodalite-web-front
+npm i
+npm run dev
+```
+
+3. Starting the backend
+```bash
+cd Sodalite/sodalite-web-back
+
+# ws servr
+cd websocketServer
+npm i
+npm start
+
+# or fileserver
+cd fileServer
+npm i
+node server.js
+
+# or 
+cd videoServer
+npm i
+node server.js
+```
