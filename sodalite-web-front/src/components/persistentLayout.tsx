@@ -18,6 +18,12 @@ import TextComparator from './textComparator';
 import CalendarPicker from './calendarPicker';
 import ContactBook from './contactBook';
 import WebcamStream from './webcamStream';
+import { LogManager } from './logManager';
+import CodeEditor from './codeEditor';
+import ResizableDraggableContainer from './resizableDraggableContainer';
+import ReminderCreator from './reminder';
+import ScreenShare from './screenShare';
+import Weather from './weather';
 
 // Child components (you can replace these with your real components)
 const Dashboard = () => <div>Dashboard Content</div>;
@@ -102,124 +108,49 @@ const PersistentLayout: React.FC = () => {
                 {/* Sidebar */}
                 <div style={sidebarStyle}>
                     {/* Collapsible Toggle Button */}
+
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         style={{ ...buttonStyle, marginBottom: '15px', textAlign: 'center' }}
                         onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor || ''}
-                    >
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor || ''}>
                         {collapsed ? '+' : '-'}
                     </button>
                     <h3 style={{ fontSize: baseFontSize * 1.2, display: collapsed ? 'none' : 'block' }}>Menu</h3>
-                    <button
-                        style={activeTab === 'dashboard' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('dashboard')}
-
-                    >
-                        {collapsed ? '' : 'Dashboard'}
-                    </button>
-                    <button
-                        style={activeTab === 'profile' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('profile')}
-                    >
-                        {collapsed ? '' : 'Profile'}
-                    </button>
-                    <button
-                        style={activeTab === 'settings' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('settings')}
-                    >
-                        {collapsed ? '' : 'Settings'}
-                    </button>
-                    <button
-                        style={activeTab === 'notes' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('notes')}
-                    >
-                        {collapsed ? '' : 'Notes'}
-                    </button>
-                    <button
-                        style={activeTab === 'iframe' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('iframe')}
-                    >
-                        {collapsed ? '' : 'Iframe'}
-                    </button>
-                    <button
-                        style={activeTab === 'cloud' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('cloud')}
-                    >
-                        {collapsed ? '' : 'Cloud'}
-                    </button>
-                    <button
-                        style={activeTab === 'canvas' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('canvas')}
-                    >
-                        {collapsed ? '' : 'Canvas'}
-                    </button>
-                    <button
-                        style={activeTab === 'chat' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('chat')}
-                    >
-                        {collapsed ? '' : 'Chat'}
-                    </button>
-                    <button
-                        style={activeTab === 'collab' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('collab')}
-                    >
-                        {collapsed ? '' : 'Collab'}
-                    </button>
-                    <button
-                        style={activeTab === 'translation' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('translation')}
-                    >
-                        {collapsed ? '' : 'Translation'}
-                    </button>
-                    <button
-                        style={activeTab === 'fileshare' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('fileshare')}
-                    >
-                        {collapsed ? '' : 'Filesharing'}
-                    </button>
-                    <button
-                        style={activeTab === 'rtc' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('rtc')}
-                    >
-                        {collapsed ? '' : 'Video Call'}
-                    </button>
-                    <button
-                        style={activeTab === 'timer' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('timer')}
-                    >
-                        {collapsed ? '' : 'Timer'}
-                    </button>
-                    <button
-                        style={activeTab === 'audio' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('audio')}
-                    >
-                        {collapsed ? '' : 'Audio'}
-                    </button>
-                    <button
-                        style={activeTab === 'comparator' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('comparator')}
-                    >
-                        {collapsed ? '' : 'Text Comparator'}
-                    </button>
-                    <button
-                        style={activeTab === 'Calendar' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('Calendar')}
-                    >
-                        {collapsed ? '' : 'Calendar'}
-                    </button>
-                    <button
-                        style={activeTab === 'Contact' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('Contact')}
-                    >
-                        {collapsed ? '' : 'Contact'}
-                    </button>
-                    <button
-                        style={activeTab === 'Video' ? activeButtonStyle : buttonStyle}
-                        onClick={() => setActiveTab('Video')}
-                    >
-                        {collapsed ? '' : 'Video'}
-                    </button>
+                    {[
+                        { key: 'dashboard', label: 'Dashboard' },
+                        { key: 'profile', label: 'Profile' },
+                        { key: 'settings', label: 'Settings' },
+                        { key: 'notes', label: 'Notes' },
+                        { key: 'iframe', label: 'Iframe' },
+                        { key: 'cloud', label: 'Cloud' },
+                        { key: 'canvas', label: 'Canvas' },
+                        { key: 'chat', label: 'Chat' },
+                        { key: 'collab', label: 'Collab' },
+                        { key: 'translation', label: 'Translation' },
+                        { key: 'fileshare', label: 'Filesharing' },
+                        { key: 'rtc', label: 'Video Call' },
+                        { key: 'timer', label: 'Timer' },
+                        { key: 'audio', label: 'Audio' },
+                        { key: 'comparator', label: 'Text Comparator' },
+                        { key: 'Calendar', label: 'Calendar' },
+                        { key: 'Contact', label: 'Contact' },
+                        { key: 'Video', label: 'Video' },
+                        { key: 'Log', label: 'Log' },
+                        { key: 'Float', label: 'Float' },
+                        { key: 'Editor', label: 'Editor' },
+                        { key: 'Reminder', label: 'Reminder' },
+                        { key: 'ScreenShare', label: 'ScreenShare' },
+                        { key: 'Weather', label: 'Weather' },
+                    ].map(({ key, label }) => (
+                        <button
+                            key={key}
+                            style={activeTab === key ? activeButtonStyle : buttonStyle}
+                            onClick={() => setActiveTab(key)}>
+                            {collapsed ? '' : label}
+                        </button>
+                    ))}
+             
                 </div>
 
                 {/* Main Content Area */}
@@ -281,6 +212,25 @@ const PersistentLayout: React.FC = () => {
                     <div style={{ display: activeTab === 'Video' ? 'flex' : 'none', flex: 1 }}>
                         <WebcamStream />
                     </div>
+                    <div style={{ display: activeTab === 'Log' ? 'flex' : 'none', flex: 1 }}>
+                        <LogManager />
+                    </div>
+                    <div style={{ display: activeTab === 'Float' ? 'flex' : 'none', flex: 1 }}>
+                        <ResizableDraggableContainer />
+                    </div>
+                    <div style={{ display: activeTab === 'Editor' ? 'flex' : 'none', flex: 1 }}>
+                        <CodeEditor />
+                    </div>
+                    <div style={{ display: activeTab === 'Reminder' ? 'flex' : 'none', flex: 1 }}>
+                        <ReminderCreator />
+                    </div>
+                    <div style={{ display: activeTab === 'ScreenShare' ? 'flex' : 'none', flex: 1 }}>
+                        <ScreenShare />
+                    </div>
+                    <div style={{ display: activeTab === 'Weather' ? 'flex' : 'none', flex: 1 }}>
+                        <Weather />
+                    </div>
+
                 </div>
             </div>
         </Container>
