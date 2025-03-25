@@ -32,7 +32,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 // Server Provider Component
 export const ServerProvider = ({ children }: { children: ReactNode }) => {
     const [address, setAddressState] = useState<{ [key: string]: string }>({
-        websocketServer: 'ws://192.168.0.103:8080', // Example default address
+        websocketServer: 'ws://192.168.0.111:8080', // Example default address
         fileServer: 'http://127.0.0.1:8081', // Another example default address
     });
 
@@ -50,7 +50,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
             username: "John Doe",
             servers: {
                 websocketServer: "ws://192.168.0.103:8080",
-                fileServer: "http://192.168.0.103:8081"
+                fileServer: "http://192.168.0.103:8081",
             },
             streak: 0,
             activityDates: [],

@@ -1,7 +1,8 @@
 import WebSocket, { WebSocketServer } from 'ws';
 
 const port = 8080;
-const server = new WebSocketServer({ host: '0.0.0.0', port });
+// const server = new WebSocketServer({ host: '0.0.0.0', port });
+const server = new WebSocketServer({ port });
 
 const groups: { [key: string]: Set<WebSocket> } = {};
 
