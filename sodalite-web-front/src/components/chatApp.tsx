@@ -32,9 +32,9 @@ export const ChatApp: React.FC = () => {
       });
     };
 
-    wsServiceRef.current.onConnectionStatusChange(setIsConnected); // Update connection status
-
     connectWebSocket(); // Initial connection attempt
+    
+    wsServiceRef.current.onConnectionStatusChange(setIsConnected); // Update connection status
 
     return () => {
       if (wsServiceRef.current) {
@@ -47,6 +47,11 @@ export const ChatApp: React.FC = () => {
     if (wsServiceRef.current && input.trim()) {
       setMessages((prevMessages) => [...prevMessages,  { message: input, group: group }]);
       wsServiceRef.current.send({ message: input, group: group });
+      // addLogs([ {
+      //   Time: new Date().toLocaleTimeString(),
+      //   Message: { message: input, group: group }.toString() as string,
+      //   Type: "chatApp",
+      // }]);
       setInput('');
     }
   };

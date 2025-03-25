@@ -21,6 +21,8 @@ const CollabApp: React.FC = () => {
       setIsConnected(true);  // Update connection status when connected
     });
 
+    wsServiceRef.current.onConnectionStatusChange(setIsConnected);
+
     // Cleanup on component unmount
     return () => {
       if (wsServiceRef.current) {
