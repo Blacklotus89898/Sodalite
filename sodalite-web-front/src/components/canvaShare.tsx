@@ -141,10 +141,12 @@ export const CanvaShare: React.FC = () => {
         if (wsServiceRef.current) {
             wsServiceRef.current.close();
             wsServiceRef.current.connect(() => {
-                setIsConnected(true);
+                // setIsConnected(true);
                 setShowAlert(true); // Show alert when reconnected
                 console.log("Reconnected to the server.");
+                
             });
+            wsServiceRef.current?.onConnectionStatusChange(setIsConnected);
         }
     }
 
