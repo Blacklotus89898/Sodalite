@@ -7,22 +7,45 @@ export const LogManager: React.FC = () => {
     const [filterType, setFilterType] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
+    const [sortKey, setSortKey] = useState<"type" | "message" | "time">("time");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-    const filteredLogs = logs.filter((log) => {
+    const filteredLogs = logs
+        .filter((log) => {
+            const message = typeof log.Message === "object" && log.Message !== null 
+                ? (log.Message as { message: string; group: string }) 
+                : { message: "", group: "" };
+            const matchesSearch = message.message?.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesType = filterType ? log.Type.toLowerCase() === filterType.toLowerCase() : true;
+            const matchesTime =
+                (!startTime || new Date(log.Time) >= new Date(startTime)) &&
+                (!endTime || new Date(log.Time) <= new Date(endTime));
+            return matchesSearch && matchesType && matchesTime;
+        })
+        .sort((a, b) => {
+            let valueA, valueB;
+            if (sortKey === "type") {
+                valueA = a.Type.toLowerCase();
+                valueB = b.Type.toLowerCase();
+            } else if (sortKey === "message") {
+                const messageA = typeof a.Message === "object" && a.Message !== null 
+                    ? (a.Message as { message: string }).message 
+                    : a.Message;
+                const messageB = typeof b.Message === "object" && b.Message !== null 
+                    ? (b.Message as { message: string }).message 
+                    : b.Message;
+                valueA = messageA?.toLowerCase() || "";
+                valueB = messageB?.toLowerCase() || "";
+            } else {
+                const parseTime = (time: string) => new Date(time).getTime();
+                valueA = isNaN(parseTime(a.Time)) ? 0 : parseTime(a.Time);
+                valueB = isNaN(parseTime(b.Time)) ? 0 : parseTime(b.Time);
+            }
 
-        console.log(JSON.stringify(log));
-        // console.log(searchTerm.toLowerCase());
-        const message = typeof log.Message === "object" && log.Message !== null 
-            ? (log.Message as { message: string; group: string }) 
-            : { message: "", group: "" };
-        const matchesSearch = message.message.toLowerCase().includes(searchTerm.toLowerCase());
-        console.log(matchesSearch);
-        const matchesType = filterType ? log.Type.toLowerCase() === filterType.toLowerCase() : true;
-        const matchesTime =
-            (!startTime || new Date(log.Time) >= new Date(startTime)) &&
-            (!endTime || new Date(log.Time) <= new Date(endTime));
-        return matchesSearch && matchesType && matchesTime;
-    });
+            if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
+            if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
+            return 0;
+        });
 
     return (
         <div style={{ padding: "10px", fontFamily: "Arial, sans-serif" }}>
@@ -58,6 +81,21 @@ export const LogManager: React.FC = () => {
                     onChange={(e) => setEndTime(e.target.value)}
                     style={{ marginRight: "10px", padding: "5px" }}
                 />
+                <select
+                    value={sortKey}
+                    onChange={(e) => setSortKey(e.target.value as "type" | "message" | "time")}
+                    style={{ marginRight: "10px", padding: "5px" }}
+                >
+                    <option value="time">Sort by Time</option>
+                    <option value="type">Sort by Type</option>
+                    <option value="message">Sort by Message</option>
+                </select>
+                <button
+                    onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+                    style={{ padding: "5px" }}
+                >
+                    {sortOrder === "asc" ? "Ascending" : "Descending"}
+                </button>
             </div>
             <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid #ccc", padding: "10px" }}>
                 {filteredLogs.length > 0 ? (
