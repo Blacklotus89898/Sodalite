@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { WebSocketService } from '../services/websocketService';
-import { useServer } from '../stores/hooks';
+import React, { useState, useRef, useEffect } from "react";
+import { WebSocketService } from "../services/websocketService";
+import { useServer } from "../stores/hooks";
 
 function ManualRTC() {
-    const [localDescription, setLocalDescription] = useState('');
-    const [remoteDescription, setRemoteDescription] = useState('');
-    const [remoteIceCandidate, setRemoteIceCandidate] = useState('');
+    const [localDescription, setLocalDescription] = useState("");
+    const [remoteDescription, setRemoteDescription] = useState("");
+    const [remoteIceCandidate, setRemoteIceCandidate] = useState("");
     const [localIceCandidates, setLocalIceCandidates] = useState<string[]>([]);
 
     const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -17,60 +17,47 @@ function ManualRTC() {
     const { address } = useServer();
     const [, setIsConnected] = useState<boolean>(false);
     const [isCaller, setIsCaller] = useState<boolean>(false);
-
-
+    const [isCallActive, setIsCallActive] = useState<boolean>(false);
 
     useEffect(() => {
-
-        wsServiceRef.current = new WebSocketService(address['websocketServer']);
+        wsServiceRef.current = new WebSocketService(address["websocketServer"]);
 
         const connectWebSocket = () => {
             wsServiceRef.current?.connect(async (data: unknown) => {
-                console.log("Data received"+data);
-                // const blob = new Blob([data]);
-                // console.log(Blob.parse(data));
+                console.log("Data received", data);
                 const parsedData = data as { type: string; message: string };
-                setIsConnected(true); // Set connection status to true when successfully connected
+                setIsConnected(true);
 
                 if (isCaller) {
-                    console.log("Caller received:" + parsedData);
                     if (parsedData.type === "answer") {
-                        console.log("Caller received sdp:"+ parsedData.message);
                         setRemoteDescription(parsedData.message);
                         await handleRemoteDescription(parsedData.message);
-                    } if (parsedData.type === "answerIce") {
-                        console.log("Caller received ice:"+ parsedData.message);
+                    } else if (parsedData.type === "answerIce") {
                         setRemoteIceCandidate(parsedData.message);
                     }
                 } else {
                     if (parsedData.type === "offer") {
-                    console.log("Before setting remote:", remoteDescription);
-                    setRemoteDescription(parsedData.message);
-                    await handleRemoteDescription(parsedData.message);
-                    console.log("After setting remote:", remoteDescription);
-                    await createAnswer();
-                    } if (parsedData.type === "offerIce") {
-
+                        setRemoteDescription(parsedData.message);
+                        await handleRemoteDescription(parsedData.message);
+                        await createAnswer();
+                    } else if (parsedData.type === "offerIce") {
                         setRemoteIceCandidate(parsedData.message);
                     }
                 }
-            },
-        
-    );};
+            });
+        };
 
-        connectWebSocket(); // Initial connection attempt
+        connectWebSocket();
         setIsConnected(wsServiceRef.current.getConnectionStatus());
 
-
-        // Peer connection
         const pc = new RTCPeerConnection();
         peerConnectionRef.current = pc;
 
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 const candidateStr = JSON.stringify(event.candidate);
-                setLocalIceCandidates(prev => [...prev, candidateStr]);
-                console.log('New ICE candidate:', candidateStr);
+                setLocalIceCandidates((prev) => [...prev, candidateStr]);
+                console.log("New ICE candidate:", candidateStr);
             }
         };
 
@@ -80,14 +67,7 @@ function ManualRTC() {
             }
         };
 
-        return () => {
-            pc.close();
-            peerConnectionRef.current = null;
-            localStreamRef.current?.getTracks().forEach(track => track.stop());
-            if (wsServiceRef.current) {
-                wsServiceRef.current.close();
-            }
-        };
+        return () => stopCall();
     }, [isCaller, address]);
 
     const startLocalStream = async () => {
@@ -99,11 +79,13 @@ function ManualRTC() {
                 localVideoRef.current.srcObject = stream;
             }
 
-            stream.getTracks().forEach(track => {
+            stream.getTracks().forEach((track) => {
                 peerConnectionRef.current?.addTrack(track, stream);
             });
+
+            setIsCallActive(true);
         } catch (error) {
-            console.error('Error accessing media devices:', error);
+            console.error("Error accessing media devices:", error);
         }
     };
 
@@ -114,7 +96,7 @@ function ManualRTC() {
             await peerConnectionRef.current.setLocalDescription(offer);
             setLocalDescription(JSON.stringify(offer));
         } catch (error) {
-            console.error('Error creating offer:', error);
+            console.error("Error creating offer:", error);
         }
     };
 
@@ -125,34 +107,24 @@ function ManualRTC() {
             await peerConnectionRef.current.setLocalDescription(answer);
             setLocalDescription(JSON.stringify(answer));
         } catch (error) {
-            console.error('Error creating answer:', error);
+            console.error("Error creating answer:", error);
         }
     };
 
-
     const handleRemoteDescription = async (sdp?: string) => {
         if (sdp) {
-            console.log("sdp:"+sdp);
             try {
                 const remoteDesc = new RTCSessionDescription(JSON.parse(sdp));
                 await peerConnectionRef.current?.setRemoteDescription(remoteDesc);
             } catch (error) {
-                console.error('Error setting remote description:', error);
-            }
-        } else {
-            try {
-                if (!peerConnectionRef.current || !remoteDescription) return;
-                const remoteDesc = new RTCSessionDescription(JSON.parse(remoteDescription));
-                await peerConnectionRef.current.setRemoteDescription(remoteDesc);
-            } catch (error) {
-                console.error('Error setting remote description:', error);
+                console.error("Error setting remote description:", error);
             }
         }
     };
 
     const parseIceCandidates = (candidatesString: string) => {
-        const candidatesArray = candidatesString.trim().split('\n').map(candidate => candidate.trim());
-        return candidatesArray.map(candidate => JSON.parse(candidate));
+        const candidatesArray = candidatesString.trim().split("\n").map((candidate) => candidate.trim());
+        return candidatesArray.map((candidate) => JSON.parse(candidate));
     };
 
     const addIceCandidate = async () => {
@@ -165,14 +137,12 @@ function ManualRTC() {
                 if (candidateData && candidateData.candidate) {
                     const iceCandidate = new RTCIceCandidate(candidateData);
                     await peerConnectionRef.current.addIceCandidate(iceCandidate);
-                    console.log('Added ICE candidate:', candidateData);
+                    console.log("Added ICE candidate:", candidateData);
                 }
             }
-
-            // alert('All ICE candidates added successfully!');
         } catch (error) {
-            console.error('Error adding ICE candidate:', error);
-            alert('Invalid ICE candidate format. Ensure it is a valid JSON array.');
+            console.error("Error adding ICE candidate:", error);
+            alert("Invalid ICE candidate format.");
         }
     };
 
@@ -185,22 +155,18 @@ function ManualRTC() {
 
     const initiateCall = async () => {
         setIsCaller(true);
-        // start local stream
         await startLocalStream();
-        // create offer and set local description
         await createOffer();
-    }
+    };
 
     useEffect(() => {
         if (isCaller && localDescription && localIceCandidates.length > 0) {
-            // send local description and ICE candidates
             wsServiceRef.current?.send({ message: localDescription, type: "offer", group: "manualRTC" });
-            wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce", group: "manualRTC" });
+            wsServiceRef.current?.send({ message: localIceCandidates.join("\n"), type: "offerIce", group: "manualRTC" });
         }
-        
     }, [localDescription, localIceCandidates, isCaller]);
 
-    useEffect(() => {   
+    useEffect(() => {
         const handleAnswer = async () => {
             if (!isCaller && localDescription && localIceCandidates.length > 0) {
                 await sendAnswer();
@@ -215,37 +181,49 @@ function ManualRTC() {
         }
     }, [remoteIceCandidate]);
 
-    // const sendOffer = async () => {
-    //     wsServiceRef.current?.send({ message: localDescription, type: "offer" });
-    //     wsServiceRef.current?.send({ message: localIceCandidates.join('\n'), type: "offerIce" });
-
-    // }
-
     const acceptCall = async () => {
         setIsCaller(false);
-        startLocalStream();
-    }
+        await startLocalStream();
+    };
 
     const sendAnswer = async () => {
-        console.log("Sending answer");
         wsServiceRef.current?.send({ message: localDescription, type: "answer", group: "manualRTC" });
         wsServiceRef.current?.send({ message: localIceCandidates.join("\n"), type: "answerIce", group: "manualRTC" });
-        // addIceCandidate();
+    };
 
-    }
+    const stopCall = () => {
+        console.log("Stopping call...");
+        
+        // Close peer connection
+        peerConnectionRef.current?.close();
+        peerConnectionRef.current = null;
 
+        // Stop all media tracks
+        localStreamRef.current?.getTracks().forEach((track) => track.stop());
+        localStreamRef.current = null;
 
+        // Clear video elements
+        if (localVideoRef.current) localVideoRef.current.srcObject = null;
+        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+
+        // Close WebSocket connection
+        wsServiceRef.current?.close();
+
+        // Reset states
+        setIsCallActive(false);
+        setLocalDescription("");
+        setRemoteDescription("");
+        setRemoteIceCandidate("");
+        setLocalIceCandidates([]);
+    };
 
     return (
         <div className="ManualRTC">
-
-            {/* <h1>Signaling Server Status ws {isConnected.toString()}</h1> */}
-            {/* <h1>CaLLER Status {isCaller.toString()}</h1> */}
-            {/* <button onClick={() => setIsConnected(wsServiceRef.current?.getConnectionStatus() ?? false)}>Refresh connection status</button> */}
             <button onClick={acceptCall}>Create Call</button>
             <button onClick={initiateCall}>Join Call</button>
-            {/* <button onClick={sendOffer}>Offer Call</button> */}
-            {/* <button onClick={sendAnswer}>Send answer</button> */}
+            <button onClick={stopCall} disabled={!isCallActive}>
+                Stop Call
+            </button>
 
             <h1>Manual WebRTC Signaling</h1>
             {/* <button onClick={startLocalStream}>Start Local Stream</button> */}
