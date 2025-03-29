@@ -14,6 +14,8 @@ import CalendarPicker from "../components/calendarPicker";
 import ReminderCreator from "../components/reminder";
 import { LogManager } from "../components/logManager";
 import ServerController from "../components/serverController";
+import Postman from "../components/postman";
+import MyMap from "../components/myMap";
 
 // Define the type for the props
 interface HomeProps {
@@ -29,8 +31,10 @@ const Home: React.FC<HomeProps> = ({ title,  }) => {
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "Home"}</h1>
             <div style={{display: 'flex'}}>
+                <MyMap/>
                 <ServerController/>
                 <LogManager/>
+                <Postman/>
             {/* <ReminderCreator/> */}
             {/* <CalendarPicker/> */}
             {/* <ContactBook/> */}
