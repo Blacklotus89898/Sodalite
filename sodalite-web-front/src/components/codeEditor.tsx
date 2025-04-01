@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
 import { useTheme } from '../stores/hooks';
+import { Container } from './container';
 
 const CodeEditor: React.FC = () => {
   const [codeInput, setCodeInput] = useState<string>('');
@@ -85,38 +86,40 @@ const CodeEditor: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Code Editor</h1>
+    <Container maxWidth={1200} maxHeight={1000}>
+      <div style={styles.container}>
+        <h1 style={styles.header}>Code Editor</h1>
 
-      {/* Language Selection */}
+        {/* Language Selection */}
         <h2>
-      <label>
-        Select Language:
-        </label>
-      <select style={styles.select} value={language} onChange={handleLanguageChange}>
-        <option value="json">JSON</option>
-        <option value="python">Python</option>
-        <option value="cpp">C++</option>
-      </select>
+          <label>
+            Select Language:
+          </label>
+          <select style={styles.select} value={language} onChange={handleLanguageChange}>
+            <option value="json">JSON</option>
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+          </select>
         </h2>
-        
-      {/* Manual Input Section */}
-      <div>
-        <label><h2>Code Input:</h2></label>
-        <textarea
-          style={styles.textarea}
-          value={codeInput}
-          onChange={handleCodeInputChange}
-          placeholder="Enter your code here..."
-        />
-      </div>
 
-      {/* Preview Section */}
-      <div style={styles.preview}>
-        <h2>Preview:</h2>
-        <div dangerouslySetInnerHTML={{ __html: highlightCode(codeInput, language) }} />
+        {/* Manual Input Section */}
+        <div>
+          <label><h2>Code Input:</h2></label>
+          <textarea
+            style={styles.textarea}
+            value={codeInput}
+            onChange={handleCodeInputChange}
+            placeholder="Enter your code here..."
+          />
+        </div>
+
+        {/* Preview Section */}
+        <div style={styles.preview}>
+          <h2>Preview:</h2>
+          <div dangerouslySetInnerHTML={{ __html: highlightCode(codeInput, language) }} />
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

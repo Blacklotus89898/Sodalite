@@ -13,7 +13,7 @@ export const Container: React.FC<ContainerProps> = ({ children, maxWidth, maxHei
     const [isHovered, setIsHovered] = useState(false);
     const [width, setWidth] = useState(400); // Safe starting size
     const [height, setHeight] = useState(300); // Safe starting size
-    const [resizing, setResizing] = useState(false);
+    const [, setResizing] = useState(false);
     const [userResized, setUserResized] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);

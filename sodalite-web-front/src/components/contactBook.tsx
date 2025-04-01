@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Container } from './container';
 
 // Define the contact interface
 interface Contact {
@@ -82,6 +83,7 @@ const ContactBook: React.FC = () => {
   );
 
   return (
+    <Container maxWidth={1200} maxHeight={1200}>
     <div style={{ display: 'flex', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ width: '30%', borderRight: '1px solid #ccc', overflowY: 'auto', padding: '10px' }}>
         <h2>Contacts</h2>
@@ -141,6 +143,7 @@ const ContactBook: React.FC = () => {
         )}
       </div>
     </div>
+    </Container>
   );
 };
 

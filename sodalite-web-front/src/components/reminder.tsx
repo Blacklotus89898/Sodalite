@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Container } from "./container";
 
 interface Reminder {
     id: number;
@@ -55,50 +56,52 @@ const ReminderCreator: React.FC = () => {
     };
 
     return (
-        <div style={{ margin: "20px" }}>
-            <h2>Create or Edit a Reminder</h2>
-            <div style={{ marginBottom: "10px" }}>
-                <input
-                    type="text"
-                    placeholder="Enter reminder"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    style={{ marginRight: "10px" }}
-                />
-                <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    style={{ marginRight: "10px" }}
-                />
-                <input
-                    type="time"
-                    value={hour}
-                    onChange={(e) => setHour(e.target.value)}
-                    style={{ marginRight: "10px" }}
-                />
-                <button onClick={handleAddOrUpdateReminder}>
-                    {editingId !== null ? "Update Reminder" : "Add Reminder"}
-                </button>
+        <Container maxWidth={1200} maxHeight={1200}>
+            <div style={{ margin: "20px" }}>
+                <h2>Create or Edit a Reminder</h2>
+                <div style={{ marginBottom: "10px" }}>
+                    <input
+                        type="text"
+                        placeholder="Enter reminder"
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        style={{ marginRight: "10px" }}
+                    />
+                    <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        style={{ marginRight: "10px" }}
+                    />
+                    <input
+                        type="time"
+                        value={hour}
+                        onChange={(e) => setHour(e.target.value)}
+                        style={{ marginRight: "10px" }}
+                    />
+                    <button onClick={handleAddOrUpdateReminder}>
+                        {editingId !== null ? "Update Reminder" : "Add Reminder"}
+                    </button>
+                </div>
+                <h3>My Reminders</h3>
+                <ul>
+                    {reminders.map((reminder) => (
+                        <li key={reminder.id} style={{ marginBottom: "5px" }}>
+                            <span>
+                                {reminder.text} - {reminder.date}
+                                {reminder.hour ? ` at ${reminder.hour}` : ""}
+                            </span>
+                            <button onClick={() => handleEditReminder(reminder.id)} style={{ marginLeft: "10px" }}>
+                                Edit
+                            </button>
+                            <button onClick={() => handleDeleteReminder(reminder.id)} style={{ marginLeft: "10px" }}>
+                                Delete
+                            </button>
+                        </li>
+                    ))}
+                </ul>
             </div>
-            <h3>My Reminders</h3>
-            <ul>
-                {reminders.map((reminder) => (
-                    <li key={reminder.id} style={{ marginBottom: "5px" }}>
-                        <span>
-                            {reminder.text} - {reminder.date}
-                            {reminder.hour ? ` at ${reminder.hour}` : ""}
-                        </span>
-                        <button onClick={() => handleEditReminder(reminder.id)} style={{ marginLeft: "10px" }}>
-                            Edit
-                        </button>
-                        <button onClick={() => handleDeleteReminder(reminder.id)} style={{ marginLeft: "10px" }}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        </Container>
     );
 };
 

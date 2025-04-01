@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../stores/hooks';
+import { Container } from './container';
 
 export const AudioIntensity: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -162,6 +163,9 @@ export const AudioIntensity: React.FC = () => {
   }, []);
 
   const containerStyle = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'flex-end',
     padding: '20px 0px',
     backgroundColor: theme === 'dark' ? '#000' : '#fff',
     color: theme === 'dark' ? '#fff' : '#000',
@@ -170,91 +174,94 @@ export const AudioIntensity: React.FC = () => {
     margin: '0 auto',
     textAlign: 'center' as const,
     border: theme === 'light' ? `1px solid black` : '1px solid transparent',
-  paddingBottom: '0px',
-
+    paddingBottom: '0px',
+    height: '90%',
   };
-  
+
   const headerStyle = {
     fontSize: '24px',
     marginBottom: '20px',
     color: theme === 'dark' ? '#fff' : '#000',
+    textAlign: 'center' as const,
   };
 
   return (
-    <div style={containerStyle}>
-      <h1 style={headerStyle}>Audio Visualizer</h1>
-      <canvas ref={canvasRef}></canvas>
-      <div style={intensityStyle}>
-        <p>Audio Intensity: {Math.round(intensity)}</p>
-        <button
-          style={isRunning ? buttonActiveStyle : buttonStyle}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = isRunning
-              ? buttonActiveStyle.backgroundColor
-              : buttonStyle.backgroundColor;
-          }}
-          // style={isRunning ? buttonActiveStyle : buttonStyle}
-          onClick={toggleAudio}
-        >
-          {isRunning ? 'Stop' : 'Start'}
-        </button>
+    <Container maxWidth={1200} maxHeight={1000}>
+        <h1 style={headerStyle}>Audio Visualizer</h1>
+      <div style={containerStyle}>
+        <canvas ref={canvasRef}></canvas>
+        <div style={intensityStyle}>
+          <p>Audio Intensity: {Math.round(intensity)}</p>
+          <button
+            style={isRunning ? buttonActiveStyle : buttonStyle}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = isRunning
+                ? buttonActiveStyle.backgroundColor
+                : buttonStyle.backgroundColor;
+            }}
+            // style={isRunning ? buttonActiveStyle : buttonStyle}
+            onClick={toggleAudio}
+          >
+            {isRunning ? 'Stop' : 'Start'}
+          </button>
 
-        <label
-          style={showBars ? labelActiveStyle : labelStyle}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = showBars
-              ? labelActiveStyle.backgroundColor
-              : labelStyle.backgroundColor;
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={showBars}
-            onChange={() => toggleVisualization('bars')}
-            style={{ display: 'none' }}  // hide actual checkbox
-          />
-          Bars
-        </label>
+          <label
+            style={showBars ? labelActiveStyle : labelStyle}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = showBars
+                ? labelActiveStyle.backgroundColor
+                : labelStyle.backgroundColor;
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showBars}
+              onChange={() => toggleVisualization('bars')}
+              style={{ display: 'none' }}  // hide actual checkbox
+            />
+            Bars
+          </label>
 
-        <label
-          style={showRadial ? labelActiveStyle : labelStyle}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = showRadial
-              ? labelActiveStyle.backgroundColor
-              : labelStyle.backgroundColor;
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={showRadial}
-            onChange={() => toggleVisualization('radial')}
-            style={{ display: 'none' }}
-          />
-          Radial
-        </label>
+          <label
+            style={showRadial ? labelActiveStyle : labelStyle}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = showRadial
+                ? labelActiveStyle.backgroundColor
+                : labelStyle.backgroundColor;
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showRadial}
+              onChange={() => toggleVisualization('radial')}
+              style={{ display: 'none' }}
+            />
+            Radial
+          </label>
 
-        <label
-          style={showWaveform ? labelActiveStyle : labelStyle}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = showWaveform
-              ? labelActiveStyle.backgroundColor
-              : labelStyle.backgroundColor;
-          }}
-        >
-          <input
-            type="checkbox"
-            checked={showWaveform}
-            onChange={() => toggleVisualization('waveform')}
-            style={{ display: 'none' }}
-          />
-          Waveform
-        </label>
+          <label
+            style={showWaveform ? labelActiveStyle : labelStyle}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = chroma}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = showWaveform
+                ? labelActiveStyle.backgroundColor
+                : labelStyle.backgroundColor;
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showWaveform}
+              onChange={() => toggleVisualization('waveform')}
+              style={{ display: 'none' }}
+            />
+            Waveform
+          </label>
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
@@ -271,6 +278,7 @@ const intensityStyle = {
   gap: '15px',
   justifyContent: 'center',
   alignItems: 'center',
+  bottom: '0',
 };
 
 const buttonStyle = {

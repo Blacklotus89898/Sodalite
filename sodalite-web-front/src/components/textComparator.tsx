@@ -1,4 +1,5 @@
 import React, { useState, useEffect, JSX } from 'react';
+import { Container } from './container';
 
 const TextComparator: React.FC = () => {
     const [text1, setText1] = useState('');
@@ -80,27 +81,27 @@ const TextComparator: React.FC = () => {
     };
 
     return (
-        <div>
+        <Container maxWidth={1200} maxHeight={1000}>
             <h2>Text Comparator (Line-by-Line)</h2>
-            <div style={{display: 'flex', gap: '10px'}}>
-            <textarea
-                placeholder="Enter first text"
-                value={text1}
-                onChange={(e) => {
-                    setText1(e.target.value);
-                }
-                }
-                style={{ width: '100%', height: '400px', marginBottom: '10px' }}
-            />
-            <textarea
-                placeholder="Enter second text"
-                value={text2}
-                onChange={(e) => {
-                    setText2(e.target.value);
-                    handleCompare();
-                }}
-                style={{ width: '100%', height: '400px', marginBottom: '10px' }}
-            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+                <textarea
+                    placeholder="Enter first text"
+                    value={text1}
+                    onChange={(e) => {
+                        setText1(e.target.value);
+                    }
+                    }
+                    style={{ width: '100%', height: '400px', marginBottom: '10px' }}
+                />
+                <textarea
+                    placeholder="Enter second text"
+                    value={text2}
+                    onChange={(e) => {
+                        setText2(e.target.value);
+                        handleCompare();
+                    }}
+                    style={{ width: '100%', height: '400px', marginBottom: '10px' }}
+                />
             </div>
 
             {/* <button onClick={handleCompare} style={{ marginBottom: '20px' }}>
@@ -115,8 +116,8 @@ const TextComparator: React.FC = () => {
             >
                 {diffOutput}
             </div>
-            <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc', whiteSpace: 'pre-wrap', }} dangerouslySetInnerHTML={{ __html: diffOutput2 }} />
-        </div>
+            <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #ccc', whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{ __html: diffOutput2 }} />
+        </Container>
     );
 };
 

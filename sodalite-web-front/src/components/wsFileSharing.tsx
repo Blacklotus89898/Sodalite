@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Container } from "./container";
 
 interface FileShareProps {
   websocketUrl: string;
@@ -64,15 +65,15 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
       const arrayBuffer = await blob.arrayBuffer();
       const fileType = blob.type || "application/pdf";
       const fileURL = URL.createObjectURL(new Blob([arrayBuffer], { type: fileType }));
-      
+
       setSharedFile({
         name: determineFileName(fileType),
         type: fileType,
         content: fileURL,
       });
-      
+
       setStatus("Received file");
-      
+
       // If it's a text file, read and set content
       if (fileType.includes("text")) {
         const text = await blob.text();
@@ -100,16 +101,16 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
     try {
       console.log("Received data:", data);
       const receivedData = JSON.parse(data);
-      
+
       setSharedFile({
         name: receivedData.filename || "Unknown",
         type: receivedData.filetype || "application/octet-stream",
         // type: receivedData.filetype || "application/pdf",
         content: receivedData.content,
       });
-      
+
       setStatus(`Received ${receivedData.filename}`);
-      
+
       // If it's text content
       if (receivedData.filetype?.includes("text")) {
         setTextContent(receivedData.content);
@@ -125,11 +126,11 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
-      
+
       // Create preview URL
       const localPreviewURL = URL.createObjectURL(selectedFile);
       setPreviewURL(localPreviewURL);
-      
+
       // Handle text files
       if (selectedFile.type.includes("text")) {
         const reader = new FileReader();
@@ -149,9 +150,9 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
     }
 
     setStatus("Sending file...");
-    
+
     const reader = new FileReader();
-    
+
     reader.onload = () => {
       const fileData = reader.result;
       if (fileData instanceof ArrayBuffer) {
@@ -161,11 +162,11 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
         setStatus("Failed to read file as binary data");
       }
     };
-    
+
     reader.onerror = () => {
       setStatus("Error reading file");
     };
-    
+
     reader.readAsArrayBuffer(file);
   }, [file, socket]);
 
@@ -180,7 +181,7 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
   }, [previewURL, sharedFile]);
 
   // Render file preview based on file type
-  const renderFilePreview = ( isReceived: boolean, url: string, fileType: string, content?: string) => {
+  const renderFilePreview = (isReceived: boolean, url: string, fileType: string, content?: string) => {
     if (fileType.includes("pdf") && !isReceived) {
       return (
         <iframe
@@ -200,18 +201,18 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
     } else if (fileType.includes("")) {
       return (
         <>
-        <img
-          src={url}
-          alt="Image Preview"
-          className="max-w-full max-h-96 mx-auto block"
+          <img
+            src={url}
+            alt="Image Preview"
+            className="max-w-full max-h-96 mx-auto block"
           />
           <p>
             {content}
           </p>
-           <iframe
-          src={content}
-          title="Iframe Preview"
-          className="max-w-full max-h-96 mx-auto block"
+          <iframe
+            src={content}
+            title="Iframe Preview"
+            className="max-w-full max-h-96 mx-auto block"
           />
           <a
             href={url}
@@ -220,17 +221,17 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
           >
             Download PDF
           </a>
-          </>
+        </>
       );
     } else if (fileType.includes("pdf")) {
       return (
         <>
-        <iframe
-          src={content}
-          title="Image Preview"
-          className="max-w-full max-h-96 mx-auto block"
+          <iframe
+            src={content}
+            title="Image Preview"
+            className="max-w-full max-h-96 mx-auto block"
           />
-          </>
+        </>
       );
     } else if (fileType.includes("text")) {
       return (
@@ -239,74 +240,76 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
         </div>
       );
     }
-    
+
     return <div className="p-4 text-gray-500">Preview not available for this file type</div>;
   };
 
   return (
-    <div className="p-6 border border-gray-300 rounded-lg max-w-md mx-auto">
-      <h3 className="text-xl font-semibold mb-4">File Sharing via WebSocket</h3>
-      
-      {/* Connection Status */}
-      <div className="mb-4 flex items-center">
-        <span className={`inline-block w-3 h-3 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
-        <span className="text-sm">{status}</span>
-      </div>
-      
-      {/* File Selection */}
-      <div className="mb-4">
-        <div className="flex mb-2">
-          <input 
-            type="file" 
-            accept="application/pdf,image/*,text/plain"
-            onChange={handleFileChange}
-            className="flex-1 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          <button 
-            onClick={handleFileSend} 
-            disabled={!file || !isConnected}
-            className={`ml-2 px-4 py-2 rounded text-white ${!file || !isConnected ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-          >
-            Send
-          </button>
+    <Container maxWidth={1200} maxHeight={1000}>
+      <div className="p-6 border border-gray-300 rounded-lg max-w-md mx-auto">
+        <h3 className="text-xl font-semibold mb-4">File Sharing via WebSocket</h3>
+
+        {/* Connection Status */}
+        <div className="mb-4 flex items-center">
+          <span className={`inline-block w-3 h-3 rounded-full mr-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
+          <span className="text-sm">{status}</span>
         </div>
-        {file && (
-          <div className="text-sm text-gray-600">
-            Selected: {file.name} ({Math.round(file.size / 1024)} KB)
+
+        {/* File Selection */}
+        <div className="mb-4">
+          <div className="flex mb-2">
+            <input
+              type="file"
+              accept="application/pdf,image/*,text/plain"
+              onChange={handleFileChange}
+              className="flex-1 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+            <button
+              onClick={handleFileSend}
+              disabled={!file || !isConnected}
+              className={`ml-2 px-4 py-2 rounded text-white ${!file || !isConnected ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            >
+              Send
+            </button>
+          </div>
+          {file && (
+            <div className="text-sm text-gray-600">
+              Selected: {file.name} ({Math.round(file.size / 1024)} KB)
+            </div>
+          )}
+        </div>
+
+        {/* File Preview Container */}
+        {file && previewURL && (
+          <div className="mb-6 border border-gray-200 rounded-lg p-4">
+            <h4 className="font-medium mb-2">Local Preview</h4>
+            <div className="text-sm text-gray-600 mb-2">
+              <div>Name: {file.name}</div>
+              <div>Type: {file.type}</div>
+            </div>
+            {renderFilePreview(false, previewURL, file.type, textContent)}
+          </div>
+        )}
+
+        {/* Received File */}
+        {sharedFile && (
+          <div className="border border-gray-200 rounded-lg p-4">
+            <h4 className="font-medium mb-2">Received File</h4>
+            <div className="text-sm text-gray-600 mb-2">
+              <div>Name: {sharedFile.name}</div>
+              <div>Type: {sharedFile.type}</div>
+            </div>
+            {typeof sharedFile.content === 'string' && renderFilePreview(
+              true,
+              sharedFile.content,
+              sharedFile.type,
+              sharedFile.type.includes("text") ? textContent : sharedFile.content as string
+
+            )}
           </div>
         )}
       </div>
-      
-      {/* File Preview Container */}
-      {file && previewURL && (
-        <div className="mb-6 border border-gray-200 rounded-lg p-4">
-          <h4 className="font-medium mb-2">Local Preview</h4>
-          <div className="text-sm text-gray-600 mb-2">
-            <div>Name: {file.name}</div>
-            <div>Type: {file.type}</div>
-          </div>
-          {renderFilePreview(false, previewURL, file.type, textContent)}
-        </div>
-      )}
-      
-      {/* Received File */}
-      {sharedFile && (
-        <div className="border border-gray-200 rounded-lg p-4">
-          <h4 className="font-medium mb-2">Received File</h4>
-          <div className="text-sm text-gray-600 mb-2">
-            <div>Name: {sharedFile.name}</div>
-            <div>Type: {sharedFile.type}</div>
-          </div>
-          {typeof sharedFile.content === 'string' && renderFilePreview(
-            true,
-            sharedFile.content,
-            sharedFile.type,
-            sharedFile.type.includes("text") ? textContent : sharedFile.content as string
-             
-          )}
-        </div>
-      )}
-    </div>
+    </Container>
   );
 };
 

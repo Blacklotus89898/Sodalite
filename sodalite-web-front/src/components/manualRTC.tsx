@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { WebSocketService } from "../services/websocketService";
 import { useServer } from "../stores/hooks";
+import { Container } from "./container";
 
 function ManualRTC() {
     const [localDescription, setLocalDescription] = useState("");
@@ -193,7 +194,7 @@ function ManualRTC() {
 
     const stopCall = () => {
         console.log("Stopping call...");
-        
+
         // Close peer connection
         peerConnectionRef.current?.close();
         peerConnectionRef.current = null;
@@ -218,28 +219,30 @@ function ManualRTC() {
     };
 
     return (
-        <div className="ManualRTC">
-            <button onClick={acceptCall}>Create Call</button>
-            <button onClick={initiateCall}>Join Call</button>
-            <button onClick={stopCall} disabled={!isCallActive}>
-                Stop Call
-            </button>
+        <Container maxWidth={1200} maxHeight={1000}>
 
-            <h1>Manual WebRTC Signaling</h1>
-            {/* <button onClick={startLocalStream}>Start Local Stream</button> */}
+            <div className="ManualRTC">
+                <button onClick={acceptCall}>Create Call</button>
+                <button onClick={initiateCall}>Join Call</button>
+                <button onClick={stopCall} disabled={!isCallActive}>
+                    Stop Call
+                </button>
 
-            <div>
-                <video ref={localVideoRef} autoPlay playsInline muted></video>
-                <video ref={remoteVideoRef} autoPlay playsInline></video>
-            </div>
-{/* 
+                <h1>Manual WebRTC Signaling</h1>
+                {/* <button onClick={startLocalStream}>Start Local Stream</button> */}
+
+                <div>
+                    <video ref={localVideoRef} autoPlay playsInline muted></video>
+                    <video ref={remoteVideoRef} autoPlay playsInline></video>
+                </div>
+                {/* 
             <div>
                 <button onClick={createOffer}>Create Offer</button>
                 <button onClick={createAnswer}>Create Answer</button>
                 <button onClick={() => handleRemoteDescription()}>Set Remote Description</button>
                 <button onClick={addIceCandidate}>Add ICE Candidate</button>
             </div> */}
-{/* 
+                {/* 
             <div>
                 <h3>Local Description (Offer/Answer)</h3>
                 <textarea value={localDescription} readOnly rows={5}></textarea>
@@ -271,7 +274,8 @@ function ManualRTC() {
                 ></textarea>
                 <button onClick={() => copyToClipboard(localIceCandidates.join('\n'))}>Copy to Clipboard</button>
             </div> */}
-        </div>
+            </div>
+        </Container>
     );
 }
 

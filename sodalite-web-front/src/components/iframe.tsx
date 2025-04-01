@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Container } from './container';
 
 interface IframeProps {
   initialLink: string;
@@ -23,6 +24,7 @@ const Iframe: React.FC<IframeProps> = ({ initialLink, name }) => {
   };
 
   return (
+    <Container maxWidth={1200} maxHeight={1200}>
     <div style={styles.container}>
       <div style={styles.controls}>
         <input
@@ -43,6 +45,7 @@ const Iframe: React.FC<IframeProps> = ({ initialLink, name }) => {
       </iframe>
 
     </div>
+    </Container>
   );
 };
 

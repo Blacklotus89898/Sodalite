@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { Container } from "./container";
 
 const WebcamStream: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null); // Reference to the video element
@@ -104,7 +105,7 @@ const WebcamStream: React.FC = () => {
     };
 
     return (
-        <div>
+        <Container maxWidth={1200} maxHeight={1200}>
             <h1>Webcam Stream</h1>
             
             {/* Webcam Video */}
@@ -203,7 +204,7 @@ const WebcamStream: React.FC = () => {
                     </video>
                 </div>
             )}
-        </div>
+        </Container>
     );
 };
 
