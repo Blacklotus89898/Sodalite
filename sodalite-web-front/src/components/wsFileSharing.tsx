@@ -62,23 +62,22 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
   // Handle binary data received from WebSocket
   const handleBinaryData = async (blob: Blob) => {
     try {
-      const arrayBuffer = await blob.arrayBuffer();
-      const fileType = blob.type || "application/pdf";
-      const fileURL = URL.createObjectURL(new Blob([arrayBuffer], { type: fileType }));
+      const fileType = blob.type || "application/octet-stream";
+      const fileURL = URL.createObjectURL(blob);
 
-      setSharedFile({
+      const sharedFileData: SharedFile = {
         name: determineFileName(fileType),
         type: fileType,
         content: fileURL,
-      });
+      };
 
-      setStatus("Received file");
-
-      // If it's a text file, read and set content
       if (fileType.includes("text")) {
-        const text = await blob.text();
-        setTextContent(text);
+        sharedFileData.content = await blob.text();
+        setTextContent(sharedFileData.content as string);
       }
+
+      setSharedFile(sharedFileData);
+      setStatus("Received file");
     } catch (error) {
       console.error("Error processing binary data:", error);
       setStatus("Error processing binary data");
@@ -155,6 +154,7 @@ const FileShare: React.FC<FileShareProps> = ({ websocketUrl }) => {
 
     reader.onload = () => {
       const fileData = reader.result;
+      // array buffer better for encryption compared to blob or base64
       if (fileData instanceof ArrayBuffer) {
         socket.send(fileData);
         setStatus(`File "${file.name}" sent successfully`);

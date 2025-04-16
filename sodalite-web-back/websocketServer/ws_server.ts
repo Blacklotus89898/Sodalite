@@ -26,7 +26,8 @@ const logger: Logger = (message) => {
 server.on('connection', (ws: WebSocket) => {
     logger('Client connected');
 
-    ws.on('message', (message) => {
+    // can use the isBinary flag to handle files
+    ws.on('message', (message, isBinary) => {
         if (message instanceof Buffer) {
             logger("Received a binary file, forwarding to group...");
 
