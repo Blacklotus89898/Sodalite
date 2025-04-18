@@ -6,7 +6,7 @@ This project aims to provide an interactive dashboard for students to collaborat
 
 You can access the web application at the following link: [Sodalite Web App](https://blacklotus89898.github.io/Sodalite/)
 
-## Features
+## Features Goals
 
 - Collaborative dashboard
 - Real-time updates
@@ -15,6 +15,8 @@ You can access the web application at the following link: [Sodalite Web App](htt
 - Camera access to take pictures
 - Video saving
 - AI agent
+- Notificaiton Center
+- Log manager
 
 ## Running in Development
 
