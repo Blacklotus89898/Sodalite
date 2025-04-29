@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sodalite_flutter/app_prefs.dart';
+import 'package:sodalite_flutter/http.dart';
 import 'package:sodalite_flutter/styled_body_text.dart';
+import 'package:sodalite_flutter/websocket.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key, required this.title});
@@ -39,6 +41,14 @@ class MyHomePage extends StatelessWidget {
           // mainAxisAlignment: MainAxisAlignment.center, // Center on axis y
           crossAxisAlignment: CrossAxisAlignment.stretch, // Center on axis y
           children: [
+            Container(
+              height: 450,
+              child: WebSocketChatWidget(),
+            ),
+            Container(
+              height: 250,
+              child: HttpRequestWidget(),
+            ),
             Container(
               color: Colors.red,
               child: StyledBodyText(text: "Text"),
