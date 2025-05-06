@@ -4,6 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const cors = require("cors");
 
+// graphic design
+const { graphqlHTTP } = require("express-graphql");
+const { buildSchema } = require("graphql");
+
 const app = express();
 const port = 8081;
 const logFilePath = path.join(__dirname, "server.log");
@@ -36,9 +40,31 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// GraphQL schema
+const schema = buildSchema(`
+    type Query {
+      hello: String
+      message: String
+    }
+  `);
+
+// GraphQL root resolver
+const root = {
+hello: () => "Hello, GraphQL!",
+message: () => "Message resource, GraphQL!",
+};
+
+
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
+
+app.use("/graphql", graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true,
+  }));
 
 // File upload route
 app.post("/upload", upload.single("file"), (req, res) => {
