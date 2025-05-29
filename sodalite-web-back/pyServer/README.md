@@ -20,4 +20,13 @@ pip install -r requirements.txt
 
 # Deactivate the virtual environment
 deactivate
+
+# YOLO model 
+yolo export model=yolo11s.pt format=engine device=0
+
+python .\server2.py # yolo
+
+python .\server3.py #tensorRT
+
+
 ```
