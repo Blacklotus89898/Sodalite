@@ -22,6 +22,7 @@ const logger = (message) => {
     fs.appendFileSync(logFilePath, logMessage, "utf8");
 };
 
+// ### Local file interface 
 // Ensure uploads directory exists
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -40,31 +41,56 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// In-memory message store
+const messages = [];
+
 // GraphQL schema
 const schema = buildSchema(`
-    type Query {
-      hello: String
-      message: String
-    }
-  `);
+  type Message {
+    id: ID!
+    content: String!
+  }
 
-// GraphQL root resolver
-const root = {
-hello: () => "Hello, GraphQL!",
-message: () => "Message resource, GraphQL!",
+  type Query {
+    hello: String!
+    message: String!
+    allMessages: [Message!]!
+  }
+
+  type Mutation {
+    addMessage(content: String!): Message!
+    clearMessages: Boolean!
+  }
+`);
+
+// Resolvers
+const resolvers = {
+  hello: () => "👋 Hello, GraphQL!",
+  message: () => "📨 This is a GraphQL message endpoint!",
+  allMessages: () => messages,
+  addMessage: ({ content }) => {
+    const newMessage = { id: String(messages.length + 1), content };
+    messages.push(newMessage);
+    return newMessage;
+  },
+  clearMessages: () => {
+    messages.length = 0;
+    return true;
+  },
 };
 
 
-
+// Setup Express middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
+// GraphQL endpoint
 app.use("/graphql", graphqlHTTP({
-    schema: schema,
-    rootValue: root,
-    graphiql: true,
-  }));
+  schema,
+  rootValue: resolvers,
+  graphiql: true,
+}));
 
 // File upload route
 app.post("/upload", upload.single("file"), (req, res) => {
