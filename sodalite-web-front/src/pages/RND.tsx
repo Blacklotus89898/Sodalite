@@ -16,6 +16,7 @@ import { CanvaShare } from "../components/canvaShare";
 import Notebook from "../components/notebook";
 import CodeEditor from "../components/codeEditor";
 import PersistentLayout from "../components/persistentLayout";
+import Gps from "../components/gps";
 
 // Define the type for the props
 interface RNDProps {
@@ -30,6 +31,7 @@ const RND: React.FC<RNDProps> = ({ title,  }) => {
     return (
         <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
             <h1>{title || "RND"}</h1>
+                <Gps initialPosition={[51.505, -0.09]} zoom={13} />
                 <VideoChat/>
                 <PersistentLayout/>
                 <Streak />
